@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>AI Admin</title>
+	<th:block th:replace="fragments/include:: include"/>
+</head>
+<body>
+	<div id="wrap" class="main">
+		<th:block th:replace="fragments/header:: header"></th:block>
+		<div class="dim"></div>
+		<div class="container">
+			<div class="inner">
+				<h1 class="page-tit">공지사항</h1>
+
+				<div class="search-box-wrap">
+					<div class="search-box">
+						<div class="box">
+							<span>검색 조건</span>
+							<div class="select-wrap">
+								<select class="select-box">
+									<option value="">전체</option>
+									<option value="">제목</option>
+									<option value="">내용</option>
+								</select>
+							</div>
+							<div class="btn-wrap">
+								<button class="btn-green">검색</button>
+								<button class="btn-gray">초기화</button>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="table-wrap">
+					<div class="tab-top">
+						<span class="total">총 <em>0개</em></span>
+						<div class="btn-wrap">
+							<a class="btn-green w180" href="javascript:;">글쓰기</a>
+						</div>
+					</div>
+
+					<table class="tbl-list">
+						<caption></caption>
+						<colgroup>
+							<col width="8%">
+							<col width="*">
+							<col width="15%">
+							<col width="15%">
+						</colgroup>
+						<thead>
+							<tr>
+								<th>NO</th>
+								<th>제목</th>
+								<th>작성자</th>
+								<th>작성일</th>
+							</tr>
+						</thead>
+						<tbody class="scroll-inner">
+							<tr>
+								<td colspan="4">검색결과가 없습니다.</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="paging-wrap">
+					<a href="javascript:;" class="first"></a>
+					<a href="javascript:;" class="prev"></a>
+					<a href="javascript:;" class="page active"><span>1</span></a>
+					<a href="javascript:;" class="page"><span>2</span></a>
+					<a href="javascript:;" class="page"><span>3</span></a>
+					<a href="javascript:;" class="page"><span>4</span></a>
+					<a href="javascript:;" class="next"></a>
+					<a href="javascript:;" class="last"></a>
+				</div>
+
+
+
+			</div>
+		</div>
+
+	</div>
+	<script>
+		$(function () {
+			var dateFormat = "yy.mm.dd",
+				from = $("#from")
+				.datepicker({
+					defaultDate: "+1d",
+					changeMonth: true,
+					numberOfMonths: 1,
+					dateFormat: 'yy.mm.dd'
+				})
+				.on("change", function () {
+					to.datepicker("option", "minDate", getDate(this));
+				}),
+				to = $("#to").datepicker({
+					defaultDate: "+1d",
+					changeMonth: true,
+					numberOfMonths: 1,
+					dateFormat: 'yy.mm.dd'
+				})
+				.on("change", function () {
+					from.datepicker("option", "maxDate", getDate(this));
+				});
+
+			function getDate(element) {
+				var date;
+				try {
+					date = $.datepicker.parseDate(dateFormat, element.value);
+				} catch (error) {
+					date = null;
+				}
+
+				return date;
+			}
+		});
+	</script>
+</body>
+
+</html>

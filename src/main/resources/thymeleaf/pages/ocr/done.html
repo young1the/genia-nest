@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>OCR 변환 관리</title>
+	<th:block th:replace="fragments/include:: include"/>
+</head>
+<body>
+<div id="wrap">
+	<th:block th:replace="fragments/header:: header"/>
+	<div class="container">
+			<div class="inner">
+				<div class="index-tit">OCR 변환 관리 > OCR 변환</div>
+				<h1 class="page-tit">OCR 변환</h1>
+				<div class="tab-wrap">
+					<ul class="tab-menu-type01">
+						<li class="ui-tab-btn">
+							<a href="/ocr">작업 중</a>
+						</li>
+						<li class="ui-tab-btn active">
+							<a href="javascript:;">작업 완료</a>
+						</li>
+					</ul>
+					<div class="contents">
+						sub02_list_01.html
+					</div>
+					<div class="contents on">
+						<div class="cnt-txt">
+							* 업로드한 PDF 교재로 OCR 변환 작업을 진행합니다.
+						</div>
+						<div class="search-box-wrap">
+							<div class="search-box">
+								<div class="box">
+									<span>검색 조건</span>
+									<div class="select-wrap">
+										<select class="select-box">
+											<option value="">구분</option>
+											<option value="">구분1</option>
+											<option value="">구분2</option>
+										</select>
+									</div>
+									<div class="select-wrap">
+										<select class="select-box">
+											<option value="">출판사</option>
+											<option value="">출판사1</option>
+											<option value="">출판사2</option>
+										</select>
+									</div>
+									<div class="select-wrap">
+										<select class="select-box" disabled>
+											<option value="">시리즈</option>
+											<option value="">시리즈1</option>
+											<option value="">시리즈2</option>
+										</select>
+									</div>
+									<div class="select-wrap">
+										<select class="select-box">
+											<option value="">년도</option>
+											<option value="">2023</option>
+											<option value="">2022</option>
+										</select>
+									</div>
+									<div class="select-wrap">
+										<select class="select-box">
+											<option value="">전체</option>
+											<option value="">츨처ID</option>
+											<option value="">교재명</option>
+											<option value="">상세분류명</option>
+											<option value="">등록자</option>
+										</select>
+									</div>
+									<input type="text" placeholder="검색어" class="search-form">
+								</div>
+								<div class="btn-wrap">
+									<button class="btn-green">검색</button>
+									<button class="btn-gray">초기화</button>
+									<button class="btn-toggle"></button>
+								</div>
+							</div>
+							<div class="toggle-box">
+								<div class="search-box">
+									<div class="box">
+										<span>교육과정</span>
+										<div class="radio-wrap">
+											<input type="radio" id="radio01_01" name="radio01" checked="">
+											<label for="radio01_01">전체</label>
+											<input type="radio" id="radio01_02" name="radio01">
+											<label for="radio01_02">초등</label>
+											<input type="radio" id="radio01_03" name="radio01">
+											<label for="radio01_03">중등</label>
+											<input type="radio" id="radio01_04" name="radio01">
+											<label for="radio01_04">고등</label>
+										</div>
+									</div>
+								</div>
+								<div class="search-box">
+									<div class="box">
+										<span>학년</span>
+										<!--상단 조건 선택 전-->
+										<!-- <div class="box-txt">학교급을 선택해주세요.</div> -->
+										<!--상단 조건 선택 후-->
+										<div class="check-wrap">
+											<input type="checkbox" id="grade00" name="gradeCode">
+											<label for="grade00">전체</label>
+											<input type="checkbox" id="grade01" name="gradeCode">
+											<label for="grade01">중1</label>
+											<input type="checkbox" id="grade02" name="gradeCode">
+											<label for="grade02">중2</label>
+											<input type="checkbox" id="grade03" name="gradeCode">
+											<label for="grade03">중3</label>
+										</div>
+									</div>
+								</div>
+								<div class="search-box">
+									<div class="box">
+										<span>학기</span>
+										<div class="radio-wrap">
+											<input type="radio" id="radio02_01" name="radio02" checked="">
+											<label for="radio02_01">전체</label>
+											<input type="radio" id="radio02_02" name="radio02">
+											<label for="radio02_02">공통</label>
+											<input type="radio" id="radio02_03" name="radio02">
+											<label for="radio02_03">1학기</label>
+											<input type="radio" id="radio02_04" name="radio02">
+											<label for="radio02_04">2학기</label>
+										</div>
+									</div>
+								</div>
+								<div class="search-box">
+									<div class="box">
+										<span>영역</span>
+										<div class="select-wrap">
+											<select class="select-box">
+												<option value="">선택</option>
+												<option value="">선택1</option>
+												<option value="">선택2</option>
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="table-wrap">
+							<div class="tab-top">
+								<div class="left-area">
+									<span class="total">총 <em>000</em>건</span>
+									<div class="select-wrap">
+										<select class="select-box w140">
+											<option value="">10개 보기</option>
+											<option value="">30개 보기</option>
+											<option value="">50개 보기</option>
+											<option value="">100개 보기</option>
+										</select>
+									</div>
+								</div>
+								<div class="btn-wrap">
+									<a class="btn-gray w120" href="javascript:;">엑셀 다운로드</a>
+									<a class="btn-green w200" href="javascript:;">문항 통합 플랫폼으로 보내기</a>
+								</div>
+							</div>
+							<table class="tbl-list">
+								<caption></caption>
+								<colgroup>
+									<col style="width: 3%;">
+									<col style="width: 4%;">
+									<col style="width: 6%;">
+									<col style="width: 6%;">
+									<col style="width: 8%;">
+									<col style="width: 5%;">
+									<col style="width: 5%;">
+									<col style="width: 5%;">
+									<col style="width: 5%;">
+									<col style="width: 12%;">
+									<col style="width: 15%;">
+									<col style="width: 6%;">
+									<col style="width: 6%;">
+									<col style="width: 6%;">
+									<col style="width: 8%;">
+								</colgroup>
+								<thead>
+									<tr>
+										<th>
+											<div class="check-wrap">
+												<input type="checkbox" id="chk100_00" name="numChk" class="allCheck">
+												<label for="chk100_00"></label>
+											</div>
+										</th>
+										<th>번호</th>
+										<th>츨처 ID</th>
+										<th>구분</th>
+										<th>시리즈</th>
+										<th>년도</th>
+										<th>학교급</th>
+										<th>학년</th>
+										<th>영역</th>
+										<th>교재명</th>
+										<th>상세 분류명</th>
+										<th>총<br>문제 수</th>
+										<th>전송<br>여부</th>
+										<th>작업자</th>
+										<th>등록일</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>
+											<div class="check-wrap"><input type="checkbox" id="chk100_30" name="numChk">
+												<label for="chk100_30"></label></div>
+										</td>
+										<td>30</td>
+										<td>0000</td>
+										<td>교재</td>
+										<td>체크체크</td>
+										<td>2022</td>
+										<td>초등</td>
+										<td>초2</td>
+										<td>수학</td>
+										<td class="tit">체크체크 2-1</td>
+										<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
+										<td>10</td>
+										<!-- S 230918 tooltip-area 추가 -->
+										<td>
+											<div class="tooltip-area">
+												<span>실패</span>
+												<div class="tooltip-wrap">
+													<button type="button" class="btn-tip"></button>
+													<div class="tooltip">
+														<span>엑셀 형식에 오류가 있어 <br>전송 실패하였습니다.</span>
+													</div>
+												</div>
+											</div>
+										</td>
+										<!-- E 230918 tooltip-area 추가 -->
+										<td>홍길동</td>
+										<td>YYYY.MM.DD</td>
+									</tr>
+									<tr>
+										<td>
+											<div class="check-wrap"><input type="checkbox" id="chk100_29" name="numChk">
+												<label for="chk100_29"></label></div>
+										</td>
+										<td>29</td>
+										<td>0000</td>
+										<td>교재</td>
+										<td>체크체크</td>
+										<td>2022</td>
+										<td>초등</td>
+										<td>초2</td>
+										<td>수학</td>
+										<td class="tit">체크체크 2-1</td>
+										<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
+										<td>10</td>
+										<td>X</td>
+										<td>홍길동</td>
+										<td>YYYY.MM.DD</td>
+									</tr>
+									<tr>
+										<td>
+											<div class="check-wrap"><input type="checkbox" id="chk100_28" name="numChk">
+												<label for="chk100_28"></label></div>
+										</td>
+										<td>28</td>
+										<td>0000</td>
+										<td>교재</td>
+										<td>체크체크</td>
+										<td>2022</td>
+										<td>초등</td>
+										<td>초2</td>
+										<td>수학</td>
+										<td class="tit">체크체크 2-1</td>
+										<td>-</td>
+										<td>10</td>
+										<td>X</td>
+										<td>홍길동</td>
+										<td>YYYY.MM.DD</td>
+									</tr>
+									<tr>
+										<td>
+											<div class="check-wrap"><input type="checkbox" id="chk100_27" name="numChk">
+												<label for="chk100_27"></label></div>
+										</td>
+										<td>27</td>
+										<td>0000</td>
+										<td>교재</td>
+										<td>체크체크</td>
+										<td>2022</td>
+										<td>초등</td>
+										<td>초2</td>
+										<td>수학</td>
+										<td class="tit">체크체크 2-1</td>
+										<td>-</a></td>
+										<td>10</td>
+										<td>X</td>
+										<td>홍길동</td>
+										<td>YYYY.MM.DD</td>
+									</tr>
+									<tr>
+										<td>
+											<div class="check-wrap"><input type="checkbox" id="chk100_26" name="numChk">
+												<label for="chk100_26"></label></div>
+										</td>
+										<td>26</td>
+										<td>0000</td>
+										<td>교재</td>
+										<td>체크체크</td>
+										<td>2022</td>
+										<td>초등</td>
+										<td>초2</td>
+										<td>수학</td>
+										<td class="tit">체크체크 2-1</td>
+										<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
+										<td>10</td>
+										<!-- S 230918 tooltip-area 추가 -->
+										<td>
+											<div class="tooltip-area">
+												<span>실패</span>
+												<div class="tooltip-wrap">
+													<button type="button" class="btn-tip"></button>
+													<div class="tooltip">
+														<span>엑셀 형식에 오류가 있어 <br>전송 실패하였습니다.</span>
+													</div>
+												</div>
+											</div>
+										</td>
+										<!-- E 230918 tooltip-area 추가 -->
+										<td>홍길동</td>
+										<td>YYYY.MM.DD</td>
+									</tr>
+									<tr>
+										<td>
+											<div class="check-wrap"><input type="checkbox" id="chk100_25" name="numChk">
+												<label for="chk100_25"></label></div>
+										</td>
+										<td>25</td>
+										<td>0000</td>
+										<td>교재</td>
+										<td>체크체크</td>
+										<td>2022</td>
+										<td>초등</td>
+										<td>초2</td>
+										<td>수학</td>
+										<td class="tit">체크체크 2-1</td>
+										<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
+										<td>10</td>
+										<td>O</td>
+										<td>홍길동</td>
+										<td>YYYY.MM.DD</td>
+									</tr>
+									<tr>
+										<td>
+											<div class="check-wrap"><input type="checkbox" id="chk100_24" name="numChk">
+												<label for="chk100_24"></label></div>
+										</td>
+										<td>24</td>
+										<td>0000</td>
+										<td>교재</td>
+										<td>체크체크</td>
+										<td>2022</td>
+										<td>초등</td>
+										<td>초2</td>
+										<td>수학</td>
+										<td class="tit">체크체크 2-1</td>
+										<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
+										<td>10</td>
+										<td>O</td>
+										<td>홍길동</td>
+										<td>YYYY.MM.DD</td>
+									</tr>
+									<tr>
+										<td>
+											<div class="check-wrap"><input type="checkbox" id="chk100_23" name="numChk">
+												<label for="chk100_23"></label></div>
+										</td>
+										<td>23</td>
+										<td>0000</td>
+										<td>교재</td>
+										<td>체크체크</td>
+										<td>2022</td>
+										<td>초등</td>
+										<td>초2</td>
+										<td>수학</td>
+										<td class="tit">체크체크 2-1</td>
+										<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
+										<td>10</td>
+										<td>X</td>
+										<td>홍길동</td>
+										<td>YYYY.MM.DD</td>
+									</tr>
+									<tr>
+										<td>
+											<div class="check-wrap"><input type="checkbox" id="chk100_22" name="numChk">
+												<label for="chk100_22"></label></div>
+										</td>
+										<td>22</td>
+										<td>0000</td>
+										<td>교재</td>
+										<td>체크체크</td>
+										<td>2022</td>
+										<td>초등</td>
+										<td>초2</td>
+										<td>수학</td>
+										<td class="tit">체크체크 2-1</td>
+										<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
+										<td>10</td>
+										<td>O</td>
+										<td>홍길동</td>
+										<td>YYYY.MM.DD</td>
+									</tr>
+									<tr>
+										<td>
+											<div class="check-wrap"><input type="checkbox" id="chk100_21" name="numChk">
+												<label for="chk100_21"></label></div>
+										</td>
+										<td>21</td>
+										<td>0000</td>
+										<td>교재</td>
+										<td>체크체크</td>
+										<td>2022</td>
+										<td>초등</td>
+										<td>초2</td>
+										<td>수학</td>
+										<td class="tit">체크체크 2-1</td>
+										<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
+										<td>10</td>
+										<td>X</td>
+										<td>홍길동</td>
+										<td>YYYY.MM.DD</td>
+									</tr>
+									<tr>
+										<td>
+											<div class="check-wrap"><input type="checkbox" id="chk100_20" name="numChk">
+												<label for="chk100_20"></label></div>
+										</td>
+										<td>20</td>
+										<td>0000</td>
+										<td>교재</td>
+										<td>체크체크</td>
+										<td>2022</td>
+										<td>초등</td>
+										<td>초2</td>
+										<td>수학</td>
+										<td class="tit">체크체크 2-1</td>
+										<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
+										<td>10</td>
+										<td>O</td>
+										<td>홍길동</td>
+										<td>YYYY.MM.DD</td>
+									</tr>
+									<tr>
+										<td>
+											<div class="check-wrap"><input type="checkbox" id="chk100_19" name="numChk">
+												<label for="chk100_19"></label></div>
+										</td>
+										<td>19</td>
+										<td>0000</td>
+										<td>교재</td>
+										<td>체크체크</td>
+										<td>2022</td>
+										<td>초등</td>
+										<td>초2</td>
+										<td>수학</td>
+										<td class="tit">체크체크 2-1</td>
+										<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
+										<td>10</td>
+										<td>O</td>
+										<td>홍길동</td>
+										<td>YYYY.MM.DD</td>
+									</tr>
+									<tr>
+										<td>
+											<div class="check-wrap"><input type="checkbox" id="chk100_18" name="numChk">
+												<label for="chk100_18"></label></div>
+										</td>
+										<td>18</td>
+										<td>0000</td>
+										<td>교재</td>
+										<td>체크체크</td>
+										<td>2022</td>
+										<td>초등</td>
+										<td>초2</td>
+										<td>수학</td>
+										<td class="tit">체크체크 2-1</td>
+										<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
+										<td>10</td>
+										<td>X</td>
+										<td>홍길동</td>
+										<td>YYYY.MM.DD</td>
+									</tr>
+									<tr>
+										<td>
+											<div class="check-wrap"><input type="checkbox" id="chk100_17" name="numChk">
+												<label for="chk100_17"></label></div>
+										</td>
+										<td>17</td>
+										<td>0000</td>
+										<td>교재</td>
+										<td>체크체크</td>
+										<td>2022</td>
+										<td>초등</td>
+										<td>초2</td>
+										<td>수학</td>
+										<td class="tit">체크체크 2-1</td>
+										<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
+										<td>10</td>
+										<td>X</td>
+										<td>홍길동</td>
+										<td>YYYY.MM.DD</td>
+									</tr>
+									<tr>
+										<td>
+											<div class="check-wrap"><input type="checkbox" id="chk100_16" name="numChk">
+												<label for="chk100_16"></label></div>
+										</td>
+										<td>16</td>
+										<td>0000</td>
+										<td>교재</td>
+										<td>체크체크</td>
+										<td>2022</td>
+										<td>초등</td>
+										<td>초2</td>
+										<td>수학</td>
+										<td class="tit">체크체크 2-1</td>
+										<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
+										<td>10</td>
+										<td>X</td>
+										<td>홍길동</td>
+										<td>YYYY.MM.DD</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="paging-wrap">
+							<a href="javascript:;" class="first"></a>
+							<a href="javascript:;" class="prev"></a>
+							<a href="javascript:;" class="page active"><span>1</span></a>
+							<a href="javascript:;" class="page"><span>2</span></a>
+							<a href="javascript:;" class="page"><span>3</span></a>
+							<a href="javascript:;" class="page"><span>4</span></a>
+							<a href="javascript:;" class="next"></a>
+							<a href="javascript:;" class="last"></a>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+	</div>
+	<script>
+	</script>
+</body>
+
+</html>
