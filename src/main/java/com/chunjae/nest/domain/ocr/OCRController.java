@@ -16,4 +16,9 @@ public class OCRController {
     public String done() {
         return "pages/ocr/done";
     }
+
+    @GetMapping("/transform")
+    public String transform() {
+        return "forward:/react/ocr.html";
+    }
 }

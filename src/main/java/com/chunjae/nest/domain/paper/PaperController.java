@@ -11,4 +11,9 @@ public class PaperController {
     public String index() {
         return "pages/paper/index";
     }
+
+    @GetMapping("/upload")
+    public String upload() {
+        return "forward:/react/paper.html";
+    }
 }
