@@ -1,1 +1,0 @@
-import{r,j as t,c,R as o}from"./client-18074b33.js";function i(){const[e,n]=r.useState(0);return t.jsxs("main",{children:[t.jsx("h1",{children:"OCR 변환 페이지"}),t.jsx("div",{children:t.jsxs("button",{onClick:()=>n(s=>s+1),children:["count is ",e]})})]})}c.createRoot(document.getElementById("root")).render(t.jsx(o.StrictMode,{children:t.jsx(i,{})}));

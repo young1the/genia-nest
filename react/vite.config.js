@@ -12,7 +12,5 @@ export default defineConfig({
         paper: resolve(__dirname, 'paper.html'),
       },
     },
-    outDir: "../src/main/resources/static/react",
-    emptyOutDir: true,
   },
 })

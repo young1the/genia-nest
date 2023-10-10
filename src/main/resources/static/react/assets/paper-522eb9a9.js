@@ -1,1 +1,0 @@
-import{r as s,j as t,c,R as o}from"./client-18074b33.js";function i(){const[e,n]=s.useState(0);return t.jsxs("main",{children:[t.jsx("h1",{children:"시험지 업로드 페이지"}),t.jsx("div",{children:t.jsxs("button",{onClick:()=>n(r=>r+1),children:["count is ",e]})})]})}c.createRoot(document.getElementById("root")).render(t.jsx(o.StrictMode,{children:t.jsx(i,{})}));
