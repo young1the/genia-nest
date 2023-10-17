@@ -1,4 +1,4 @@
-package com.chunjae.nest.domain.paper;
+package com.chunjae.nest.domain.paper.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

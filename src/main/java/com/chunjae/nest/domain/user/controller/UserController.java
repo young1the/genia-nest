@@ -1,4 +1,4 @@
-package com.chunjae.nest.domain.user;
+package com.chunjae.nest.domain.user.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
