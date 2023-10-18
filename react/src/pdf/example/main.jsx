@@ -2,11 +2,11 @@ import React, {useState} from "react";
 import ReactDOM from 'react-dom/client'
 import usePDFDocument from "../viewer/usePDFDocument";
 import PDFCanvas from "../viewer/PDFCanvas";
+import PDFLoader from "../viewer/PDFLoader.jsx";
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-        <PDFExampleApp/>
+    <PDFExampleApp/>
 )
-
 
 const PDFFILE_EXAMPLE_INITIAL_STATE = {
     data: undefined,
@@ -15,30 +15,29 @@ const PDFFILE_EXAMPLE_INITIAL_STATE = {
 }
 
 function PDFExampleApp() {
-    const [pdfFile, setPDFFile] = useState(PDFFILE_EXAMPLE_INITIAL_STATE);
+    const [pdfFiles, setPDFFiles] = useState([PDFFILE_EXAMPLE_INITIAL_STATE]);
     const onChangeHandler = async (e) => {
         const file = e.target.files[0];
         const arrayBuffer = await file.arrayBuffer();
-        setPDFFile({data: arrayBuffer, name: file.name});
+        setPDFFiles((prev) => [...prev, {data: arrayBuffer, name: file.name}]);
+    }
+    const deleteHandler = (deleteIdx) => {
+        setPDFFiles(prev => prev.filter((_, idx) => idx !== deleteIdx))
     }
     return (
         <>
-            {pdfFile.name ? <PDFLoader pdfFile={pdfFile}/> : null}
-            <input type="file" onChange={onChangeHandler}/>
+            <div>
+                <ul>
+                    {pdfFiles.map((ele, idx) => <li key={ele.name} onClick={() => {
+                        deleteHandler(idx);
+                    }}>{ele.name}</li>)}
+                </ul>
+            </div>
+            <div style={{display:"grid", gridTemplateColumns:"1fr 1fr 1fr"}}>
+            {pdfFiles.length > 0 ?
+                pdfFiles.map((ele) => <PDFLoader key={ele.name} pdfFile={ele}/>) : null}
+            </div>
+            <input type="file" multiple={true} onChange={onChangeHandler}/>
         </>
     );
-}
-
-function PDFLoader ({pdfFile}) {
-    const {pdfDoc, pdfPages, loading} = usePDFDocument(pdfFile);
-
-    return (
-        <div>
-            {
-                pdfPages ? pdfPages.map((page, idx) => {
-                    return <PDFCanvas key={`pdf-${name}-${idx}`} pdfPage={page}/>
-                }) : null
-            }
-        </div>
-    )
 }
