@@ -1,37 +1,70 @@
-import React, { useState } from "react";
+import React from "react";
 import ReactDOM from "react-dom/client";
-import usePDFDocument from "../viewer/usePDFDocument";
-import PDFCanvas from "../viewer/PDFCanvas";
-import PDFLoader from "../viewer/PDFLoader.jsx";
-import usePDFViewer from "../hook/usePDFViewer";
+import PDFCanvas from "../components/PDFCanvas";
+import usePDFViewer from "../hooks/usePDFViewer";
+import {closestCenter, DndContext } from "@dnd-kit/core";
+import {arrayMove, rectSortingStrategy, SortableContext} from "@dnd-kit/sortable";
+import SortableItem from "../components/SortableItem.jsx";
 
-ReactDOM.createRoot(document.getElementById("root")).render(<PDFExampleApp />);
-
-const PDFFILE_EXAMPLE_INITIAL_STATE = {
-  data: undefined,
-  url: "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/examples/learning/helloworld.pdf",
-  name: "hello world",
-};
+ReactDOM.createRoot(document.getElementById("root")).render(<PDFExampleApp/>);
 
 function PDFExampleApp() {
-  const { addPDF, getPDFPages } = usePDFViewer();
-  const onChangeHandler = async (e) => {
-    const file = e.target.files[0];
-    const arrayBuffer = await file.arrayBuffer();
-    addPDF({ data: arrayBuffer, name: file.name });
-  };
-  return (
-    <>
-      <div>
-        <ul></ul>
-        {getPDFPages().map((ele) => (
-          <PDFCanvas pdfPage={ele} />
-        ))}
-      </div>
-      <div
-        style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr" }}
-      ></div>
-      <input type="file" multiple={true} onChange={onChangeHandler} />
-    </>
-  );
+    const {addPDF, pages, setPages} = usePDFViewer();
+
+    const onChangeHandler = async (e) => {
+        const file = e.target.files[0];
+        const arrayBuffer = await file.arrayBuffer();
+        await addPDF({data: arrayBuffer, name: file.name});
+    };
+
+    const handleDragEnd = (event) => {
+        const {active, over} = event;
+        if (active.id !== over.id) {
+            let oldIndex;
+            let newIndex;
+            setPages((items) => {
+                for (let i = 0; i < pages.length; ++i) {
+                    const page = pages[i];
+                    oldIndex = page.id === active.id ? i : oldIndex;
+                    newIndex = page.id === over.id ? i : newIndex;
+                }
+                return arrayMove(items, oldIndex, newIndex);
+            });
+        }
+    };
+
+    const deleteHandler = (id) => {
+        setPages((pages)=>pages.filter(page=>page.id!==id));
+    }
+
+    return (
+        <>
+            <div>
+                <input type="file" multiple={true} onChange={onChangeHandler}/>
+            </div>
+            <DndContext
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+            >
+                <div style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    flexDirection: "row",
+                    maxWidth: "600px",
+                }}>
+                    <SortableContext items={pages} strategy={rectSortingStrategy}>
+                        <div style={{display: "flex", flexWrap: "wrap", maxWidth: "600px"}}>
+                            {pages?.map(({id, data}) => (
+                                <SortableItem key={id} id={id} remove={()=> {
+                                    deleteHandler(id)
+                                }}>
+                                    <PDFCanvas pdfPage={data}/>
+                                </SortableItem>
+                            ))}
+                        </div>
+                    </SortableContext>
+                </div>
+            </DndContext>
+        </>
+    );
 }
