@@ -3,15 +3,13 @@ package com.chunjae.nest.domain.user.entity;
 import com.chunjae.nest.common.BaseEntity;
 import com.chunjae.nest.domain.paper.entity.PaperAssignment;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -43,5 +41,6 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     private List<PaperAssignment> paperAssignments = new ArrayList<>();
+
 
 }

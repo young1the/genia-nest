@@ -1,10 +1,129 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>계정 상세 페이지</title>
+    <title>사용자 추가</title>
+    <th:block th:replace="~{fragments/include:: include}"/>
 </head>
+<style>
+    /* CSS 스타일 추가 */
+    .tbl-list {
+        width: 100%; /* 표 너비 100%로 조절 */
+    }
+</style>
 <body>
+<div id="wrap">
+    <th:block th:replace="~{fragments/header:: header}"/>
+    <div class="container">
+        <div class="inner">
+            <div class="index-tit">시스템 관리 > 계정 관리</div>
+            <h1 class="page-tit">사용자 관리</h1>
 
+            <div class="search-box-wrap">
+                <div class="search-box">
+                    <div class="box">
+                        <span>검색</span>
+                        <input type="text" placeholder="검색어" class="search-form">
+                    </div>
+                    <div class="btn-wrap">
+                        <button class="btn-green">검색</button>
+                        <button class="btn-gray">초기화</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <div class="tab-top">
+                    <div class="left-area">
+                        <span class="total">총 <em>00</em>명</span>
+                        <div class="select-wrap">
+                            <select class="select-box w140">
+                                <option value="">10개 보기</option>
+                                <option value="">30개 보기</option>
+                                <option value="">50개 보기</option>
+                                <option value="">100개 보기</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="btn-wrap">
+                        <a class="btn-gray w120" href="javascript:;">추가</a>
+                    </div>
+                </div>
+                <form action="/user/add" method="POST">
+                    <table class="tbl-list">
+                        <thead>
+                        <tr>
+                            <th>NO</th>
+                            <th>소속부서</th>
+                            <th>이름</th>
+                            <th>아이디</th>
+                            <th>사용기간</th>
+                            <th>비밀번호 초기화</th>
+                            <th>관리</th>
+                        </tr>
+                        </thead>
+                        <tr>
+                            <th id="auto-increment">1</th>
+                            <th> <input type="text" id="part" name="part"></th>
+                            <th> <input type="text" id="name" name="name"></th>
+                            <th> <input type="text" id="userId" name="userId"></th>
+                            <th style="DISPLAY: FLEX;">
+                                <input type="datetime-local" id="startDate" name="startDate" style="width: 140px;">
+                                ~
+                                <input type="datetime-local" id="endDate" name="endDate" style="width: 140px;">
+                            </th>
+
+
+                            <th>-</th>
+                            <th><a class="btn-gray w120" href="javascript:;">저장</a></th>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function createUser() {
+        var partValue = document.querySelector("input[name='part']").value;
+        var nameValue = document.querySelector("input[name='name']").value;
+        var userIdValue = document.querySelector("input[name='userId']").value;
+        var startDateValue = document.querySelector("input[name='startDate']").value;
+        var endDateValue = document.querySelector("input[name='endDate']").value;
+
+
+        var userDTO = {
+            part: partValue,
+            name: nameValue,
+            userId: userIdValue,
+            startDate: startDateValue,
+            endDate: endDateValue
+        };
+
+        // 서버로 데이터를 전송하고 결과에 따라 경고 메시지를 표시
+        const sendData = async () => {
+            const response = await fetch('/user/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userDTO)
+            });
+            const data = await response.json();
+            if (response.ok) {
+                alert("사용자 추가 성공");
+            } else {
+                alert("사용자 추가 실패");
+            }
+        }
+
+        sendData();
+
+        // "NO"를 1씩 증가시키는 부분
+        var autoIncrement = document.getElementById("auto-increment");
+        autoIncrement.textContent = (parseInt(autoIncrement.textContent) + 1).toString();
+    }
+</script>
 </body>
 </html>
