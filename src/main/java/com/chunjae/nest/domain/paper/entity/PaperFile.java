@@ -2,10 +2,7 @@ package com.chunjae.nest.domain.paper.entity;
 
 import com.chunjae.nest.common.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
 @AllArgsConstructor
@@ -25,4 +22,10 @@ public class PaperFile extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "paper_id")
     private Paper paper;
+
+    @Builder
+    public PaperFile(String name, String url) {
+        this.name = name;
+        this.url = url;
+    }
 }

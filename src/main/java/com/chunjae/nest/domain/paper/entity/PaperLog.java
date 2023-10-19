@@ -2,10 +2,7 @@ package com.chunjae.nest.domain.paper.entity;
 
 import com.chunjae.nest.common.BaseLogEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
 @AllArgsConstructor
@@ -20,4 +17,9 @@ public class PaperLog extends BaseLogEntity {
     @Column(length = 255, nullable = false)
     private String url;
 
+    @Builder
+    public PaperLog(String url, String userId) {
+        super.userId = userId;
+        this.url = url;
+    }
 }

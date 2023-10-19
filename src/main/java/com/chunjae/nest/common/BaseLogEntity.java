@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class BaseLogEntity {
 
     @Column(length = 50, nullable = false)
-    private String userId;
+    protected String userId;
 
     @CreatedDate
     @Column(updatable = false)

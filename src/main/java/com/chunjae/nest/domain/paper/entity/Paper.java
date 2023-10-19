@@ -1,12 +1,10 @@
 package com.chunjae.nest.domain.paper.entity;
 
 import com.chunjae.nest.common.BaseEntity;
+import com.chunjae.nest.domain.paper.dto.req.PaperRequest;
 import com.chunjae.nest.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,4 +58,19 @@ public class Paper extends BaseEntity {
 
     @OneToMany(mappedBy = "paper")
     private List<PaperFile> paperFiles = new ArrayList<>();
+
+    @Builder
+    public Paper(User user, short year, short month, short grade, String name, short totalCount, String category, String area, String subject, short ocrCount, PaperStatus paperStatus) {
+        this.user = user;
+        this.year = year;
+        this.month = month;
+        this.grade = grade;
+        this.name = name;
+        this.totalCount = totalCount;
+        this.category = category;
+        this.area = area;
+        this.subject = subject;
+        this.ocrCount = ocrCount;
+        this.paperStatus = paperStatus;
+    }
 }
