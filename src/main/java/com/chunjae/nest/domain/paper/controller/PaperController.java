@@ -1,14 +1,30 @@
 package com.chunjae.nest.domain.paper.controller;
 
+import com.chunjae.nest.domain.paper.dto.SearchPaperDTO;
+import com.chunjae.nest.domain.paper.entity.Paper;
+import com.chunjae.nest.domain.paper.service.PaperService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/paper")
 public class PaperController {
+
+    private final PaperService paperService;
+    @Autowired
+    public PaperController(PaperService paperService) {
+        this.paperService = paperService;
+    }
+
     @GetMapping("")
-    public String index() {
+    public String index(Model model, SearchPaperDTO searchPaperDTO) {
+        List<Paper> papers = paperService.findPapers(searchPaperDTO);
+        model.addAttribute("papers", papers);
         return "pages/paper/index";
     }
 
