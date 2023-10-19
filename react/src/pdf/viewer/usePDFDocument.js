@@ -10,8 +10,8 @@ const DOCUMENT_DEFAULT_CONFIG = {
     cMapPacked: true,
 }
 
-const usePDFDocument = (pdfFile) => {
-    let {current: pdfDoc} = useRef();
+const usePDFDocument = (pdfFiles) => {
+    let {current: pdfDocs} = useRef();
     const [loading, setLoading] = useState(true);
     const [pdfPages, setPdfPages] = useState([]);
     useEffect(() => {
@@ -19,7 +19,7 @@ const usePDFDocument = (pdfFile) => {
         setLoading(false);
     }, [pdfFile]);
     const loadPdf = async () => {
-        pdfDoc = await getPDFDocProxy();
+        pdfDocs = await getPDFDocProxy();
         const pdfPages = await getPDFPages(pdfDoc);
         setPdfPages(pdfPages);
     }
