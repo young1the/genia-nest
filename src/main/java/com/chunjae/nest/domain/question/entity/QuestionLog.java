@@ -23,5 +23,5 @@ public class QuestionLog extends BaseLogEntity {
     private String name;
 
     @Column(nullable = false)
-    private short num;
+    private int num;
 }

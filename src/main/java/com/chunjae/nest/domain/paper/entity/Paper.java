@@ -1,7 +1,6 @@
 package com.chunjae.nest.domain.paper.entity;
 
 import com.chunjae.nest.common.BaseEntity;
-import com.chunjae.nest.domain.paper.dto.req.PaperRequest;
 import com.chunjae.nest.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,19 +22,19 @@ public class Paper extends BaseEntity {
     private User user;
 
     @Column(nullable = false)
-    private short year;
+    private int year;
 
     @Column(nullable = false)
-    private short month;
+    private int month;
 
     @Column(nullable = false)
-    private short grade;
+    private int grade;
 
     @Column(nullable = false)
     private String name;
 
     @Column(nullable = false)
-    private short totalCount;
+    private int totalCount;
 
     @Column(length = 5, nullable = false)
     private String category;
@@ -47,7 +46,7 @@ public class Paper extends BaseEntity {
     private String subject;
 
     @Column(nullable = false)
-    private short ocrCount;
+    private int ocrCount;
 
     @Column(length = 10, nullable = false)
     @Enumerated(EnumType.STRING)
@@ -56,11 +55,11 @@ public class Paper extends BaseEntity {
     @OneToMany(mappedBy = "paper")
     private List<PaperAssignment> paperAssignments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "paper")
-    private List<PaperFile> paperFiles = new ArrayList<>();
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "paper")
+    private PaperFile paperFile;
 
     @Builder
-    public Paper(User user, short year, short month, short grade, String name, short totalCount, String category, String area, String subject, short ocrCount, PaperStatus paperStatus) {
+    public Paper(User user, int year, int month, int grade, String name, int totalCount, String category, String area, String subject, int ocrCount, PaperStatus paperStatus) {
         this.user = user;
         this.year = year;
         this.month = month;
@@ -73,4 +72,6 @@ public class Paper extends BaseEntity {
         this.ocrCount = ocrCount;
         this.paperStatus = paperStatus;
     }
+
+
 }

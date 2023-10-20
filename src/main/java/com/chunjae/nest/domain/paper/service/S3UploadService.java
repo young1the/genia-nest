@@ -1,6 +1,5 @@
 package com.chunjae.nest.domain.paper.service;
 
-import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +33,6 @@ public class S3UploadService {
         amazonS3.putObject(bucket, fileName, multipartFile.getInputStream(), metadata);
         return URLDecoder.decode(amazonS3.getUrl(bucket, fileName).toString(), "UTF-8");
     }
-
 
     public String setFileName(MultipartFile multipartFile) {
         return "static" + "/" + UUID.randomUUID() + "." + multipartFile.getOriginalFilename();

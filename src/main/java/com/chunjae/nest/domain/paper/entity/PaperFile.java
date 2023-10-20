@@ -19,13 +19,15 @@ public class PaperFile extends BaseEntity {
     @Column(length = 255, nullable = false)
     private String url;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "paper_id")
     private Paper paper;
 
+
     @Builder
-    public PaperFile(String name, String url) {
+    public PaperFile(String name, String url, Paper paper) {
         this.name = name;
         this.url = url;
+        this.paper = paper;
     }
 }

@@ -1,6 +1,7 @@
 package com.chunjae.nest.domain.paper.service;
 
 import com.chunjae.nest.domain.paper.dto.req.PaperRequest;
+import com.chunjae.nest.domain.paper.dto.res.PaperResponse;
 import com.chunjae.nest.domain.paper.entity.Paper;
 import com.chunjae.nest.domain.paper.entity.PaperFile;
 import com.chunjae.nest.domain.paper.entity.PaperLog;
@@ -44,7 +45,9 @@ public class PaperService {
 
             if (!url.equals("failed")) {
                 Paper paper = paperRequest.toEntity(paperRequest, user);
-                PaperFile paperFile = getPaperFile(fileName, url);
+
+
+                PaperFile paperFile = getPaperFile(fileName, url, paper);
                 PaperLog paperLog = getPaperLog(user, url);
 
                 paperRepository.save(paper);
@@ -57,26 +60,45 @@ public class PaperService {
         return "failed";
     }
 
+    @Transactional(readOnly = true)
+    public PaperResponse getPaperDetail(Long id) {
 
-    public PaperFile getPaperFile(String fileName, String url) {
-        PaperFile paperFile = PaperFile.builder()
+        Paper paper = paperRepository.findById(id).orElseThrow(() -> (
+                new IllegalArgumentException("시험지가 없습니다.")
+        ));
+
+        return PaperResponse.builder()
+                .year(paper.getYear())
+                .month(paper.getMonth())
+                .grade(paper.getGrade())
+                .name(paper.getName())
+                .totalCount(paper.getTotalCount())
+                .category(paper.getCategory())
+                .area(paper.getArea())
+                .subject(paper.getSubject())
+                .url(paper.getPaperFile().getUrl())
+                .build();
+    }
+
+    public PaperFile getPaperFile(String fileName, String url, Paper paper) {
+        return PaperFile.builder()
                 .name(fileName)
                 .url(url)
+                .paper(paper)
                 .build();
-        return paperFile;
     }
 
     public PaperLog getPaperLog(User user, String url) {
-        PaperLog paperLog = PaperLog.builder()
+        return PaperLog.builder()
                 .userId(user.getUserId())
                 .url(url)
                 .build();
-        return paperLog;
     }
-
 
     public boolean isAllowedFileType(MultipartFile multipartFile) {
         String fileName = multipartFile.getOriginalFilename();
         return fileName != null && fileName.toLowerCase().endsWith(".pdf");
     }
+
+
 }

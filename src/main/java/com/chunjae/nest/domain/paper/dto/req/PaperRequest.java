@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PaperRequest {
 
-    private short year;
-    private short month;
-    private short grade;
+    private int year;
+    private int month;
+    private int grade;
     private String name;
-    private short totalCount;
+    private int totalCount;
     private String category;
     private String area;
     private String subject;
@@ -31,7 +31,7 @@ public class PaperRequest {
                 .category(paperRequest.getCategory())
                 .area(paperRequest.getArea())
                 .subject(paperRequest.getSubject())
-                .ocrCount((short) 0)
+                .ocrCount(0)
                 .paperStatus(PaperStatus.TO_DO)
                 .build();
     }
