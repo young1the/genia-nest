@@ -1,70 +1,86 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import PDFCanvas from "../components/PDFCanvas";
-import usePDFViewer from "../hooks/usePDFViewer";
-import {closestCenter, DndContext } from "@dnd-kit/core";
-import {arrayMove, rectSortingStrategy, SortableContext} from "@dnd-kit/sortable";
+import usePDF from "../hooks/usePDF.js";
+import { closestCenter, DndContext } from "@dnd-kit/core";
+import { rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import SortableItem from "../components/SortableItem.jsx";
+import SortableItemContainer from "../components/SortableItemContainer.jsx";
 
-ReactDOM.createRoot(document.getElementById("root")).render(<PDFExampleApp/>);
+ReactDOM.createRoot(document.getElementById("root")).render(<PDFExampleApp />);
 
 function PDFExampleApp() {
-    const {addPDF, pages, setPages} = usePDFViewer();
+  const {
+    addPDF,
+    pages,
+    deletePDFPage,
+    movePDFPage,
+    generatePDFFile,
+    files,
+    deletePDFFile,
+    pdfFileUrl,
+  } = usePDF();
 
-    const onChangeHandler = async (e) => {
-        const file = e.target.files[0];
-        const arrayBuffer = await file.arrayBuffer();
-        await addPDF({data: arrayBuffer, name: file.name});
-    };
+  const onChangeHandler = async (e) => {
+    const file = e.target.files[0];
+    const arrayBuffer = await file.arrayBuffer();
+    await addPDF({ data: arrayBuffer, name: file.name });
+  };
 
-    const handleDragEnd = (event) => {
-        const {active, over} = event;
-        if (active.id !== over.id) {
-            let oldIndex;
-            let newIndex;
-            setPages((items) => {
-                for (let i = 0; i < pages.length; ++i) {
-                    const page = pages[i];
-                    oldIndex = page.id === active.id ? i : oldIndex;
-                    newIndex = page.id === over.id ? i : newIndex;
-                }
-                return arrayMove(items, oldIndex, newIndex);
-            });
-        }
-    };
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    movePDFPage(active.id, over.id);
+  };
 
-    const deleteHandler = (id) => {
-        setPages((pages)=>pages.filter(page=>page.id!==id));
-    }
+  const createPdfFile = () => {
+    generatePDFFile();
+  };
 
-    return (
-        <>
-            <div>
-                <input type="file" multiple={true} onChange={onChangeHandler}/>
-            </div>
-            <DndContext
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
+  return (
+    <>
+      <div>
+        <input type="file" multiple={true} onChange={onChangeHandler} />
+        <ul>
+          {files?.map((file) => (
+            <li
+              onClick={() => {
+                deletePDFFile(file);
+              }}
+              key={`pdfFileName--${file}`}
             >
-                <div style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    flexDirection: "row",
-                    maxWidth: "600px",
-                }}>
-                    <SortableContext items={pages} strategy={rectSortingStrategy}>
-                        <div style={{display: "flex", flexWrap: "wrap", maxWidth: "600px"}}>
-                            {pages?.map(({id, data}) => (
-                                <SortableItem key={id} id={id} remove={()=> {
-                                    deleteHandler(id)
-                                }}>
-                                    <PDFCanvas pdfPage={data}/>
-                                </SortableItem>
-                            ))}
-                        </div>
-                    </SortableContext>
-                </div>
-            </DndContext>
-        </>
-    );
+              {file}
+            </li>
+          ))}
+        </ul>
+        <button onClick={createPdfFile}>파일 전송 또는 저장</button>
+        {pdfFileUrl ? (
+          <a href={pdfFileUrl} download>
+            다운로드
+          </a>
+        ) : null}
+      </div>
+      <div style={{ width: "800px" }}>
+        <DndContext
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext items={pages} strategy={rectSortingStrategy}>
+            <SortableItemContainer>
+              {pages?.map(({ id, data }) => (
+                <SortableItem
+                  key={id}
+                  id={id}
+                  remove={() => {
+                    deletePDFPage(id);
+                  }}
+                >
+                  <PDFCanvas pdfPage={data} />
+                </SortableItem>
+              ))}
+            </SortableItemContainer>
+          </SortableContext>
+        </DndContext>
+      </div>
+    </>
+  );
 }
