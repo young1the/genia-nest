@@ -22,9 +22,12 @@ public class PaperController {
     }
 
     @GetMapping("")
-    public String index(Model model, SearchPaperDTO searchPaperDTO) {
-        List<Paper> papers = paperService.findPapers(searchPaperDTO);
+    public String index(Model model) {
+        // 전체 불러오기
+        List<Paper> papers = paperService.findPapers();
         model.addAttribute("papers", papers);
+
+        // 동적 쿼리 실행하기
         return "pages/paper/index";
     }
 

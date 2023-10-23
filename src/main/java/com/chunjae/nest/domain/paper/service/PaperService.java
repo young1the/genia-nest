@@ -18,7 +18,7 @@ public class PaperService {
         this.paperRepository = paperRepository;
     }
 
-    public List<Paper> findPapers(SearchPaperDTO searchPaperDTO) {
+    public List<Paper> findPapers() {
         return paperRepository.findAll(Sort.by(Sort.Order.desc("id")));
     }
 }
