@@ -20,7 +20,7 @@ const SortableItem = (props) => {
       : null,
     zIndex: isDragging ? "42" : "auto",
 
-    background: "#fcfdf7",
+    background: "#fff",
     borderRadius: "12px",
     border: "1px solid #CAC4D0",
     padding: "16px",
