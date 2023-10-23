@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Entity
@@ -18,7 +19,7 @@ public class Paper extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(nullable = false)
@@ -58,20 +59,9 @@ public class Paper extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "paper")
     private PaperFile paperFile;
 
-    @Builder
-    public Paper(User user, int year, int month, int grade, String name, int totalCount, String category, String area, String subject, int ocrCount, PaperStatus paperStatus) {
-        this.user = user;
-        this.year = year;
-        this.month = month;
-        this.grade = grade;
-        this.name = name;
-        this.totalCount = totalCount;
-        this.category = category;
-        this.area = area;
-        this.subject = subject;
-        this.ocrCount = ocrCount;
-        this.paperStatus = paperStatus;
-    }
 
+    public void setPaperStatusToDelete() {
+        this.paperStatus = PaperStatus.DELETED;
+    }
 
 }

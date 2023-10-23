@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -20,14 +21,8 @@ public class PaperFile extends BaseEntity {
     private String url;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "paper_id")
+    @JoinColumn(name = "paper_id", nullable = false)
     private Paper paper;
 
 
-    @Builder
-    public PaperFile(String name, String url, Paper paper) {
-        this.name = name;
-        this.url = url;
-        this.paper = paper;
-    }
 }

@@ -1,5 +1,6 @@
 package com.chunjae.nest.domain.paper.service;
 
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +35,22 @@ public class S3UploadService {
         return URLDecoder.decode(amazonS3.getUrl(bucket, fileName).toString(), "UTF-8");
     }
 
+    public void deletePaper(String url) {
+        String fileName = getFileName(url);
+        String keyName = "static/" + fileName;
+        boolean isFileExists = amazonS3.doesObjectExist(bucket, keyName);
+        log.info("url:{}, isFileExists:{}", keyName, isFileExists);
+        try {
+            if (isFileExists) {
+                amazonS3.deleteObject(bucket, keyName);
+            }
+        } catch (AmazonServiceException e) {
+            log.error(e.toString());
+        }
+    }
+
     public String setFileName(MultipartFile multipartFile) {
-        return "static" + "/" + UUID.randomUUID() + "." + multipartFile.getOriginalFilename();
+        return "static" + "/" + UUID.randomUUID() + "/" + multipartFile.getOriginalFilename();
     }
 
     public String getFileName(String url) {

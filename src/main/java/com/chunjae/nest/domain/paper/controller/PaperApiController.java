@@ -34,4 +34,15 @@ public class PaperApiController {
     }
 
 
+    @PostMapping("/remove/{id}")
+    public ResponseEntity<String> deletePaper(@PathVariable(name = "id") Long id) {
+
+        String deletedPaper = paperService.deletePaper(id);
+
+        if (deletedPaper.equals("ok")) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
 }

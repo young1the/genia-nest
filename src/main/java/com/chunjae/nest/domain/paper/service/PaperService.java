@@ -45,10 +45,16 @@ public class PaperService {
 
             if (!url.equals("failed")) {
                 Paper paper = paperRequest.toEntity(paperRequest, user);
-
-
-                PaperFile paperFile = getPaperFile(fileName, url, paper);
-                PaperLog paperLog = getPaperLog(user, url);
+                PaperFile paperFile = PaperFile.builder()
+                        .name(fileName)
+                        .url(url)
+                        .paper(paper)
+                        .build();
+                PaperLog paperLog = PaperLog.builder()
+                        .userId(user.getUserId())
+                        .paperUrl(url)
+                        .paperName(paperRequest.getName())
+                        .build();
 
                 paperRepository.save(paper);
                 paperFileRepository.save(paperFile);
@@ -63,9 +69,7 @@ public class PaperService {
     @Transactional(readOnly = true)
     public PaperResponse getPaperDetail(Long id) {
 
-        Paper paper = paperRepository.findById(id).orElseThrow(() -> (
-                new IllegalArgumentException("시험지가 없습니다.")
-        ));
+        Paper paper = paperRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("시험지가 없습니다."));
 
         return PaperResponse.builder()
                 .year(paper.getYear())
@@ -80,25 +84,25 @@ public class PaperService {
                 .build();
     }
 
-    public PaperFile getPaperFile(String fileName, String url, Paper paper) {
-        return PaperFile.builder()
-                .name(fileName)
-                .url(url)
-                .paper(paper)
-                .build();
-    }
 
-    public PaperLog getPaperLog(User user, String url) {
-        return PaperLog.builder()
-                .userId(user.getUserId())
-                .url(url)
-                .build();
+    @Transactional
+    public String deletePaper(Long id) {
+        Paper paper = paperRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("시험지가 없습니다."));
+        String url = paper.getPaperFile().getUrl();
+
+        if (0 == paper.getOcrCount()) {
+            s3UploadService.deletePaper(url);
+            paper.setPaperStatusToDelete();
+            paperRepository.save(paper);
+            paperFileRepository.delete(paper.getPaperFile());
+            return "ok";
+        }
+        return "failed";
     }
 
     public boolean isAllowedFileType(MultipartFile multipartFile) {
         String fileName = multipartFile.getOriginalFilename();
         return fileName != null && fileName.toLowerCase().endsWith(".pdf");
     }
-
 
 }
