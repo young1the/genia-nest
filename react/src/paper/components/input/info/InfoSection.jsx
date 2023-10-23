@@ -1,12 +1,12 @@
 import PaperMetaForm from "./PaperMetaForm.jsx";
 import PaperFileSelect from "./PaperFileSelect.jsx";
 
-const InfoSection = () => {
+const InfoSection = ({infoSectionProps}) => {
     return (
-        <div>
+        <>
             <PaperMetaForm />
-            <PaperFileSelect />
-        </div>
+            <PaperFileSelect infoSectionProps={infoSectionProps} />
+        </>
     )
 }
 

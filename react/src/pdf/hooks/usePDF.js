@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import {useCallback, useRef, useState} from "react";
 import * as PDF_JS from "pdfjs-dist";
 import * as PDF_LIB from "pdf-lib";
 import { arrayMove } from "@dnd-kit/sortable";
@@ -23,13 +23,7 @@ const usePDF = () => {
   const [pages, setPages] = useState([]);
   const [pdfFileUrl, setPDFFileUrl] = useState();
 
-  const addPDF = async (pdfFile) => {
-    const src = pdfFile?.data.slice(0) ?? pdfFile.url;
-    const newDoc = await _getPDFDocPromise(pdfFile);
-    pdfDocs[pdfFile.name] = { data: newDoc, id: pdfFile.name, src };
-    await _addPDFPages(pdfDocs[pdfFile.name]);
-  };
-
+  const addPDF = useCallback(async (pdfFile) => {
   const _getPDFDocPromise = (pdfFile) => {
     const documentInitParams = {
       ...DOCUMENT_DEFAULT_CONFIG,
@@ -38,7 +32,6 @@ const usePDF = () => {
     };
     return PDF_JS.getDocument(documentInitParams).promise;
   };
-
   const _addPDFPages = async (pdfDoc) => {
     const pdfPagePromiseArray = [];
     for (let i = 0; i < pdfDoc.data.numPages; ++i) {
@@ -52,19 +45,24 @@ const usePDF = () => {
     setPages((prev) => [...prev, ...newPages]);
     setFiles((prev) => [...prev, pdfDoc.id]);
   };
+    const src = pdfFile?.data.slice(0) ?? pdfFile.url;
+    const newDoc = await _getPDFDocPromise(pdfFile);
+    pdfDocs[pdfFile.name] = { data: newDoc, id: pdfFile.name, src };
+    await _addPDFPages(pdfDocs[pdfFile.name]);
+  },[]);
 
-  const deletePDFPage = (pdfPageId) => {
+  const deletePDFPage = useCallback((pdfPageId) => {
     setPages((pages) => pages.filter((page) => page.id !== pdfPageId));
-  };
+  },[]);
 
-  const deletePDFFile = (pdfFileName) => {
+  const deletePDFFile = useCallback((pdfFileName) => {
     setFiles((files) => files.filter((fileName) => fileName !== pdfFileName));
     setPages((pages) =>
       pages.filter((page) => page.id.indexOf(pdfFileName) < 0)
     );
-  };
+  },[]);
 
-  const movePDFPage = (aPageId, bPageId) => {
+  const movePDFPage = useCallback((aPageId, bPageId) => {
     if (aPageId === bPageId) return;
     let aIndex;
     let bIndex;
@@ -77,9 +75,9 @@ const usePDF = () => {
       }
       return arrayMove(items, aIndex, bIndex);
     });
-  };
+  },[pages]);
 
-  const generatePDFFile = async () => {
+  const generatePDFFile = useCallback(async () => {
     if (pages.length === 0) return;
     const docMap = new Map();
     const newPDFDoc = await PDF_LIB.PDFDocument.create();
@@ -101,7 +99,7 @@ const usePDF = () => {
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
     const docUrl = URL.createObjectURL(blob);
     setPDFFileUrl(docUrl);
-  };
+  },[pages])
 
   return {
     addPDF,

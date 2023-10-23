@@ -17,7 +17,7 @@
 }
 
 .th {
-    flex:1 1 0;
+    flex:1 1 50px;
     border-bottom: 1px solid #ccc;
     background-color: #f0f0f0;
     color: #000;

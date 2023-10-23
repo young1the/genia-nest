@@ -24,6 +24,7 @@
 
 .info {
     flex: 2 1 0;
+    max-width: calc(100% / 5);
 }
 
 .pdf {

@@ -1,4 +1,5 @@
 import styles from "./Button.module.css"
+import {memo} from "react";
 
 const Button = (props) => {
     const {onClick, color, children} = props;
@@ -10,4 +11,4 @@ const Button = (props) => {
     )
 }
 
-export default Button
+export default memo(Button)

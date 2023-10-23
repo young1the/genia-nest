@@ -1,4 +1,13 @@
 @import url(https://fonts.googleapis.com/earlyaccess/notosanskr.css);
+@import url(https://fonts.googleapis.com/icon?family=Material+Icons);
+
+.icon {
+    font-family: 'Material Icons', emoji;
+    font-style: normal;
+    font-weight: 400;
+    padding: 4px;
+    cursor: pointer;
+}
 
 body {
     width: 100vw;
