@@ -3,7 +3,6 @@ plugins {
     id 'org.springframework.boot' version '3.1.4'
     id 'io.spring.dependency-management' version '1.1.3'
     id "com.github.node-gradle.node" version "7.0.1"
-    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 }
 
 group = 'com.chunjae'
@@ -33,40 +32,28 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-    // QueryDSL 설정
-    implementation "com.querydsl:querydsl-jpa:5.0.0:jakarta"
+// QueryDSL --- START
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
     annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
-    // -- QueryDSL ---
 }
-// Querydsl 설정
-def generated = 'src/main/generated'
+def querydslDir = "$buildDir/generated/querydsl"
 
-querydsl {
-    jpa = true
-    querydslSourcesDir = generated
-}
 sourceSets {
-    main.java.srcDir generated
+    main.java.srcDirs += [ querydslDir ]
 }
 
-compileQuerydsl{
-    options.annotationProcessorPath = configurations.querydsl
+tasks.withType(JavaCompile) {
+    options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir)
 }
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-    querydsl.extendsFrom compileClasspath
+clean.doLast {
+    file(querydslDir).deleteDir()
 }
-// querydsl 끝
+// QueryDSL --- END
 
-tasks.named('test') {
-    useJUnitPlatform()
-}
-
+// NODE -- START
 node {
     download = true
     nodeProjectDir = file("${project.projectDir}/react")
@@ -82,3 +69,8 @@ task copyDist(type: Copy, dependsOn: npmBuild) {
 }
 
 processResources.dependsOn 'copyDist'
+// NODE -- END
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
