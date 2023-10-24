@@ -31,12 +31,29 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+// QueryDSL --- START
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+}
+def querydslDir = "$buildDir/generated/querydsl"
+
+sourceSets {
+    main.java.srcDirs += [ querydslDir ]
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
+tasks.withType(JavaCompile) {
+    options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir)
 }
 
+clean.doLast {
+    file(querydslDir).deleteDir()
+}
+// QueryDSL --- END
+
+// NODE -- START
 node {
     download = true
     nodeProjectDir = file("${project.projectDir}/react")
@@ -52,3 +69,8 @@ task copyDist(type: Copy, dependsOn: npmBuild) {
 }
 
 processResources.dependsOn 'copyDist'
+// NODE -- END
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
