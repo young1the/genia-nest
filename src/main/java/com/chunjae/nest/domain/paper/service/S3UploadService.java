@@ -50,7 +50,7 @@ public class S3UploadService {
     }
 
     public String setFileName(MultipartFile multipartFile) {
-        return "static" + "/" + UUID.randomUUID() + "/" + multipartFile.getOriginalFilename();
+        return "static" + "/" + UUID.randomUUID() + "." + multipartFile.getOriginalFilename();
     }
 
     public String getFileName(String url) {

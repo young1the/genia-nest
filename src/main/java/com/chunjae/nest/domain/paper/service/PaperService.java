@@ -5,6 +5,7 @@ import com.chunjae.nest.domain.paper.dto.res.PaperResponse;
 import com.chunjae.nest.domain.paper.entity.Paper;
 import com.chunjae.nest.domain.paper.entity.PaperFile;
 import com.chunjae.nest.domain.paper.entity.PaperLog;
+import com.chunjae.nest.domain.paper.entity.PaperStatus;
 import com.chunjae.nest.domain.paper.repository.PaperFileRepository;
 import com.chunjae.nest.domain.paper.repository.PaperLogRepository;
 import com.chunjae.nest.domain.paper.repository.PaperRepository;
@@ -44,7 +45,7 @@ public class PaperService {
             log.info(" url: {}, fileName: {}", url, fileName);
 
             if (!url.equals("failed")) {
-                Paper paper = paperRequest.toEntity(paperRequest, user);
+                Paper paper = paperRequest.createNewPaper(user);
                 PaperFile paperFile = PaperFile.builder()
                         .name(fileName)
                         .url(url)
@@ -82,6 +83,45 @@ public class PaperService {
                 .subject(paper.getSubject())
                 .url(paper.getPaperFile().getUrl())
                 .build();
+    }
+
+
+    @Transactional
+    public String updatePaper(Long id, PaperRequest paperRequest, MultipartFile multipartFile) throws IOException {
+        log.info("id:{}, paperRequest:{}", id, paperRequest.toString());
+        Long userId = 1L;
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
+        Paper paper = paperRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("시험지가 없습니다."));
+        PaperFile paperFile = paper.getPaperFile();
+        paper.paperToUpdate(paperRequest);
+
+        if (paper.getOcrCount() != 0 && (paper.getPaperStatus() == PaperStatus.IN_PROGRESS || paper.getPaperStatus() == PaperStatus.TO_DO)) {
+            paperRepository.save(paper);
+            return "ok";
+        }
+        s3UploadService.deletePaper(paper.getPaperFile().getUrl());
+
+        if (isAllowedFileType(multipartFile)) {
+            String url = s3UploadService.uploadPaper(multipartFile);
+            String fileName = s3UploadService.getFileName(url);
+            log.info("url:{}, fileName:{}", url, fileName);
+
+            if (!url.equals("failed")) {
+                paperFile.updatePaperFile(fileName, url);
+                PaperLog paperLog = PaperLog.builder()
+                        .userId(user.getUserId())
+                        .paperUrl(url)
+                        .paperName(paperRequest.getName())
+                        .build();
+
+                paperRepository.save(paper);
+                paperFileRepository.save(paperFile);
+                paperLogRepository.save(paperLog);
+
+                return "ok";
+            }
+        }
+        return "failed";
     }
 
 

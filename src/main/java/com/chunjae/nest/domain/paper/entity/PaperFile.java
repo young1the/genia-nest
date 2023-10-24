@@ -24,5 +24,9 @@ public class PaperFile extends BaseEntity {
     @JoinColumn(name = "paper_id", nullable = false)
     private Paper paper;
 
+    public void updatePaperFile(String name, String url) {
+        this.name = name;
+        this.url = url;
+    }
 
 }

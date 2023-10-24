@@ -1,6 +1,8 @@
 package com.chunjae.nest.domain.paper.entity;
 
 import com.chunjae.nest.common.BaseEntity;
+import com.chunjae.nest.domain.paper.dto.req.PaperRequest;
+import com.chunjae.nest.domain.question.entity.Question;
 import com.chunjae.nest.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -10,6 +12,7 @@ import java.util.List;
 
 @Getter
 @Builder
+@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Entity
@@ -58,6 +61,20 @@ public class Paper extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "paper")
     private PaperFile paperFile;
+
+    @OneToMany(mappedBy = "paper")
+    private List<Question> questions = new ArrayList<>();
+
+    public void paperToUpdate(PaperRequest paperRequest) {
+        this.year = paperRequest.getYear();
+        this.month = paperRequest.getMonth();
+        this.grade = paperRequest.getGrade();
+        this.name = paperRequest.getName();
+        this.totalCount = paperRequest.getTotalCount();
+        this.category = paperRequest.getCategory();
+        this.area = paperRequest.getArea();
+        this.subject = paperRequest.getSubject();
+    }
 
 
     public void setPaperStatusToDelete() {

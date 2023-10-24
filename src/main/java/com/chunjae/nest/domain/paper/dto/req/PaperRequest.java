@@ -19,18 +19,18 @@ public class PaperRequest {
     private String area;
     private String subject;
 
-    public Paper toEntity(PaperRequest paperRequest, User user) {
+    public Paper createNewPaper(User user) {
 
         return Paper.builder()
                 .user(user)
-                .year(paperRequest.getYear())
-                .month(paperRequest.getMonth())
-                .grade(paperRequest.getGrade())
-                .name(paperRequest.getName())
-                .totalCount(paperRequest.getTotalCount())
-                .category(paperRequest.getCategory())
-                .area(paperRequest.getArea())
-                .subject(paperRequest.getSubject())
+                .year(year)
+                .month(month)
+                .grade(grade)
+                .name(name)
+                .totalCount(totalCount)
+                .category(category)
+                .area(area)
+                .subject(subject)
                 .ocrCount(0)
                 .paperStatus(PaperStatus.TO_DO)
                 .build();
