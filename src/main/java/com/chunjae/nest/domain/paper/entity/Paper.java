@@ -25,19 +25,19 @@ public class Paper extends BaseEntity {
     private User user;
 
     @Column(nullable = false)
-    private short year;
+    private int year;
 
     @Column(nullable = false)
-    private short month;
+    private int month;
 
     @Column(nullable = false)
-    private short grade;
+    private int grade;
 
     @Column(nullable = false)
     private String name;
 
     @Column(nullable = false)
-    private short totalCount;
+    private int totalCount;
 
     @Column(length = 5, nullable = false)
     private String category;
@@ -49,7 +49,7 @@ public class Paper extends BaseEntity {
     private String subject;
 
     @Column(nullable = false)
-    private short ocrCount;
+    private int ocrCount;
 
     @Column(length = 10, nullable = false)
     @Enumerated(EnumType.STRING)

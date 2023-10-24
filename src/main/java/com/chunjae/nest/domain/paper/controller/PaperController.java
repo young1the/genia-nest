@@ -1,12 +1,13 @@
 package com.chunjae.nest.domain.paper.controller;
 
-import com.chunjae.nest.domain.paper.dto.SearchPaperDTO;
+import com.chunjae.nest.domain.paper.dto.SearchKeywordDTO;
 import com.chunjae.nest.domain.paper.entity.Paper;
 import com.chunjae.nest.domain.paper.service.PaperService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
@@ -22,12 +23,15 @@ public class PaperController {
     }
 
     @GetMapping("")
-    public String index(Model model) {
-        // 전체 불러오기
-        List<Paper> papers = paperService.findPapers();
+    public String index(Model model, @ModelAttribute SearchKeywordDTO searchKeywordDTO) {
+
+        System.out.println("==============================================");
+        System.out.println("컨트롤러 부분 - " + searchKeywordDTO.toString());
+        //List<Paper> papers = paperService.findPapers(); // 전체 조회
+
+        List<Paper> papers = paperService.searchResults(searchKeywordDTO); // 조건에 따른 조회
         model.addAttribute("papers", papers);
 
-        // 동적 쿼리 실행하기
         return "pages/paper/index";
     }
 

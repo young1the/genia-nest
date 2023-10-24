@@ -1,6 +1,6 @@
 package com.chunjae.nest.domain.paper.service;
 
-import com.chunjae.nest.domain.paper.dto.SearchPaperDTO;
+import com.chunjae.nest.domain.paper.dto.SearchKeywordDTO;
 import com.chunjae.nest.domain.paper.entity.Paper;
 import com.chunjae.nest.domain.paper.repository.PaperRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,12 @@ public class PaperService {
         this.paperRepository = paperRepository;
     }
 
-    public List<Paper> findPapers() {
+    public List<Paper> findPapers() { // 사용 x. 임시
         return paperRepository.findAll(Sort.by(Sort.Order.desc("id")));
     }
+
+    public List<Paper> searchResults(SearchKeywordDTO searchKeywordDTO) {
+      return paperRepository.searchByWhere(searchKeywordDTO);
+    }
+
 }

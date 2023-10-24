@@ -18,14 +18,14 @@
                             <span>검색 조건</span>
                             <div class="select-wrap">
                                 <select class="select-box" name="year">
-                                    <option value="전체년도">년도</option>
+                                    <option value="전체">년도</option>
                                     <option value="2023">2023</option>
                                     <option value="2022">2022</option>
                                 </select>
                             </div>
                             <div class="select-wrap">
                                 <select class="select-box" name="month">
-                                    <option value="전체월">출제 월</option>
+                                    <option value="0">출제 월</option>
                                     <option value="1">1월</option>
                                     <option value="2">2월</option>
                                     <option value="3">3월</option>
@@ -41,8 +41,8 @@
                                 </select>
                             </div>
                             <div class="select-wrap">
-                                <select class="select-box" name="area">
-                                    <option value="전체영역">영역</option>
+                                <select class="select-box" id="areaSelect" name="area">
+                                    <option value="전체">영역</option>
                                     <option value="국어">국어</option>
                                     <option value="수학">수학</option>
                                     <option value="영어">영어</option>
@@ -50,18 +50,17 @@
                                     <option value="사회탐구">사회탐구</option>
                                     <option value="과학탐구">과학탐구</option>
                                     <option value="직업탐구">직업탐구</option>
-                                    <option value="제2외국어/한문">제 2외국어/한문</option>
+                                    <option value="제2외국어/한문">제2외국어/한문</option>
 
                                 </select>
                             </div>
                             <div class="select-wrap">
-                                <select class="select-box" name="subject">
-                                    <option value="전체과목">과목</option>
-                                    <option value=""></option>
+                                <select class="select-box" id="subjectSelect" name="subject">
+                                    <option value="전체">과목</option>
                                 </select>
                             </div>
                             <div class="select-wrap">
-                                <select class="select-box">
+                                <select class="select-box" name="searchOption">
                                     <option value="전체">전체</option>
                                     <option value="name">시험지 명</option>
                                     <option value="user_id">등록자</option>
@@ -80,11 +79,11 @@
                             <div class="box">
                                 <span>시험 종류</span>
                                 <div class="check-wrap">
-                                    <input type="checkbox" id="grade00" name="category">
+                                    <input type="checkbox" id="grade00" name="category" value="수능">
                                     <label for="grade00">수능</label>
-                                    <input type="checkbox" id="grade01" name="category">
+                                    <input type="checkbox" id="grade01" name="category" value="모의고사">
                                     <label for="grade01">모의</label>
-                                    <input type="checkbox" id="grade02" name="category">
+                                    <input type="checkbox" id="grade02" name="category" value="학력고사">
                                     <label for="grade02">학력</label>
                                 </div>
                             </div>
@@ -93,11 +92,11 @@
                             <div class="box">
                                 <span>업로드 상태</span>
                                 <div class="radio-wrap">
-                                    <input type="radio" id="radio01_01" name="paperStatus" checked="">
+                                    <input type="radio" id="radio01_01" name="paperStatus" value="ALL" checked>
                                     <label for="radio01_01">전체</label>
-                                    <input type="radio" id="radio01_02" name="paperStatus">
+                                    <input type="radio" id="radio01_02" name="paperStatus" value="DONE">
                                     <label for="radio01_02">완료</label>
-                                    <input type="radio" id="radio01_03" name="paperStatus">
+                                    <input type="radio" id="radio01_03" name="paperStatus" value="IN_PROGRESS">
                                     <label for="radio01_03">진행</label>
                                 </div>
                             </div>
@@ -106,13 +105,13 @@
                             <div class="box">
                                 <span>학년</span>
                                 <div class="radio-wrap">
-                                    <input type="radio" id="radio02_01" name="grade" checked="">
+                                    <input type="radio" id="radio02_01" name="grade" value="전체" checked="">
                                     <label for="radio02_01">전체</label>
-                                    <input type="radio" id="radio02_02" name="grade">
+                                    <input type="radio" id="radio02_02" name="grade" value="1">
                                     <label for="radio02_02">1학년</label>
-                                    <input type="radio" id="radio02_03" name="grade">
+                                    <input type="radio" id="radio02_03" name="grade" value="2">
                                     <label for="radio02_03">2학년</label>
-                                    <input type="radio" id="radio02_04" name="grade">
+                                    <input type="radio" id="radio02_04" name="grade" value="3">
                                     <label for="radio02_04">3학년</label>
                                 </div>
                             </div>
@@ -189,8 +188,8 @@
                         <td th:text="${paper.area}" />
                         <td th:text="${paper.subject}" />
                         <td th:text="${paper.name}" class="tit"><a href="javascript:;" /></td>
-                        <td>홍길동</td>
-                        <td>YYYY.MM.DD</td>
+                        <td th:text="${paper.user.name}" />
+                        <td th:text="${#temporals.format(paper.createdAt, 'MM-dd-yyyy')}"></td>
                         <td th:text="${paper.paperStatus}" />
                     </tr>
                     </tbody>
@@ -212,6 +211,75 @@
 
 </div>
 <script>
+    const areaSelect = document.getElementById('areaSelect');
+    const subjectSelect = document.getElementById('subjectSelect');
+
+    areaSelect.addEventListener('change', function () {
+       const selectArea = areaSelect.value;
+       subjectSelect.innerHTML = ''; // 기존 내용 지우기
+
+        if (selectArea === '국어') {
+            addOption(subjectSelect, '전체');
+            addOption(subjectSelect, '화법과 작문');
+            addOption(subjectSelect, '언어와 매체');
+        } else if (selectArea === '수학') {
+            addOption(subjectSelect, '전체');
+            addOption(subjectSelect, '확률과 통계');
+            addOption(subjectSelect, '미적분');
+            addOption(subjectSelect, '기하');
+        } else if (selectArea === '영어') {
+            addOption(subjectSelect, '전체');
+            addOption(subjectSelect, '영어');
+        } else if (selectArea === '한국사') {
+            addOption(subjectSelect, '전체');
+            addOption(subjectSelect, '한국사');
+        } else if (selectArea === '사회탐구') {
+            addOption(subjectSelect, '전체');
+            addOption(subjectSelect, '생활과 윤리');
+            addOption(subjectSelect, '윤리와 사상');
+            addOption(subjectSelect, '한국지리');
+            addOption(subjectSelect, '세계지리');
+            addOption(subjectSelect, '동아시아사');
+            addOption(subjectSelect, '세계사');
+            addOption(subjectSelect, '경제');
+            addOption(subjectSelect, '정치와 법');
+        } else if (selectArea === '과학탐구') {
+            addOption(subjectSelect, '전체');
+            addOption(subjectSelect, '물리학I');
+            addOption(subjectSelect, '화학I');
+            addOption(subjectSelect, '생명과학I');
+            addOption(subjectSelect, '지구과학I');
+            addOption(subjectSelect, '물리학II');
+            addOption(subjectSelect, '화학II');
+            addOption(subjectSelect, '생명과학II');
+            addOption(subjectSelect, '지구과학II');
+        } else if (selectArea === '직업탐구') {
+            addOption(subjectSelect, '전체');
+            addOption(subjectSelect, '농업 기초 기술');
+            addOption(subjectSelect, '공업 일반');
+            addOption(subjectSelect, '상업 경제');
+            addOption(subjectSelect, '수산 해운 산업 기초');
+            addOption(subjectSelect, '인간 발달');
+            addOption(subjectSelect, '성공적인 직업생활');
+        } else if (selectArea === '제2외국어/한문') {
+            addOption(subjectSelect, '전체');
+            addOption(subjectSelect, '독일어I');
+            addOption(subjectSelect, '프랑스어I');
+            addOption(subjectSelect, '스페인어I');
+            addOption(subjectSelect, '중국어I');
+            addOption(subjectSelect, '일본어I');
+            addOption(subjectSelect, '러시아어I');
+            addOption(subjectSelect, '아랍어I');
+            addOption(subjectSelect, '베트남어I');
+            addOption(subjectSelect, '한문I');
+        }
+    });
+
+    function addOption(selectBox, optionText) {
+        const option = document.createElement('option');
+        option.text = optionText;
+        selectBox.add(option);
+    }
 </script>
 </body>
 
