@@ -1530,7 +1530,7 @@ select {
   .queChgWrap
   .boxWrap
   .boxTop {
-  margin: 30px 0 10px;
+  margin: 10px 0 10px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -1560,7 +1560,7 @@ select {
   label {
   padding-right: 0;
 }
-.ocrWrap
+/* .ocrWrap
   .popContent
   .viewBoxWrap
   .viewBox
@@ -1596,7 +1596,7 @@ select {
   .boxTop
   .radioWrap:last-child::after {
   display: none;
-}
+} */
 .ocrWrap
   .popContent
   .viewBoxWrap

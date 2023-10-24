@@ -8,8 +8,20 @@ function OCRApp() {
   "/sample-test.jpg";
   const [image, setImage] = useState(defaultSrc);
   const [iscaptureStart, setIscaptureStart] = useState(false);
-  const [cropData, setCropData] = useState("#");
+  const [croppedImage, setCroppedImage] = useState(false);
+  const [cropData, setCropData] = useState([]);
   const cropperRef = useRef();
+  
+  const [QuestionType, setQuestionType] = useState();
+  const handleQuestionType = (e)=>{
+    setQuestionType(e.target.value);
+    console.log(e.target.value);
+  }
+  const [useLatex, setUseLatex] = useState();
+  const handleUseLatex = (e)=>{
+    console.log(e.target.value);
+    setUseLatex(e.target.value);    
+  }
 
   const onChange = (e) => {
     e.preventDefault();
@@ -24,11 +36,14 @@ function OCRApp() {
       setImage(reader.result);
     };
     reader.readAsDataURL(files[0]);
-  };
+  };0
 
   const getCropData = () => {
     if (typeof cropperRef.current?.cropper !== "undefined") {
-      setCropData(cropperRef.current?.cropper.getCroppedCanvas().toDataURL());
+      const croppedCanvas = cropperRef.current?.cropper.getCroppedCanvas();
+      const croppedDataURL = croppedCanvas.toDataURL();
+      setCropData(prev=>[...prev, croppedDataURL]);
+      setCroppedImage((prev)=> { return !prev; });      
     }
   };
   return (
@@ -79,19 +94,16 @@ function OCRApp() {
                           <button
                             className={`${styles.geniaButton} ${styles.geniaButtonGreen}`}
                             onClick={()=>{
-                              console.log(cropperRef.current);
                               setIscaptureStart((prev)=> { return !prev; });
-                              console.log(iscaptureStart);
                             }}
                           >
                             캡쳐시작
                           </button>
                           <div style={{ width: "100%" }}>
-                            <input type="file" onChange={onChange} />
-                            <button>Use default img</button>
-                            <br />
-                            <br />
-                            
+                            <input type="file" onChange={onChange} />                            
+                            <button onClick={getCropData}>
+                              Crop Image
+                            </button>                                                                              
                           </div>
                         </div>
                       </div>
@@ -118,15 +130,13 @@ function OCRApp() {
                               page <em>1</em> / <em>4</em>
                             </span>
                           </div>
+                          <div>
+                            <button>+</button> 
+                            <button>-</button> 
+                          </div>
                         </div>
                         <div className={styles.imgBox}>
-                          <div className="pdf-area">
-                          <img
-                              src="/sample-test.jpg"
-                              alt="샘플 시험지"
-                              width={"720px"}
-                              height={"560px"}
-                            />
+                          <div className="pdf-area">                        
                             {!iscaptureStart ? <img src={image} style={{width:"100%", height: "400"}}></img>:<Cropper
                               ref={cropperRef}
                               style={{ height: 400, width: "100%" }}
@@ -163,44 +173,54 @@ function OCRApp() {
                     <div className={styles.viewBottom}>
                       <div className={styles.queChgWrap}>
                         <div className={styles.boxWrap}>
+                          <div>
+                            <button
+                              className={
+                                styles.geniaButton + " " + styles.geniaButtonGray
+                              }
+                              onClick={()=>{setCropData([])}}                              
+                            >
+                              초기화
+                            </button>
+                          </div>                          
+                          <div className={styles.box}>
+                            {cropData.length > 0 ? 
+                            cropData.map((data, index)=><img key={`${data.slice(20, 30)}`} style={{ width: "100%" }} src={data} alt="cropped" />) : 
+                            <p className={styles.emptyTxt}>문제 텍스트를 캡처 해주세요.</p>}                                                   
+                          </div>
                           <div className={styles.boxTop}>
-                            <div className={styles.tit}>변환조건</div>
+                            <div className={styles.tit}>변환조건
+                            </div>
                             <div className={styles.radioWrap}>
-                              <input type="radio" id="term01_01" name="term" />
-                              <label htmlFor="term01_01">문제</label>
-                              <input type="radio" id="term01_02" name="term" />
-                              <label htmlFor="term01_02">정답/해설</label>
+                              <input type="radio" id="term01_01" name="term" value="S" onChange={handleQuestionType} />
+                              <label htmlFor="term01_01">주관식</label>
+                              <input type="radio" id="term01_02" name="term" value="M" onChange={handleQuestionType} />
+                              <label htmlFor="term01_02">객관식</label>                              
+                            </div>
+                            <div className={styles.tit}>수식유무
                             </div>
                             <div className={styles.radioWrap}>
                               <input
                                 type="radio"
                                 id="chg_type01_01"
                                 name="type"
+                                defaultChecked
+                                onChange={handleUseLatex}
+                                value="N"
                               />
-                              <label htmlFor="chg_type01_01">텍스트 변환</label>
+                              <label htmlFor="chg_type01_01">없음</label>
                               <input
                                 type="radio"
                                 id="chg_type01_02"
                                 name="type"
+                                onChange={handleUseLatex}
+                                value="Y"
                               />
-                              <label htmlFor="chg_type01_02">이미지 변환</label>
-                            </div>
-                          </div>
-                          <div className={styles.box}>
-                            <p className={styles.emptyTxt}>
-                              문제 텍스트를 캡처 해주세요.
-                            </p>
+                              <label htmlFor="chg_type01_02">있음</label>
+                            </div>                            
                           </div>
                         </div>
-
-                        <div className={styles.btnWrap}>
-                          <a
-                            className={
-                              styles.geniaButton + " " + styles.geniaButtonGray
-                            }
-                          >
-                            초기화
-                          </a>
+                        <div className={styles.btnWrap}>                          
                           <a
                             className={
                               styles.geniaButton + " " + styles.geniaButtonGreen
@@ -209,7 +229,6 @@ function OCRApp() {
                             OCR 변환하기
                           </a>
                         </div>
-
                         <div
                           className={`${styles.boxWrap} ${styles.resultBox}`}
                         >
@@ -243,9 +262,6 @@ function OCRApp() {
         </div>
       </div>
       <div className={styles.dimPop}></div>
-      {/* <Header /> */}
-        {/* <ImageCrop /> */}
-        {/* <Transform /> */}
     </>
   );
 }
