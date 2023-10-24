@@ -17,11 +17,11 @@ public class QuestionLog extends BaseLogEntity {
     private Long id;
 
     @Column(length = 255, nullable = false)
-    private String url;
+    private String questionUrl;
 
     @Column(length = 255, nullable = false)
-    private String name;
+    private String paperName;
 
     @Column(nullable = false)
-    private short num;
+    private int questionNum;
 }
