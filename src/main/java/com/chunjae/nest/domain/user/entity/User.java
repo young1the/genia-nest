@@ -4,7 +4,6 @@ import com.chunjae.nest.common.BaseEntity;
 import com.chunjae.nest.domain.paper.entity.PaperAssignment;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,8 +35,8 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
 
-    @OneToMany(mappedBy = "user")
-    private List<Role> roles = new ArrayList<>();
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user")
+    private Role role;
 
     @OneToMany(mappedBy = "user")
     private List<PaperAssignment> paperAssignments = new ArrayList<>();

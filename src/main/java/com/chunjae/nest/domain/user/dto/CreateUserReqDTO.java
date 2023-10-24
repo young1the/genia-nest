@@ -3,6 +3,7 @@ package com.chunjae.nest.domain.user.dto;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.sql.Date;
 import java.time.LocalDateTime;
 
 @Builder
@@ -14,9 +15,9 @@ public class CreateUserReqDTO {
     private String part;
     private String name;
     private String userId;
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime startDate;
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime endDate;
+    private Date startDate;
+    private Date endDate;
     private String role;
+    public Long id;
+
 }

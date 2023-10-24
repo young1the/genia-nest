@@ -10,7 +10,9 @@ import com.chunjae.nest.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Service
@@ -21,27 +23,32 @@ public class UserService {
     private final RoleRepository roleRepository;
 
     @Transactional
-    public User createUser(CreateUserReqDTO userDTO){
+    public User createUser(CreateUserReqDTO userDTO) {
 
-User user = User.builder()
-        .userId(userDTO.getUserId())
-        .password(userDTO.getUserId())
-        .name(userDTO.getName())
-        .userStatus(UserStatus.NEW_USER)
-        .part("디지털사업부").build();
-        userRepository.save(user);
+        User user = User.builder()
+                .userId(userDTO.getUserId())
+                .password(userDTO.getUserId())
+                .name(userDTO.getName())
+                .userStatus(UserStatus.NEW_USER)
+                .part(userDTO.getPart()).build();
+        User dbUser = userRepository.save(user);
 
-        LocalDateTime now = LocalDateTime.now();
+
 
         Role role = Role.builder()
-                .startDate(now)
-                .endDate(now.plusYears(1))
-                .role("총괄관리자")
+                .user(dbUser)
+                .role(userDTO.getRole())
+                .startDate(userDTO.getStartDate())
+                .endDate(userDTO.getEndDate())
                 .roleStatus(RoleStatus.PENDING)
                 .build();
         roleRepository.save(role);
 
         return user;
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
 }

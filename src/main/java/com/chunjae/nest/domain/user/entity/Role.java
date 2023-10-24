@@ -4,6 +4,7 @@ import com.chunjae.nest.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.sql.Date;
 import java.time.LocalDateTime;
 
 @Getter
@@ -17,7 +18,7 @@ public class Role extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -25,10 +26,10 @@ public class Role extends BaseEntity {
     private String role;
 
     @Column(nullable = false)
-    private LocalDateTime startDate;
+    private Date startDate;
 
     @Column(nullable = false)
-    private LocalDateTime endDate;
+    private Date endDate;
 
 
     @Enumerated(EnumType.STRING)

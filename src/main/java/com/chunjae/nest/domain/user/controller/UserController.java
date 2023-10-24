@@ -7,7 +7,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @Slf4j
@@ -22,11 +25,14 @@ public class UserController {
         return "pages/user/login";
     }
 
-//잠시테스트
-@GetMapping("/acctMgmt")
-public String showAccountManagementPage() {
-    return "pages/user/acctMgmt";
-}
+    //잠시테스트
+    @GetMapping("/acctMgmt")
+    public String showAccountManagementPage(Model model) {
+        List<User> users = userService.getAllUsers();
+        model.addAttribute("users", users);
+        return "pages/user/acctMgmt";
+    }
+
 
     @PostMapping("/add")
     @ResponseBody
@@ -41,6 +47,13 @@ public String showAccountManagementPage() {
             return ResponseEntity.badRequest().build();
         }
 
+    }
+
+    @GetMapping("/users")
+    public String getUsers(Model model) {
+        List<User> users = userService.getAllUsers();
+        model.addAttribute("users", users);
+        return "pages/user/acctMgmt";
     }
 
 }

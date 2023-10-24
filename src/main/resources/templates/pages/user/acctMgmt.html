@@ -1,20 +1,42 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:height="http://www.w3.org/1999/xhtml"
+      xmlns:border-left="http://www.w3.org/1999/xhtml" xmlns:border-bottom="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>사용자 추가</title>
     <th:block th:replace="~{fragments/include:: include}"/>
+
 </head>
 <style>
-    /* CSS 스타일 추가 */
     .tbl-list {
-        width: 100%; /* 표 너비 100%로 조절 */
+        width: 100%;
     }
 </style>
 <body>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var now = new Date();
+        var nextYear = new Date();
+        nextYear.setFullYear(now.getFullYear() + 1);
+
+        function formatDate(date) {
+            var day = ("0" + date.getDate()).slice(-2);
+            var month = ("0" + (date.getMonth() + 1)).slice(-2);
+            var year = date.getFullYear();
+
+            return year + "-" + month + "-" + day;
+        }
+
+        document.getElementById("startDate").value = formatDate(now);
+        document.getElementById("endDate").value = formatDate(nextYear);
+    });
+</script>
+
 <div id="wrap">
     <th:block th:replace="~{fragments/header:: header}"/>
     <div class="container">
+
         <div class="inner">
             <div class="index-tit">시스템 관리 > 계정 관리</div>
             <h1 class="page-tit">사용자 관리</h1>
@@ -35,7 +57,7 @@
             <div class="table-wrap">
                 <div class="tab-top">
                     <div class="left-area">
-                        <span class="total">총 <em>00</em>명</span>
+                        <span class="total">총 <em th:text="${users.size()}"></em>명</span>
                         <div class="select-wrap">
                             <select class="select-box w140">
                                 <option value="">10개 보기</option>
@@ -54,6 +76,7 @@
                         <thead>
                         <tr>
                             <th>NO</th>
+                            <th>관리자 그룹</th>
                             <th>소속부서</th>
                             <th>이름</th>
                             <th>아이디</th>
@@ -63,19 +86,36 @@
                         </tr>
                         </thead>
                         <tr>
-                            <th id="auto-increment">1</th>
-                            <th> <input type="text" id="part" name="part"></th>
-                            <th> <input type="text" id="name" name="name"></th>
-                            <th> <input type="text" id="userId" name="userId"></th>
-                            <th style="DISPLAY: FLEX;">
-                                <input type="datetime-local" id="startDate" name="startDate" style="width: 140px;">
-                                ~
-                                <input type="datetime-local" id="endDate" name="endDate" style="width: 140px;">
-                            </th>
+                            <td></td>
+                            <td> <input type="text" id="role" name="role"></td>
+                            <td> <input type="text" id="part" name="part"></td>
+                            <td> <input type="text" id="name" name="name"></td>
+                            <td> <input type="text" id="userId" name="userId"></td>
+                            <form id="dateForm">
+                                <td style="display: flex; height: 43.33px;">
+                                <input type="date" id="startDate" name="startDate" style="width: 140px;">
+                                    ~
+                                    <input type="date" id="endDate" name="endDate" style="width: 140px;">
+                                </td>
+                                <button type="submit">저장</button>
+                            </form>
+                            <th style="border-bottom: 1px solid #ccc;
+           border-left:   1px solid #ccc;">-</th>
+                            <th><a class="btn-gray w120" href="#" onclick="createUser();">저장</a></th>
 
-
-                            <th>-</th>
-                            <th><a class="btn-gray w120" href="javascript:;">저장</a></th>
+                        </tr>
+                        <tr th:each="user : ${users}">
+                            <td th:text="${user.id}"></td>
+                            <td th:text="${user.role.role}"></td>
+                            <td th:text="${user.part}"></td>
+                            <td th:text="${user.name}"></td>
+                            <td th:text="${user.userId}"></td>
+                            <td>
+                                <span th:text="${#temporals.format(user.role.startDate, 'yyyy.MM.dd')}"> </span>
+                                <span th:text="${#temporals.format(user.role.endDate, 'yyyy.MM.dd')}"> </span>
+                            </td>
+                            <td></td>
+                            <td></td>
                         </tr>
                     </table>
                 </form>
@@ -85,24 +125,26 @@
 </div>
 
 <script>
-    function createUser() {
-        var partValue = document.querySelector("input[name='part']").value;
-        var nameValue = document.querySelector("input[name='name']").value;
-        var userIdValue = document.querySelector("input[name='userId']").value;
-        var startDateValue = document.querySelector("input[name='startDate']").value;
-        var endDateValue = document.querySelector("input[name='endDate']").value;
+    async function createUser() {
+        const roleValue = document.querySelector("input[name='role']").value;
+        const partValue = document.querySelector("input[name='part']").value;
+        const nameValue = document.querySelector("input[name='name']").value;
+        const userIdValue = document.querySelector("input[name='userId']").value;
+        const startDateValue = document.querySelector("input[name='startDate']").value;
+        const endDateValue = document.querySelector("input[name='endDate']").value;
 
 
-        var userDTO = {
+        const userDTO = {
+            role: roleValue,
             part: partValue,
             name: nameValue,
             userId: userIdValue,
             startDate: startDateValue,
             endDate: endDateValue
         };
+        console.log(startDateValue, endDateValue);
 
         // 서버로 데이터를 전송하고 결과에 따라 경고 메시지를 표시
-        const sendData = async () => {
             const response = await fetch('/user/add', {
                 method: 'POST',
                 headers: {
@@ -110,19 +152,15 @@
                 },
                 body: JSON.stringify(userDTO)
             });
+
             const data = await response.json();
+
             if (response.ok) {
-                alert("사용자 추가 성공");
+                alert("사용자 추가 성공, 새 사용자 ID: " + data.id);
             } else {
                 alert("사용자 추가 실패");
             }
-        }
-
-        sendData();
-
-        // "NO"를 1씩 증가시키는 부분
-        var autoIncrement = document.getElementById("auto-increment");
-        autoIncrement.textContent = (parseInt(autoIncrement.textContent) + 1).toString();
+        location.reload();
     }
 </script>
 </body>
