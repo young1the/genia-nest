@@ -4,6 +4,8 @@ import "cropperjs/dist/cropper.css"
 import styles from "./OCRApp.module.css";
 import usePDF from "../pdf/hooks/usePDF.js";
 import PDFCanvas from "../pdf/components/PDFCanvas.jsx";
+import html2canvas from "html2canvas";
+import saveAs from "file-saver";
 
 function OCRApp() {
     const [iscaptureStart, setIscaptureStart] = useState(false);
@@ -22,6 +24,9 @@ function OCRApp() {
         setUseLatex(e.target.value);
     }
 
+    const totalQuestion = 25;
+    const [questionNum, setQuestionNum] = useState(1);
+
     const onChange = async (e) => {
         e.preventDefault();
         const file = e.target.files[0];
@@ -36,6 +41,24 @@ function OCRApp() {
             const croppedDataURL = croppedCanvas.toDataURL();
             setCropData(prev => [...prev, croppedDataURL]);
         }
+    };
+
+    const divRef = useRef(null);
+
+    const handleDownload = async () => {
+      if(!divRef.current) return;
+
+      try{
+        const div = divRef.current;
+        const canvas = await html2canvas(div, { scale:2 });
+        canvas.toBlob((blob) => {
+          if(blob !== null){
+            saveAs(blob, "result.png");
+          }
+        });
+      }catch(error){
+        console.error("Error converting div to image:", error);
+      }
     };
 
     return (
@@ -86,7 +109,7 @@ function OCRApp() {
                                                     <button
                                                         className={`${styles.geniaButton} ${styles.geniaButtonGreen}`}
                                                         onClick={() => {
-                                                            setIscaptureStart((prev) => {
+                                                            setIscaptureStart(prev => {
                                                                 return !prev;
                                                             });
                                                         }}
@@ -125,21 +148,22 @@ function OCRApp() {
                             </span> : null}
                                                     </div>
                                                     <div>
-                                                        <button onClick={() => {
-                                                            setCurrentPage(prev => {
-                                                                if (pages.length === 0) return;
-                                                                setIscaptureStart(false);
-                                                                return (prev + 1) % pages.length
-                                                            })
-                                                        }}>+
-                                                        </button>
+
                                                         <button onClick={() => {
                                                             setCurrentPage(prev => {
                                                                 if (pages.length === 0) return;
                                                                 setIscaptureStart(false);
                                                                 return (prev - 1) < 0 ? pages.length - 1 : prev - 1
                                                             })
-                                                        }}>-
+                                                        }}><span className={styles.icon}>arrow_back</span>
+                                                        </button>
+                                                        <button onClick={() => {
+                                                            setCurrentPage(prev => {
+                                                                if (pages.length === 0) return;
+                                                                setIscaptureStart(false);
+                                                                return (prev + 1) % pages.length
+                                                            })
+                                                        }}><span className={styles.icon}>arrow_forward</span>
                                                         </button>
                                                     </div>
                                                 </div>
@@ -147,7 +171,6 @@ function OCRApp() {
                                                     <div className="pdf-area">
                                                         {pages.length > 0 ? iscaptureStart ? <Cropper
                                                             ref={cropperRef}
-                                                            style={{height: 400, width: "100%"}}
                                                             zoomTo={0.5}
                                                             initialAspectRatio={1}
                                                             preview=".img-preview"
@@ -172,11 +195,39 @@ function OCRApp() {
                                         <div className={styles.viewTop}>
                                             <span className={styles.tit}>문제 변환</span>
                                             <div className={styles.pageWrap}>
-                                                <a className={styles.first}></a>
-                                                <a className={styles.prev}></a>
-                                                <input type="text"/>/<input type="text"/>
-                                                <a className={styles.next}></a>
-                                                <a className={styles.last}></a>
+                                                <button 
+                                                  className={styles.icon}
+                                                  onClick={() =>{
+                                                    setQuestionNum(1);
+                                                  }}
+                                                >first_page</button>
+                                                <button 
+                                                  className={styles.icon}
+                                                  onClick={() => {
+                                                    if(questionNum === 1){
+                                                      setQuestionNum(1);
+                                                      console.log("첫번째 문제");
+                                                    }
+                                                    else setQuestionNum(questionNum => questionNum-1)
+                                                  }}
+                                                >chevron_left</button>
+                                                <input type="text" value={questionNum} onChange={(e)=>{setQuestionNum(e.target.value)}} />/<input type="text" defaultValue={totalQuestion} />
+                                                <button 
+                                                  className={styles.icon}
+                                                  onClick={() =>{
+                                                    if(questionNum === totalQuestion){
+                                                      setQuestionNum(totalQuestion);
+                                                      console.warn("마지막 문제");
+                                                    }
+                                                    else setQuestionNum(questionNum => questionNum+1)
+                                                  }}
+                                                >chevron_right</button>
+                                                <button 
+                                                  className={styles.icon}
+                                                  onClick={() =>{                                                    
+                                                    setQuestionNum(totalQuestion);
+                                                  }}
+                                                >last_page</button>
                                             </div>
                                         </div>
                                         <div className={styles.viewBottom}>
@@ -194,13 +245,14 @@ function OCRApp() {
                                                             초기화
                                                         </button>
                                                     </div>
-                                                    <div className={styles.box}>
+                                                    <div className={styles.box} ref={divRef}>
                                                         {cropData.length > 0 ?
                                                             cropData.map((data, index) => <img
                                                                 key={`image-${index}`} style={{width: "100%"}}
                                                                 src={data} alt="cropped"/>) :
                                                             <p className={styles.emptyTxt}>문제 텍스트를 캡처 해주세요.</p>}
                                                     </div>
+                                                    <button onClick={handleDownload}>이미지 다운로드</button>
                                                     <div className={styles.boxTop}>
                                                         <div className={styles.tit}>변환조건
                                                         </div>
@@ -275,7 +327,7 @@ function OCRApp() {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>            
             <div className={styles.dimPop}></div>
         </>
     );
