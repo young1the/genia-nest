@@ -51,7 +51,6 @@
                                     <option value="과학탐구">과학탐구</option>
                                     <option value="직업탐구">직업탐구</option>
                                     <option value="제2외국어/한문">제2외국어/한문</option>
-
                                 </select>
                             </div>
                             <div class="select-wrap">
@@ -92,11 +91,11 @@
                             <div class="box">
                                 <span>업로드 상태</span>
                                 <div class="radio-wrap">
-                                    <input type="radio" id="radio01_01" name="paperStatus" value="ALL" checked>
+                                    <input type="radio" id="radio01_01" name="paperStatus" value="전체" checked>
                                     <label for="radio01_01">전체</label>
-                                    <input type="radio" id="radio01_02" name="paperStatus" value="DONE">
+                                    <input type="radio" id="radio01_02" name="paperStatus" value="완료">
                                     <label for="radio01_02">완료</label>
-                                    <input type="radio" id="radio01_03" name="paperStatus" value="IN_PROGRESS">
+                                    <input type="radio" id="radio01_03" name="paperStatus" value="진행중">
                                     <label for="radio01_03">진행</label>
                                 </div>
                             </div>
@@ -122,7 +121,7 @@
             <div class="table-wrap">
                 <div class="tab-top">
                     <div class="left-area">
-                        <span class="total">총 <em>000</em>건</span>
+                        <span class="total">총 <em th:text="${#lists.size(papers)}">0</em>건</span>
                         <div class="select-wrap">
                             <select class="select-box w140">
                                 <option value="">10개 보기</option>
@@ -140,7 +139,7 @@
                 <table class="tbl-list">
                     <caption></caption>
                     <colgroup>
-                        <col style="width: 3%;">
+<!--                        <col style="width: 3%;">-->
                         <col style="width: 4%;">
                         <col style="width: 6%;">
                         <col style="width: 6%;">
@@ -155,12 +154,12 @@
                     </colgroup>
                     <thead>
                     <tr>
-                        <th >
-                            <div class="check-wrap">
-                                <input type="checkbox" id="chk100_00" name="numChk" class="allCheck">
-                                <label for="chk100_00"></label>
-                            </div>
-                        </th>
+<!--                        <th >-->
+<!--                            <div class="check-wrap">-->
+<!--                                <input type="checkbox" id="chk100_00" name="numChk" class="allCheck">-->
+<!--                                <label for="chk100_00"></label>-->
+<!--                            </div>-->
+<!--                        </th>-->
                         <th>NO</th>
                         <th>출제 년도</th>
                         <th>월</th>
@@ -175,12 +174,14 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="paper : ${papers}">
-                        <td>
-                            <div class="check-wrap"><input type="checkbox" id="chk100_30" name="numChk">
-                                <label for="chk100_30"></label></div>
-                        </td>
-                        <td th:text="${paper.id}" />
+                    <tr th:each="paper, iterStat : ${papers}">
+<!--                        <td>-->
+<!--                            <div class="check-wrap"><input type="checkbox" id="chk100_30" name="numChk">-->
+<!--                                <label for="chk100_30"></label></div>-->
+<!--                        </td>-->
+<!--                        <td th:text="${iterStat.count}" />-->
+                        <td th:text="${#numbers.sequence(papers.size(), 1, -1)[iterStat.index]}" />
+                        <td th:text="${paper.id}" style="display: none;"  />
                         <td th:text="${paper.year}" />
                         <td th:text="${paper.month}" />
                         <td th:text="${paper.category}" />
@@ -189,23 +190,39 @@
                         <td th:text="${paper.subject}" />
                         <td th:text="${paper.name}" class="tit"><a href="javascript:;" /></td>
                         <td th:text="${paper.user.name}" />
-                        <td th:text="${#temporals.format(paper.createdAt, 'MM-dd-yyyy')}"></td>
-                        <td th:text="${paper.paperStatus}" />
+                        <td th:text="${#temporals.format(paper.createdAt, 'yyyy-MM-dd')}"></td>
+                        <td th:text="${paper.paperStatus.displayValue}" />
                     </tr>
                     </tbody>
                 </table>
             </div>
-            <!-- 페이징 -->
-            <div class="paging-wrap">
-                <a href="javascript:;" class="first"></a>
-                <a href="javascript:;" class="prev"></a>
-                <a href="javascript:;" class="page active"><span>1</span></a>
-                <a href="javascript:;" class="page"><span>2</span></a>
-                <a href="javascript:;" class="page"><span>3</span></a>
-                <a href="javascript:;" class="page"><span>4</span></a>
-                <a href="javascript:;" class="next"></a>
-                <a href="javascript:;" class="last"></a>
-            </div>
+            <!-- 페이지네이션 링크 -->
+            <ul class="pagination">
+                <li th:if="${papers.hasPrevious()}" class="page-item">
+                    <a class="page-link" th:href="@{/paper(page=1, size=${papers.size})}">처음</a>
+                </li>
+                <li th:if="${papers.hasPrevious()}" class="page-item">
+                    <a class="page-link" th:href="@{/paper(page=${papers.number - 1}, size=${papers.size})}">이전</a>
+                </li>
+                <li th:if="${papers.hasNext()}" class="page-item">
+                    <a class="page-link" th:href="@{/paper(page=${papers.number + 1}, size=${papers.size})}">다음</a>
+                </li>
+                <li th:if="${papers.hasNext()}" class="page-item">
+                    <a class="page-link" th:href="@{/paper(page=${papers.totalPages}, size=${papers.size})}">마지막</a>
+                </li>
+            </ul>
+
+<!--            &lt;!&ndash; 페이징 &ndash;&gt;-->
+<!--            <div class="paging-wrap">-->
+<!--                <a href="javascript:;" class="first"></a>-->
+<!--                <a href="javascript:;" class="prev"></a>-->
+<!--                <a href="javascript:;" class="page active"><span>1</span></a>-->
+<!--                <a href="javascript:;" class="page"><span>2</span></a>-->
+<!--                <a href="javascript:;" class="page"><span>3</span></a>-->
+<!--                <a href="javascript:;" class="page"><span>4</span></a>-->
+<!--                <a href="javascript:;" class="next"></a>-->
+<!--                <a href="javascript:;" class="last"></a>-->
+<!--            </div>-->
         </div>
     </div>
 
@@ -216,6 +233,7 @@
 
     areaSelect.addEventListener('change', function () {
        const selectArea = areaSelect.value;
+       const selectSubject = subjectSelect.value;
        subjectSelect.innerHTML = ''; // 기존 내용 지우기
 
         if (selectArea === '국어') {
@@ -273,13 +291,42 @@
             addOption(subjectSelect, '베트남어I');
             addOption(subjectSelect, '한문I');
         }
+
+        const selectedData = { // 선택 값들 객체화 시키기
+            area : selectArea,
+            subject : selectSubject
+        };
+        const jsonData = JSON.stringify(selectedData); // JSON으로 변환
+
+        fetch('api/paper', {
+            method : 'GET',
+            headers : {
+                'Content-Type' : 'application/json',
+            },
+            body : jsonData,
+        })
+            .then(response => response.json())
+            .then(data => {
+                // 서버에서 받은 결과 데이터 처리
+                console.log(data);
+            })
+            .catch(error => {
+                console.log('에러 발생 : ', error);
+            })
     });
 
-    function addOption(selectBox, optionText) {
+    function addOption(selectBox, optionText) { // 영역 - 과목 셀렉트 박스
         const option = document.createElement('option');
         option.text = optionText;
         selectBox.add(option);
     }
+
+    function updateTotalCount() { //  총 건수 세기
+        const totalCount = document.querySelectorAll('.left-area .select-box option').length;
+        document.getElementById('totalCount').innerText = totalCount;
+    }
+
+    updateTotalCount();
 </script>
 </body>
 

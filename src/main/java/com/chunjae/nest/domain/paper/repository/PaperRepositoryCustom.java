@@ -2,7 +2,9 @@ package com.chunjae.nest.domain.paper.repository;
 
 import com.chunjae.nest.domain.paper.dto.SearchKeywordDTO;
 import com.chunjae.nest.domain.paper.entity.Paper;
+import org.springframework.data.domain.Page;
 
+import java.awt.print.Pageable;
 import java.util.List;
 
 public interface PaperRepositoryCustom {
