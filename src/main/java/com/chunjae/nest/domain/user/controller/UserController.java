@@ -25,8 +25,7 @@ public class UserController {
         return "pages/user/login";
     }
 
-    //잠시테스트
-    @GetMapping("/acctMgmt")
+    @GetMapping("/management")
     public String showAccountManagementPage(Model model) {
         List<User> users = userService.getAllUsers();
         model.addAttribute("users", users);
@@ -47,13 +46,6 @@ public class UserController {
             return ResponseEntity.badRequest().build();
         }
 
-    }
-
-    @GetMapping("/users")
-    public String getUsers(Model model) {
-        List<User> users = userService.getAllUsers();
-        model.addAttribute("users", users);
-        return "pages/user/acctMgmt";
     }
 
 }

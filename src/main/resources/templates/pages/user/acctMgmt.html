@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:height="http://www.w3.org/1999/xhtml"
-      xmlns:border-left="http://www.w3.org/1999/xhtml" xmlns:border-bottom="http://www.w3.org/1999/xhtml">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>사용자 추가</title>
@@ -111,8 +110,8 @@
                             <td th:text="${user.name}"></td>
                             <td th:text="${user.userId}"></td>
                             <td>
-                                <span th:text="${#temporals.format(user.role.startDate, 'yyyy.MM.dd')}"> </span>
-                                <span th:text="${#temporals.format(user.role.endDate, 'yyyy.MM.dd')}"> </span>
+                                <span th:text="${user.role.startDate}"></span>~
+                                <span th:text="${user.role.endDate}"></span>
                             </td>
                             <td></td>
                             <td></td>
@@ -153,10 +152,8 @@
                 body: JSON.stringify(userDTO)
             });
 
-            const data = await response.json();
-
             if (response.ok) {
-                alert("사용자 추가 성공, 새 사용자 ID: " + data.id);
+                alert("사용자 추가 성공");
             } else {
                 alert("사용자 추가 실패");
             }
