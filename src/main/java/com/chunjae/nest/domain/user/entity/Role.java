@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.sql.Date;
-import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
@@ -35,5 +34,8 @@ public class Role extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(length = 10, nullable = false)
     private RoleStatus roleStatus;
+
+
+
 
 }

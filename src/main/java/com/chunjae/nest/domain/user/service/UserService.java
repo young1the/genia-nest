@@ -49,6 +49,15 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    public User login(String userId, String password) {
+        // 회원 정보 & 비밀번호 조회
+        User user = userRepository.findByUserId(userId);
 
+        if (user == null || !password.equals(user.getPassword())) {
+            return null;
+        }
+
+        return user;
+    }
 
 }
