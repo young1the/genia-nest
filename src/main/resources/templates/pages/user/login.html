@@ -5,27 +5,26 @@
   <th:block th:replace="~{fragments/include:: include}"/>
 </head>
 <body style="background-color: #ffffff;">
-  <div id="wrap" class="login">
-    <div class="login-wrap">
-      <div class="tit-wrap">
-        <img th:src="@{/images/logo.svg}" alt="천재교육" />
-        <h1>AI 교재 서비스 가공 플랫폼</h1>
+<div id="wrap" class="login">
+  <div class="login-wrap">
+    <div class="tit-wrap">
+      <img th:src="@{/images/logo.svg}" alt="천재교육" />
+      <h1>AI 교재 서비스 가공 플랫폼</h1>
+    </div>
+
+    <form action="/user/login" method="post" class="input-form">
+      <input type="text" name="userId" placeholder="아이디" />
+      <input type="password" name="password" placeholder="비밀번호" />
+      <div class="id-save">
+        <input type="checkbox" id="chk_id">
+        <label for="chk_id">아이디 저장</label>
       </div>
-
-      <div class="input-form">
-        <input type="text" placeholder="아이디" />
-        <input type="password" placeholder="비밀번호" />
-        <div class="id-save">
-          <input type="checkbox" id="chk_id">
-          <label for="chk_id">아이디 저장</label>
-        </div>
-        <button class="btn-login">로그인</button>
-
-        <span class="notice-txt">
+      <button type="submit" class="btn-login">로그인</button>
+      <span class="notice-txt">
           * 아이디/비밀번호가 기억나지 않을 경우, 담당자에게 문의하시길 바랍니다.
         </span>
-      </div>
-    </div>
+    </form>
   </div>
+</div>
 </body>
 </html>

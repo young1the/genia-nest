@@ -1,10 +1,8 @@
 package com.chunjae.nest.domain.user.dto;
 
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
-
 import java.sql.Date;
-import java.time.LocalDateTime;
+
 
 @Builder
 @Data
