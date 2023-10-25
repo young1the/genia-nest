@@ -19,7 +19,7 @@ public class PaperLog extends BaseLogEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 255, nullable = false)
+    @Column(length = 255, nullable = true)
     private String paperUrl;
 
     @Column(length = 255, nullable = false)

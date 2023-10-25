@@ -5,6 +5,7 @@ import com.chunjae.nest.domain.paper.entity.PaperStatus;
 import com.chunjae.nest.domain.user.entity.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @NoArgsConstructor
@@ -18,8 +19,9 @@ public class PaperRequest {
     private String category;
     private String area;
     private String subject;
+    private MultipartFile multipartFile;
 
-    public Paper createNewPaper(User user) {
+    public Paper createPaper(User user) {
 
         return Paper.builder()
                 .user(user)

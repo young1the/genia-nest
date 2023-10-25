@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -32,12 +33,12 @@ public class PaperService {
 
 
     @Transactional
-    public String saveUploadedPaper(PaperRequest paperRequest, MultipartFile multipartFile) throws IOException {
+    public String saveUploadedPaper(PaperRequest paperRequest) throws IOException {
         log.info(" paperRequest:{}", paperRequest.toString());
 
         Long id = 1L;
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
-
+        MultipartFile multipartFile = paperRequest.getMultipartFile();
         if (isAllowedFileType(multipartFile)) {
             String url = s3UploadService.uploadPaper(multipartFile);
             String fileName = s3UploadService.getFileName(url);
@@ -45,7 +46,7 @@ public class PaperService {
             log.info(" url: {}, fileName: {}", url, fileName);
 
             if (!url.equals("failed")) {
-                Paper paper = paperRequest.createNewPaper(user);
+                Paper paper = paperRequest.createPaper(user);
                 PaperFile paperFile = PaperFile.builder()
                         .name(fileName)
                         .url(url)
@@ -68,8 +69,13 @@ public class PaperService {
     }
 
     @Transactional(readOnly = true)
-    public PaperResponse getPaperDetail(Long id) {
+    public String getPaperUrl(Long id) {
+        Paper paper = paperRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("시험지가 없습니다."));
+        return paper.getPaperFile().getUrl();
+    }
 
+    @Transactional(readOnly = true)
+    public PaperResponse getPaperDetail(Long id) {
         Paper paper = paperRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("시험지가 없습니다."));
 
         return PaperResponse.builder()
@@ -85,59 +91,147 @@ public class PaperService {
                 .build();
     }
 
+//    @Transactional
+//    public String updatePaper(Long id, PaperRequest paperRequest, MultipartFile multipartFile) throws IOException {
+//        log.info("id:{}, paperRequest:{}", id, paperRequest.toString());
+//        Long userId = 1L;
+//        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
+//        Paper paper = paperRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("시험지가 없습니다."));
+//        PaperFile paperFile = paper.getPaperFile();
+//        paper.paperToUpdate(paperRequest);
+//
+//        try {
+//            if (paper.getOcrCount() != 0 && (paper.getPaperStatus() == PaperStatus.IN_PROGRESS || paper.getPaperStatus() == PaperStatus.TO_DO)) {
+//                paperRepository.save(paper);
+//                return "ok";
+//            }
+//
+//            if (isAllowedFileType(multipartFile) && !multipartFile.isEmpty()) {
+//                s3UploadService.deletePaper(paper.getPaperFile().getUrl());
+//                String url = s3UploadService.uploadPaper(multipartFile);
+//                String fileName = s3UploadService.getFileName(url);
+//                log.info("url:{}, fileName:{}", url, fileName);
+//
+//                if (!url.equals("failed")) {
+//                    paperFile.updatePaperFile(fileName, url);
+//                    PaperLog paperLog = PaperLog.builder()
+//                            .userId(user.getUserId())
+//                            .paperUrl(url)
+//                            .paperName(paperRequest.getName())
+//                            .build();
+//
+//                    paperFileRepository.save(paperFile);
+//                    paperRepository.save(paper);
+//                    paperLogRepository.save(paperLog);
+//
+//                    return "ok";
+//                }
+//            } else if (multipartFile.isEmpty()) {
+//                paperRepository.save(paper);
+//                s3UploadService.deletePaper(paper.getPaperFile().getUrl());
+//                paperFile.updatePaperFile("", "");
+//                paperFileRepository.save(paperFile);
+//                PaperLog paperLog = PaperLog.builder()
+//                        .userId(user.getUserId())
+//                        .paperUrl("")
+//                        .paperName(paperRequest.getName())
+//                        .build();
+//                paperLogRepository.save(paperLog);
+//                return "ok";
+//            }
+//
+//            return "failed";
+//        } catch (Exception e) {
+//            return "failed";
+//        }
+//    }
 
     @Transactional
-    public String updatePaper(Long id, PaperRequest paperRequest, MultipartFile multipartFile) throws IOException {
+    public String updatePaper(Long id, PaperRequest paperRequest) throws IOException {
         log.info("id:{}, paperRequest:{}", id, paperRequest.toString());
         Long userId = 1L;
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
         Paper paper = paperRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("시험지가 없습니다."));
+        validateUserAndPaper(user, paper);
+
         PaperFile paperFile = paper.getPaperFile();
         paper.paperToUpdate(paperRequest);
-
+        MultipartFile multipartFile = paperRequest.getMultipartFile();
         if (paper.getOcrCount() != 0 && (paper.getPaperStatus() == PaperStatus.IN_PROGRESS || paper.getPaperStatus() == PaperStatus.TO_DO)) {
             paperRepository.save(paper);
             return "ok";
         }
-        s3UploadService.deletePaper(paper.getPaperFile().getUrl());
+        try {
 
-        if (isAllowedFileType(multipartFile)) {
-            String url = s3UploadService.uploadPaper(multipartFile);
-            String fileName = s3UploadService.getFileName(url);
-            log.info("url:{}, fileName:{}", url, fileName);
+            if (isAllowedFileType(multipartFile) && !multipartFile.isEmpty()) {
+                s3UploadService.deletePaper(paper.getPaperFile().getUrl());
+                String url = s3UploadService.uploadPaper(multipartFile);
+                String fileName = s3UploadService.getFileName(url);
+                log.info("url:{}, fileName:{}", url, fileName);
 
-            if (!url.equals("failed")) {
-                paperFile.updatePaperFile(fileName, url);
+                if (!url.equals("failed")) {
+                    paperFile.updatePaperFile(fileName, url);
+                    PaperLog paperLog = PaperLog.builder()
+                            .userId(user.getUserId())
+                            .paperUrl(url)
+                            .paperName(paperRequest.getName())
+                            .build();
+
+                    paperFileRepository.save(paperFile);
+                    paperRepository.save(paper);
+                    paperLogRepository.save(paperLog);
+
+                    return "ok";
+                }
+            } else if (multipartFile.isEmpty()) {
+                paperRepository.save(paper);
+                s3UploadService.deletePaper(paper.getPaperFile().getUrl());
+                paperFile.updatePaperFile("", "");
+                paperFileRepository.save(paperFile);
                 PaperLog paperLog = PaperLog.builder()
                         .userId(user.getUserId())
-                        .paperUrl(url)
+                        .paperUrl("")
                         .paperName(paperRequest.getName())
                         .build();
-
-                paperRepository.save(paper);
-                paperFileRepository.save(paperFile);
                 paperLogRepository.save(paperLog);
-
                 return "ok";
             }
-        }
-        return "failed";
-    }
 
+            return "failed";
+        } catch (Exception e) {
+            return "failed";
+        }
+    }
 
     @Transactional
     public String deletePaper(Long id) {
+        Long userId = 1L;
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
         Paper paper = paperRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("시험지가 없습니다."));
         String url = paper.getPaperFile().getUrl();
+        validateUserAndPaper(user, paper);
 
         if (0 == paper.getOcrCount()) {
             s3UploadService.deletePaper(url);
             paper.setPaperStatusToDelete();
             paperRepository.save(paper);
             paperFileRepository.delete(paper.getPaperFile());
+            PaperLog paperLog = PaperLog.builder()
+                    .userId(paper.getUser().getUserId())
+                    .paperName(paper.getName())
+                    .paperUrl("")
+                    .build();
+            paperLogRepository.save(paperLog);
             return "ok";
         }
         return "failed";
+    }
+
+
+    public void validateUserAndPaper(User user, Paper paper) {
+        if (!Objects.equals(user.getId(), paper.getUser().getId())) {
+            throw new IllegalArgumentException("유저와 시험지의 작성자가 일치하지 않습니다.");
+        }
     }
 
     public boolean isAllowedFileType(MultipartFile multipartFile) {

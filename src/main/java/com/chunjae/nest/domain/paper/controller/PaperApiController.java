@@ -6,7 +6,6 @@ import com.chunjae.nest.domain.paper.service.PaperService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -18,14 +17,18 @@ public class PaperApiController {
     private final PaperService paperService;
 
     @PostMapping("/upload")
-    public ResponseEntity<String> saveUploadedPaper(@RequestPart(value = "paperRequest") PaperRequest paperRequest,
-                                                    @RequestPart(value = "multipartFile") MultipartFile multipartFile) throws IOException {
+    public ResponseEntity<String> saveUploadedPaper(PaperRequest paperRequest) throws IOException {
 
-        String saveUploadedPaper = paperService.saveUploadedPaper(paperRequest, multipartFile);
+        String saveUploadedPaper = paperService.saveUploadedPaper(paperRequest);
         if (saveUploadedPaper.equals("ok")) {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.badRequest().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<String> getPaperUrl(@PathVariable(name = "id") Long id) {
+        return ResponseEntity.ok().body(paperService.getPaperUrl(id));
     }
 
     @GetMapping("/detail/{id}")
@@ -35,10 +38,9 @@ public class PaperApiController {
 
     @PostMapping("/modify/{id}")
     public ResponseEntity<String> updatePaper(@PathVariable(name = "id") Long id,
-                                              @RequestPart(value = "paperRequest") PaperRequest paperRequest,
-                                              @RequestPart(value = "multipartFile", required = false) MultipartFile multipartFile) throws IOException {
+                                              PaperRequest paperRequest) throws IOException {
 
-        String updatePaper = paperService.updatePaper(id, paperRequest, multipartFile);
+        String updatePaper = paperService.updatePaper(id, paperRequest);
         if (updatePaper.equals("ok")) {
             return ResponseEntity.ok().build();
         }
