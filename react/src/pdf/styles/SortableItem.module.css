@@ -1,0 +1,18 @@
+@import url(https://fonts.googleapis.com/icon?family=Material+Icons);
+
+.icon {
+    font-family: 'Material Icons', emoji;
+    font-style: normal;
+    font-weight: 400;
+    padding: 4px;
+    cursor: pointer;
+}
+
+.icon:hover {
+    background: #dee5d9;
+}
+
+.btnContainer {
+    display: flex;
+    justify-content: space-between;
+}

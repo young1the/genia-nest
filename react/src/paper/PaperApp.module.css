@@ -1,0 +1,32 @@
+.wrapper {
+    width: 100%;
+    padding: 30px;
+}
+
+.header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-content: center;
+    margin-bottom: 20px;
+}
+
+.inputContainer {
+    display: flex;
+    gap: 20px;
+}
+
+.info, .pdf {
+    background: #fff;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.info {
+    flex: 2 1 0;
+    max-width: calc(100% / 5);
+}
+
+.pdf {
+    flex: 5 1 0;
+}
