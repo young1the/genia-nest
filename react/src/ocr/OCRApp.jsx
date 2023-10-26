@@ -14,16 +14,14 @@ function OCRApp() {
     const {addPDF, pages} = usePDF();
     const [currentPage, setCurrentPage] = useState(0);
     const canvasRef = useRef();
-
     const [QuestionType, setQuestionType] = useState();
     const handleQuestionType = (e) => {
         setQuestionType(e.target.value);
     }
-    const [useLatex, setUseLatex] = useState();
+    const [useLatex, setUseLatex] = useState("N");
     const handleUseLatex = (e) => {
         setUseLatex(e.target.value);
     }
-
     const totalQuestion = 25;
     const [questionNum, setQuestionNum] = useState(1);
 
@@ -44,10 +42,8 @@ function OCRApp() {
     };
 
     const divRef = useRef(null);
-
     const handleDownload = async () => {
       if(!divRef.current) return;
-
       try{
         const div = divRef.current;
         const canvas = await html2canvas(div, { scale:2 });
@@ -61,9 +57,71 @@ function OCRApp() {
       }
     };
 
+    const [isLoading, setIsLoading] = useState(false);
+    const transformOCR = async () => {
+        const src = "https://genia-fs1-nest-s3.s3.ap-northeast-2.amazonaws.com/math.png"
+        const formats = ["text", "html"]
+        const data_options = {
+            include_asciimath: true,
+            include_latex: true,
+        }
+        const body = {
+            src,
+            formats,
+            data_options,
+        }
+        const stringifiedBody = JSON.stringify(body);
+        setIsLoading(true);
+        const response = await fetch("https://api.mathpix.com/v3/text", {
+            headers: {
+                "app_id": import.meta.env.VITE_LATEX_API_ID,
+                "app_key": import.meta.env.VITE_LATEX_API_KEY,
+                "Content-Type": "application/json; charset=utf-8",
+            },
+            method: "POST",
+            body: stringifiedBody,
+        })
+        const result = await response.json();
+        setIsLoading(false);
+        console.log(result);
+    }
+
+    const transformtextOCR = async () => {
+        const url = "https://genia-fs1-nest-s3.s3.ap-northeast-2.amazonaws.com/text.png"
+        const format = "png"
+        const name = "test"        
+        const requestjson = {
+            "images": [
+              {
+                format,
+                name,                
+                url,                
+              }
+            ],
+            "lang": "ko",
+            "requestId": "string",
+            "resultType": "string",
+            "timestamp": 0,
+            "version": "V2"
+        }
+        const stringifiedRequest = JSON.stringify(requestjson)
+        const textresponse = await fetch("https://gsayd3fesc.apigw.ntruss.com/custom/v1/16872/475a5777d1cd1c2351b160840bcc6824d24e5e6e20d9cdb7dbcb7e87421eed01/general", {
+            header: {                
+                "X-OCR-SECRET" : import.meta.env.X_OCR_SECRET,
+                "content-Type" : "application/json",
+            },
+            method: "POST",
+            body: stringifiedRequest,
+        })
+        const textresult = await textresponse.json();
+        console.log(textresult);
+    }
+
     return (
         <>
             <div className={styles.fullPop}>
+                <button onClick={transformOCR}>test m.e. button</button>
+                <button onClick={transformtextOCR}>test text button</button>
                 <div className={styles.container}>
                     <div className={styles.dim}></div>
                     <div className={styles.inner}>
@@ -84,11 +142,11 @@ function OCRApp() {
                   </span>
                                 </div>
                                 <div className={styles.btnWrap}>
-                                    <a
+                                    <button
                                         className={`${styles.geniaButton} ${styles.geniaButtonLine}`}
                                     >
-                                        닫기
-                                    </a>
+                                        목록
+                                    </button>
                                 </div>
                             </div>
                             <div className={styles.popContent}>
@@ -106,21 +164,9 @@ function OCRApp() {
                                             </div>
                                             <div className="right-area">
                                                 <div className={styles.btnWrap}>
-                                                    <button
-                                                        className={`${styles.geniaButton} ${styles.geniaButtonGreen}`}
-                                                        onClick={() => {
-                                                            setIscaptureStart(prev => {
-                                                                return !prev;
-                                                            });
-                                                        }}
-                                                    >
-                                                        캡쳐시작
-                                                    </button>
+                                                
                                                     <div style={{width: "100%"}}>
-                                                        <input type="file" onChange={onChange}/>
-                                                        <button onClick={getCropData}>
-                                                            Crop Image
-                                                        </button>
+                                                        <input type="file" onChange={onChange}/>                                                        
                                                     </div>
                                                 </div>
                                             </div>
@@ -144,8 +190,8 @@ function OCRApp() {
                                                     </div>
                                                     <div className={styles.pageWrap}>
                                                         {pages.length > 0 ? <span>
-                              page <em>{currentPage + 1}</em> / <em>{pages.length}</em>
-                            </span> : null}
+                                                            page <em>{currentPage + 1}</em> / <em>{pages.length}</em>
+                                                            </span> : null}
                                                     </div>
                                                     <div>
 
@@ -166,7 +212,40 @@ function OCRApp() {
                                                         }}><span className={styles.icon}>arrow_forward</span>
                                                         </button>
                                                     </div>
-                                                </div>
+                                                </div>    
+                                                <div className={styles.typeBoxWrap}>
+                                                    <div className={styles.radioWrap}>
+                                                        {iscaptureStart ?
+                                                            <button
+                                                                className={`${styles.geniaButton} ${styles.geniaButtonGreen}`}
+                                                                onClick={() => {
+                                                                    setIscaptureStart(prev => {
+                                                                        return !prev;
+                                                                    });
+                                                                }}
+                                                            >
+                                                                캡쳐종료
+                                                            </button>:
+
+                                                            <button
+                                                                className={`${styles.geniaButton} ${styles.geniaButtonGreen}`}
+                                                                onClick={() => {
+                                                                    setIscaptureStart(prev => {
+                                                                        return !prev;
+                                                                    });
+                                                                }}
+                                                            >
+                                                                캡쳐시작
+                                                            </button>                                                        
+                                                        }
+                                                        
+                                                    </div>                                                
+                                                    <div>
+                                                        <button onClick={getCropData}>
+                                                            Crop Image
+                                                        </button>
+                                                    </div>
+                                                </div>                                         
                                                 <div className={styles.imgBox}>
                                                     <div className="pdf-area">
                                                         {pages.length > 0 ? iscaptureStart ? <Cropper
@@ -250,9 +329,13 @@ function OCRApp() {
                                                             cropData.map((data, index) => <img
                                                                 key={`image-${index}`} style={{width: "100%"}}
                                                                 src={data} alt="cropped"/>) :
-                                                            <p className={styles.emptyTxt}>문제 텍스트를 캡처 해주세요.</p>}
+                                                            <p className={styles.emptyTxt}>문제 텍스트를 캡쳐 해주세요.</p>}
                                                     </div>
-                                                    <button onClick={handleDownload}>이미지 다운로드</button>
+                                                        {cropData.length > 0 ?
+                                                            <button onClick={handleDownload}>이미지 다운로드</button>:
+                                                            <button onClick={()=>{alert("문제 택스트를 캡쳐 해주세요")}}>이미지 다운로드</button>
+                                                        }
+                                                        
                                                     <div className={styles.boxTop}>
                                                         <div className={styles.tit}>변환조건
                                                         </div>
@@ -288,13 +371,16 @@ function OCRApp() {
                                                     </div>
                                                 </div>
                                                 <div className={styles.btnWrap}>
-                                                    <a
+                                                    <button
                                                         className={
                                                             styles.geniaButton + " " + styles.geniaButtonGreen
                                                         }
+                                                        onClick={() => {
+                                                            console.log(questionNum, QuestionType, useLatex)
+                                                        }}
                                                     >
                                                         OCR 변환하기
-                                                    </a>
+                                                    </button>
                                                 </div>
                                                 <div
                                                     className={`${styles.boxWrap} ${styles.resultBox}`}
@@ -308,7 +394,7 @@ function OCRApp() {
                                                         </p>
                                                     </div>
                                                     <div className={styles.btnWrap}>
-                                                        <a
+                                                        <button
                                                             className={
                                                                 styles.geniaButton +
                                                                 " " +
@@ -316,7 +402,7 @@ function OCRApp() {
                                                             }
                                                         >
                                                             다음
-                                                        </a>
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>
