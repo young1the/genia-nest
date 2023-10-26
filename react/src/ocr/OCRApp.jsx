@@ -6,6 +6,8 @@ import usePDF from "../pdf/hooks/usePDF.js";
 import PDFCanvas from "../pdf/components/PDFCanvas.jsx";
 import html2canvas from "html2canvas";
 import saveAs from "file-saver";
+import LoaderIcon from "react-loader-icon";
+
 
 function OCRApp() {
     const [iscaptureStart, setIscaptureStart] = useState(false);
@@ -58,6 +60,7 @@ function OCRApp() {
     };
 
     const [isLoading, setIsLoading] = useState(false);
+    const [resultText, setResultText] = useState();
     const transformOCR = async () => {
         const src = "https://genia-fs1-nest-s3.s3.ap-northeast-2.amazonaws.com/math.png"
         const formats = ["text", "html"]
@@ -83,6 +86,7 @@ function OCRApp() {
         })
         const result = await response.json();
         setIsLoading(false);
+        setResultText(result.text);
         console.log(result);
     }
 
@@ -368,31 +372,37 @@ function OCRApp() {
                                                             />
                                                             <label htmlFor="chg_type01_02">있음</label>
                                                         </div>
+                                                        <div className={styles.btnWrap}>
+                                                            <button
+                                                                className={
+                                                                    styles.geniaButton + " " + styles.geniaButtonGreen
+                                                                }
+                                                                onClick={() => {
+                                                                    console.log(questionNum, QuestionType, useLatex)
+                                                                }}
+                                                            >
+                                                                OCR 변환하기
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div className={styles.btnWrap}>
-                                                    <button
-                                                        className={
-                                                            styles.geniaButton + " " + styles.geniaButtonGreen
-                                                        }
-                                                        onClick={() => {
-                                                            console.log(questionNum, QuestionType, useLatex)
-                                                        }}
-                                                    >
-                                                        OCR 변환하기
-                                                    </button>
-                                                </div>
+                                                
                                                 <div
                                                     className={`${styles.boxWrap} ${styles.resultBox}`}
                                                 >
                                                     <div className={styles.boxTop}>
                                                         <div className={styles.tit}>OCR 인식 결과</div>
-                                                    </div>
+                                                    </div>                                                    
+                                                    {resultText ? 
+                                                    <textarea className={`${styles.box} ${styles.geniaTextarea}`} style={{}} value={resultText} onChange={(e) => {setResultText(e.target.value)}}></textarea> :
                                                     <div className={styles.box}>
                                                         <p className={styles.emptyTxt}>
                                                             캡쳐한 이미지의 OCR 결과가 노출 됩니다.
+                                                            {isLoading ? <LoaderIcon /> : <></>}                                                        
                                                         </p>
+                                                        
                                                     </div>
+                                                    }
                                                     <div className={styles.btnWrap}>
                                                         <button
                                                             className={

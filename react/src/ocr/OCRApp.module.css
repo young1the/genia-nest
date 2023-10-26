@@ -38,6 +38,11 @@
     border: none;
 }
 
+.geniaTextarea{
+    resize: none;
+    height: 200px;
+    line-height: 1.5;
+}
 
 .inner {
     width: 100%;
@@ -1643,7 +1648,7 @@ textarea {
 .box.edit-box
 .btnWrap {
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: space-between;
 }
 
 .ocrWrap
