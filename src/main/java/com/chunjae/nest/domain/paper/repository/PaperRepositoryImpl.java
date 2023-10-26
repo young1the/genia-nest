@@ -25,24 +25,25 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
 
     @Override
     public List<SearchPaperDTO> searchByWhere(SearchKeywordDTO searchKeywordDTO) {
-        QPaper paper = QPaper.paper;
-        return queryFactory
-                .select(new QSearchPaperDTO(
-                        paper.id,
-                        paper.year,
-                        paper.category,
-                        paper.month,
-                        paper.grade,
-                        paper.area,
-                        paper.subject,
-                        paper.name,
-                        paper.paperStatus,
-                        paper.totalCount.intValue(),
-                        paper.user,
-                        paper.createdAt
-                ))
-                .from(paper)
-                .where()
-                .fetch();
+        return null;
+//        QPaper paper = QPaper.paper;
+//        return queryFactory
+//                .select(new QSearchPaperDTO(
+//                        paper.id,
+//                        paper.year,
+//                        paper.category,
+//                        paper.month,
+//                        paper.grade,
+//                        paper.area,
+//                        paper.subject,
+//                        paper.name,
+//                        paper.paperStatus,
+//                        paper.totalCount.intValue(),
+//                        paper.user,
+//                        paper.createdAt
+//                ))
+//                .from(paper)
+//                .where()
+//                .fetch();
     }
 }
