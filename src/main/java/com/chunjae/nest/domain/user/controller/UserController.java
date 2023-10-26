@@ -15,11 +15,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
 import static com.chunjae.nest.common.util.CookieUtil.USER_ID_COOKIE_NAME;
 import static com.chunjae.nest.common.util.CookieUtil.deleteCookie;
 
@@ -84,7 +81,6 @@ public class UserController {
         }
     }
 
-
     @GetMapping("/management")
     public String showAccountManagementPage(Model model) {
         List<User> users = userService.getAllUsers();
@@ -113,6 +109,11 @@ public class UserController {
         deleteCookie(request,response);
 
         return "redirect:/user/login";
+    }
+
+    @GetMapping("/modPassword")
+    public String modPassword(){
+        return "pages/user/modPassword";
     }
 
 

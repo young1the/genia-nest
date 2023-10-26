@@ -15,14 +15,14 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        var now = new Date();
-        var nextYear = new Date();
+        const now = new Date();
+        const nextYear = new Date();
         nextYear.setFullYear(now.getFullYear() + 1);
 
         function formatDate(date) {
-            var day = ("0" + date.getDate()).slice(-2);
-            var month = ("0" + (date.getMonth() + 1)).slice(-2);
-            var year = date.getFullYear();
+            const day = ("0" + date.getDate()).slice(-2);
+            const month = ("0" + (date.getMonth() + 1)).slice(-2);
+            const year = date.getFullYear();
 
             return year + "-" + month + "-" + day;
         }

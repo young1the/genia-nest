@@ -31,8 +31,6 @@ public class UserService {
                 .part(userDTO.getPart()).build();
         User dbUser = userRepository.save(user);
 
-
-
         Role role = Role.builder()
                 .user(dbUser)
                 .role(userDTO.getRole())
