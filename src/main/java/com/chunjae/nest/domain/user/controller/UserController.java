@@ -1,5 +1,6 @@
 package com.chunjae.nest.domain.user.controller;
 
+import com.chunjae.nest.common.util.CookieUtil;
 import com.chunjae.nest.domain.user.dto.CreateUserReqDTO;
 import com.chunjae.nest.domain.user.entity.User;
 import com.chunjae.nest.domain.user.service.UserService;
@@ -19,6 +20,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static com.chunjae.nest.common.util.CookieUtil.USER_ID_COOKIE_NAME;
+import static com.chunjae.nest.common.util.CookieUtil.deleteCookie;
+
 @Controller
 @Slf4j
 @RequiredArgsConstructor
@@ -26,29 +30,17 @@ import java.util.Optional;
 public class UserController {
 
     private final UserService userService;
-
-    //이 상수를 쓰는게 나은지 안쓰는게 나은지 ??
-    private static final String USER_ID_COOKIE_NAME = "userId";
+    private final CookieUtil cookieUtil;
 
     @GetMapping("/login")
     public String showLoginPage(HttpServletRequest request, Model model) {
         //이전 아이디 값 읽어오기
-        Optional<Cookie> userIdCookie = findCookie(request, USER_ID_COOKIE_NAME);
-        userIdCookie.ifPresent(cookie -> model.addAttribute("userId", cookie.getValue()));
+        Optional<Cookie> userIdCookie = cookieUtil.findCookie(request, USER_ID_COOKIE_NAME);
+        userIdCookie.ifPresent(cookie -> model.addAttribute(USER_ID_COOKIE_NAME, cookie.getValue()));
         return "pages/user/login";
     }
 
-    //findCookie 메서드 정의!
-    private Optional<Cookie> findCookie(HttpServletRequest request, String cookieName) {
-        Cookie[] cookies = request.getCookies();
 
-        if (cookies != null) {
-            return Arrays.stream(cookies)
-                    .filter(cookie -> cookieName.equals(cookie.getName()))
-                    .findFirst();
-        }
-        return Optional.empty();
-    }
 
     @PostMapping("/login")
     public String login(
@@ -70,22 +62,11 @@ public class UserController {
 
                 // 아이디 저장 체크박스 상태 확인
                 if ("on".equals(saveId)) {
-                    // 아이디 저장 체크박스가 체크되었을 때 쿠키를 설정
-                    Cookie cookie = new Cookie(USER_ID_COOKIE_NAME, userId);
-                    cookie.setMaxAge(60 * 60 * 24 * 30); // 30일 동안 유지 (초 단위)
-                    response.addCookie(cookie);
+
+                    cookieUtil.addCookie(userId, response);
                 } else {
-                    // 체크가 해제되었을 때 해당 쿠키를 삭제
-                    Cookie[] cookies = request.getCookies();
-                    if (cookies != null) {
-                        for (Cookie cookie : cookies) {
-                            if (USER_ID_COOKIE_NAME.equals(cookie.getName())) {
-                                cookie.setMaxAge(0);
-                                response.addCookie(cookie);
-                                break;
-                            }
-                        }
-                    }
+
+                    cookieUtil.deleteCookie(request, response);
                 }
 
                 // 로그인에 성공한 후, 원하는 페이지로 리다이렉트
@@ -125,22 +106,13 @@ public class UserController {
         }
     }
 
-    @PostMapping("/logout")
+    @GetMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 
         session.invalidate();
+        deleteCookie(request,response);
 
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("userId".equals(cookie.getName())) {
-                    cookie.setMaxAge(0);
-                    response.addCookie(cookie);
-                    break;
-                }
-            }
-        }
-        return "redirect:/";
+        return "redirect:/user/login";
     }
 
 

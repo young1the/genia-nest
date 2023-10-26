@@ -4,7 +4,7 @@
   <title>로그인 페이지</title>
   <th:block th:replace="~{fragments/include:: include}"/>
   <script th:inline="javascript">
-    var message = [[${message}]];
+    const message = [[${message}]];
     if (message) {
       alert(message);
     }
@@ -19,10 +19,12 @@
     </div>
 
     <form action="/user/login" method="post" class="input-form">
-      <input type="text" name="userId" placeholder="아이디" />
+      <input type="text" th:if="${userId}" name="userId" th:value="${userId}"/>
+      <input type="text" th:unless="${userId}" name="userId" placeholder="아이디" />
       <input type="password" name="password" placeholder="비밀번호" />
       <div class="id-save">
-        <input type="checkbox" id="chk_id">
+        <input type="checkbox" th:if="${userId}" name="saveId" checked/>
+        <input type="checkbox" th:unless="${userId}" name="saveId" id="chk_id">
         <label for="chk_id">아이디 저장</label>
       </div>
       <button type="submit" class="btn-login">로그인</button>
