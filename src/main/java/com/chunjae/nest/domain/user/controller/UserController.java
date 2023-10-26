@@ -62,16 +62,16 @@ public class UserController {
     ) {
         try {
             User loginRequest = userService.login(userId, password);
-
             if (loginRequest != null) {
+                String loginUserId = loginRequest.getUserId();
                 // 로그인에 성공한 경우
-                session.setAttribute("loginMember", loginRequest);
+                session.setAttribute("userId", loginUserId);
                 session.setMaxInactiveInterval(60 * 30); // 30분 동안 세션 유지
 
                 // 아이디 저장 체크박스 상태 확인
                 if ("on".equals(saveId)) {
                     // 아이디 저장 체크박스가 체크되었을 때 쿠키를 설정
-                    Cookie cookie = new Cookie("loginId", userId);
+                    Cookie cookie = new Cookie(USER_ID_COOKIE_NAME, userId);
                     cookie.setMaxAge(60 * 60 * 24 * 30); // 30일 동안 유지 (초 단위)
                     response.addCookie(cookie);
                 } else {
@@ -79,7 +79,7 @@ public class UserController {
                     Cookie[] cookies = request.getCookies();
                     if (cookies != null) {
                         for (Cookie cookie : cookies) {
-                            if ("loginId".equals(cookie.getName())) {
+                            if (USER_ID_COOKIE_NAME.equals(cookie.getName())) {
                                 cookie.setMaxAge(0);
                                 response.addCookie(cookie);
                                 break;
