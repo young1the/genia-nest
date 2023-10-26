@@ -2,6 +2,7 @@ package com.chunjae.nest.domain.paper.service;
 
 import com.chunjae.nest.domain.paper.dto.req.PaperRequest;
 import com.chunjae.nest.domain.paper.dto.res.PaperResponse;
+import com.chunjae.nest.domain.paper.dto.SearchPaperDTO;
 import com.chunjae.nest.domain.paper.entity.Paper;
 import com.chunjae.nest.domain.paper.entity.PaperFile;
 import com.chunjae.nest.domain.paper.entity.PaperLog;
@@ -13,10 +14,11 @@ import com.chunjae.nest.domain.user.entity.User;
 import com.chunjae.nest.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
+import java.util.List;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -90,61 +92,6 @@ public class PaperService {
                 .url(paper.getPaperFile().getUrl())
                 .build();
     }
-
-//    @Transactional
-//    public String updatePaper(Long id, PaperRequest paperRequest, MultipartFile multipartFile) throws IOException {
-//        log.info("id:{}, paperRequest:{}", id, paperRequest.toString());
-//        Long userId = 1L;
-//        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
-//        Paper paper = paperRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("시험지가 없습니다."));
-//        PaperFile paperFile = paper.getPaperFile();
-//        paper.paperToUpdate(paperRequest);
-//
-//        try {
-//            if (paper.getOcrCount() != 0 && (paper.getPaperStatus() == PaperStatus.IN_PROGRESS || paper.getPaperStatus() == PaperStatus.TO_DO)) {
-//                paperRepository.save(paper);
-//                return "ok";
-//            }
-//
-//            if (isAllowedFileType(multipartFile) && !multipartFile.isEmpty()) {
-//                s3UploadService.deletePaper(paper.getPaperFile().getUrl());
-//                String url = s3UploadService.uploadPaper(multipartFile);
-//                String fileName = s3UploadService.getFileName(url);
-//                log.info("url:{}, fileName:{}", url, fileName);
-//
-//                if (!url.equals("failed")) {
-//                    paperFile.updatePaperFile(fileName, url);
-//                    PaperLog paperLog = PaperLog.builder()
-//                            .userId(user.getUserId())
-//                            .paperUrl(url)
-//                            .paperName(paperRequest.getName())
-//                            .build();
-//
-//                    paperFileRepository.save(paperFile);
-//                    paperRepository.save(paper);
-//                    paperLogRepository.save(paperLog);
-//
-//                    return "ok";
-//                }
-//            } else if (multipartFile.isEmpty()) {
-//                paperRepository.save(paper);
-//                s3UploadService.deletePaper(paper.getPaperFile().getUrl());
-//                paperFile.updatePaperFile("", "");
-//                paperFileRepository.save(paperFile);
-//                PaperLog paperLog = PaperLog.builder()
-//                        .userId(user.getUserId())
-//                        .paperUrl("")
-//                        .paperName(paperRequest.getName())
-//                        .build();
-//                paperLogRepository.save(paperLog);
-//                return "ok";
-//            }
-//
-//            return "failed";
-//        } catch (Exception e) {
-//            return "failed";
-//        }
-//    }
 
     @Transactional
     public String updatePaper(Long id, PaperRequest paperRequest) throws IOException {
@@ -237,6 +184,10 @@ public class PaperService {
     public boolean isAllowedFileType(MultipartFile multipartFile) {
         String fileName = multipartFile.getOriginalFilename();
         return fileName != null && fileName.toLowerCase().endsWith(".pdf");
+    }
+
+    public List<Paper> findPapers() {
+        return paperRepository.findAll(Sort.by(Sort.Order.desc("id")));
     }
 
 }
