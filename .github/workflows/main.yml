@@ -18,7 +18,7 @@ jobs:
       
     - name: Clean Docker
       run: |
-        chmod +x ./clean-docker.sh && bash ./clean-docker.sh
+        sudo chmod +x ./clean-docker.sh && sudo bash ./clean-docker.sh
 
     - name: Build Docker image
       run: sudo docker build -t myapp .
