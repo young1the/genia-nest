@@ -93,7 +93,6 @@ const usePDF = () => {
       newPDFDoc.addPage(copiedPage);
     }
     const pdfBytes = await newPDFDoc.save();
-    const blob = new Blob([pdfBytes], { type: "application/pdf" });
     setPdfBlob(new Blob([pdfBytes], { type: "application/pdf" }));
   },[pages])
 
@@ -103,7 +102,7 @@ const usePDF = () => {
     deletePDFPage,
     deletePDFFile,
     generatePDFFile,
-    pdfFileUrl: pdfBlob,
+    pdfBlob,
     files,
     pages,
   };

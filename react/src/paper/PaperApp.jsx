@@ -16,24 +16,23 @@ function PaperApp() {
         deletePDFPage,
         pages,
         generatePDFFile,
-        pdfFileUrl,
+        pdfBlob,
     } = usePDF();
-    const infoSectionProps = {addPDF, deletePDFFile, files, inputRefs};
-    const pdfSectionProps = {
-        movePDFPage, deletePDFPage, pages,
-        generatePDFFile,
-        pdfFileUrl,
-    }
+
     const paperFileSubmitHandler = async () => {
-        if (!pdfFileUrl) return ;
+        if (!pdfBlob) return ;
         const formData = new FormData();
-        formData.append("file", pdfFileUrl, "pdf");
+        let fileName;
         for (const [name, elem] of Object.entries(inputRefs)) {
             if (elem?.value) {
                 formData.append(name, elem.value);
+                if (name === "name") {
+                    fileName = elem.value + ".pdf"
+                }
             }
         }
-        const response = await fetch(``, {
+        formData.append("multipartFile", pdfBlob, fileName);
+        const response = await fetch(`/api/paper/upload`, {
             method: "POST",
             body: formData,
         })
@@ -41,6 +40,13 @@ function PaperApp() {
         else alert("not ok");
     }
 
+    const infoSectionProps = {addPDF, deletePDFFile, files, inputRefs};
+    const pdfSectionProps = {
+        movePDFPage, deletePDFPage, pages,
+        generatePDFFile,
+        pdfFileUrl: pdfBlob,
+        paperFileSubmitHandler,
+    }
     return (
         <main className={styles.wrapper}>
             <header className={styles.header}>

@@ -18,7 +18,7 @@ function PDFExampleApp() {
     generatePDFFile,
     files,
     deletePDFFile,
-    pdfFileUrl,
+    pdfBlob,
   } = usePDF();
 
   const onChangeHandler = async (e) => {
@@ -53,8 +53,8 @@ function PDFExampleApp() {
           ))}
         </ul>
         <button onClick={createPdfFile}>파일 전송 또는 저장</button>
-        {pdfFileUrl ? (
-          <a href={pdfFileUrl} download>
+        {pdfBlob ? (
+          <a href={pdfBlob} download>
             다운로드
           </a>
         ) : null}
