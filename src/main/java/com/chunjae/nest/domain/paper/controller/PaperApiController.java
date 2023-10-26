@@ -11,7 +11,7 @@ import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/paper")
+@RequestMapping("/api/paper")
 public class PaperApiController {
 
     private final PaperService paperService;
