@@ -91,41 +91,26 @@ function OCRApp() {
     }
 
     const transformtextOCR = async () => {
-        const url = "https://genia-fs1-nest-s3.s3.ap-northeast-2.amazonaws.com/text.png"
-        const format = "png"
-        const name = "test"        
-        const requestjson = {
-            "images": [
-              {
-                format,
-                name,                
-                url,                
-              }
-            ],
-            "lang": "ko",
-            "requestId": "string",
-            "resultType": "string",
-            "timestamp": 0,
-            "version": "V2"
-        }
-        const stringifiedRequest = JSON.stringify(requestjson)
-        const textresponse = await fetch("https://gsayd3fesc.apigw.ntruss.com/custom/v1/16872/475a5777d1cd1c2351b160840bcc6824d24e5e6e20d9cdb7dbcb7e87421eed01/general", {
-            header: {                
-                "X-OCR-SECRET" : import.meta.env.X_OCR_SECRET,
-                "content-Type" : "application/json",
+        setIsLoading(true);
+        const src = "https://genia-fs1-nest-s3.s3.ap-northeast-2.amazonaws.com/text.png"
+        const body = {src}
+        const stringifiedRequest = JSON.stringify(body)
+        const textresponse = await fetch("/api/ocr/text", {
+            headers: {                
+                "Content-Type" : "application/json",
             },
             method: "POST",
             body: stringifiedRequest,
         })
         const textresult = await textresponse.json();
+        setIsLoading(false);
+        setResultText(textresult.text);
         console.log(textresult);
     }
 
     return (
         <>
             <div className={styles.fullPop}>
-                <button onClick={transformOCR}>test m.e. button</button>
-                <button onClick={transformtextOCR}>test text button</button>
                 <div className={styles.container}>
                     <div className={styles.dim}></div>
                     <div className={styles.inner}>
@@ -300,7 +285,7 @@ function OCRApp() {
                                                   onClick={() =>{
                                                     if(questionNum === totalQuestion){
                                                       setQuestionNum(totalQuestion);
-                                                      console.warn("마지막 문제");
+                                                      console.log("마지막 문제");
                                                     }
                                                     else setQuestionNum(questionNum => questionNum+1)
                                                   }}
@@ -379,6 +364,7 @@ function OCRApp() {
                                                                 }
                                                                 onClick={() => {
                                                                     console.log(questionNum, QuestionType, useLatex)
+                                                                    {useLatex === "N" ? transformtextOCR() : transformOCR()}
                                                                 }}
                                                             >
                                                                 OCR 변환하기
