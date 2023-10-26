@@ -35,4 +35,10 @@ public class SearchKeywordDTO { // 검색 조건 DTO
                 ", paperStatus='" + paperStatus + '\'' +
                 '}';
     }
+
+    public boolean isEmpty() {
+        return year == null && month == 0 && area == null && subject == null
+                && searchOption == null && searchKeyword == null && category == null
+                && paperStatus == null && grade == null;
+    }
 }

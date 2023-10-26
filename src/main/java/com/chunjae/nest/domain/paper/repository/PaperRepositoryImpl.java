@@ -6,13 +6,14 @@ import com.chunjae.nest.domain.paper.entity.PaperStatus;
 import com.chunjae.nest.domain.paper.entity.QPaper;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Pageable;
 
-import java.awt.print.Pageable;
 import java.util.List;
 
 @Repository
@@ -23,8 +24,8 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
     QPaper paper = QPaper.paper;
 
     @Override
-    public List<Paper> searchByWhere(SearchKeywordDTO searchKeywordDTO) {
-        return queryFactory
+    public Page<Paper> searchByWhere(SearchKeywordDTO searchKeywordDTO, Pageable pageable) {
+        JPAQuery<Paper> query = queryFactory
                 .selectFrom(paper)
                 .where(
                         yearEq(searchKeywordDTO.getYear()),
@@ -35,39 +36,16 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
                         paperStatusEq(searchKeywordDTO.getPaperStatus()),
                         gradeEq(searchKeywordDTO.getGrade())
                 )
-                .orderBy(paper.id.desc())
+                .orderBy(paper.id.desc());
+
+        long total = countTotalResults(searchKeywordDTO); // 총 결과 수
+
+        List<Paper> results = query
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
 
-//        List<Paper> searchResult = queryFactory
-//                .selectFrom(paper)
-//                .where(
-//                        yearEq(searchKeywordDTO.getYear()),
-//                        monthEq(searchKeywordDTO.getMonth()),
-//                        areaAndSubjectEq(searchKeywordDTO.getArea(), searchKeywordDTO.getSubject()),
-//                        keyWordEq(searchKeywordDTO.getSearchOption(), searchKeywordDTO.getSearchKeyword()),
-//                        categoryEq(searchKeywordDTO.getCategory()),
-//                        paperStatusEq(searchKeywordDTO.getPaperStatus()),
-//                        gradeEq(searchKeywordDTO.getGrade())
-//                )
-//                .orderBy(paper.id.desc())
-//                .fetch();
-//
-//        int total = queryFactory
-//                .selectFrom(paper)
-//                .where(
-//                        yearEq(searchKeywordDTO.getYear()),
-//                        monthEq(searchKeywordDTO.getMonth()),
-//                        areaAndSubjectEq(searchKeywordDTO.getArea(), searchKeywordDTO.getSubject()),
-//                        keyWordEq(searchKeywordDTO.getSearchOption(), searchKeywordDTO.getSearchKeyword()),
-//                        categoryEq(searchKeywordDTO.getCategory()),
-//                        paperStatusEq(searchKeywordDTO.getPaperStatus()),
-//                        gradeEq(searchKeywordDTO.getGrade())
-//                )
-//                .fetch().size();
-//
-//        return new PageImpl<>(searchResult, pageable, total);
-
-
+        return new PageImpl<>(results, pageable, total);
     }
 
     private BooleanExpression yearEq(String year) {
@@ -88,6 +66,7 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
         System.out.println("레파지토리 부분 - 받은 month 값 : " + month);
         BooleanExpression monthCondition = (month != 0) ? paper.month.eq(month) : null;
 
+        // 생략해도 돌아가는지 확인하기
         if (monthCondition != null) {
             // 이전에 설정된 조건이 있을 경우에만 OR 연산을 수행
             monthCondition = monthCondition.or(paper.month.eq(month));
@@ -172,5 +151,20 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
             // 두 값 모두 넘어오지 않았을 경우
             return result;
         }
+    }
+
+    private Long countTotalResults(SearchKeywordDTO searchKeywordDTO) {
+        JPAQuery<Paper> query = queryFactory
+                .selectFrom(paper)
+                .where(
+                        yearEq(searchKeywordDTO.getYear()),
+                        monthEq(searchKeywordDTO.getMonth()),
+                        areaAndSubjectEq(searchKeywordDTO.getArea(), searchKeywordDTO.getSubject()),
+                        keyWordEq(searchKeywordDTO.getSearchOption(), searchKeywordDTO.getSearchKeyword()),
+                        categoryEq(searchKeywordDTO.getCategory()),
+                        paperStatusEq(searchKeywordDTO.getPaperStatus()),
+                        gradeEq(searchKeywordDTO.getGrade())
+                );
+        return query.fetchCount();
     }
 }

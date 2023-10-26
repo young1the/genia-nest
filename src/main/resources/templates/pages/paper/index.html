@@ -121,13 +121,13 @@
             <div class="table-wrap">
                 <div class="tab-top">
                     <div class="left-area">
-                        <span class="total">총 <em th:text="${#lists.size(papers)}">0</em>건</span>
+                        <span class="total">총 <em th:text="${papers.totalElements}">0</em>건</span>
                         <div class="select-wrap">
-                            <select class="select-box w140">
-                                <option value="">10개 보기</option>
-                                <option value="">30개 보기</option>
-                                <option value="">50개 보기</option>
-                                <option value="">100개 보기</option>
+                            <select class="select-box w140" id="pageSizeSelect">
+                                <option value="10">10개 보기</option>
+                                <option value="30">30개 보기</option>
+                                <option value="50">50개 보기</option>
+                                <option value="100">100개 보기</option>
                             </select>
                         </div>
                     </div>
@@ -180,8 +180,10 @@
 <!--                                <label for="chk100_30"></label></div>-->
 <!--                        </td>-->
 <!--                        <td th:text="${iterStat.count}" />-->
-                        <td th:text="${#numbers.sequence(papers.size(), 1, -1)[iterStat.index]}" />
-                        <td th:text="${paper.id}" style="display: none;"  />
+<!--                        <td th:text="${#numbers.sequence(papers.size(), 1, -1)[iterStat.index]}" />-->
+                        <td th:text="${#numbers.sequence(papers.number * papers.size + 1, (papers.number + 1) * papers.size)[iterStat.index]}" />
+<!--                    <td th:text="${#numbers.sequence((papers.number + 1) * papers.size, papers.number * papers.size + 1)[iterStat.index]}" />-->
+                        <td th:text="${paper.id}" style="display: none;" />
                         <td th:text="${paper.year}" />
                         <td th:text="${paper.month}" />
                         <td th:text="${paper.category}" />
@@ -196,22 +198,27 @@
                     </tbody>
                 </table>
             </div>
-            <!-- 페이지네이션 링크 -->
-            <ul class="pagination">
-                <li th:if="${papers.hasPrevious()}" class="page-item">
-                    <a class="page-link" th:href="@{/paper(page=1, size=${papers.size})}">처음</a>
-                </li>
-                <li th:if="${papers.hasPrevious()}" class="page-item">
-                    <a class="page-link" th:href="@{/paper(page=${papers.number - 1}, size=${papers.size})}">이전</a>
-                </li>
-                <li th:if="${papers.hasNext()}" class="page-item">
-                    <a class="page-link" th:href="@{/paper(page=${papers.number + 1}, size=${papers.size})}">다음</a>
-                </li>
-                <li th:if="${papers.hasNext()}" class="page-item">
-                    <a class="page-link" th:href="@{/paper(page=${papers.totalPages}, size=${papers.size})}">마지막</a>
-                </li>
-            </ul>
-
+            <div class="paging-wrap">
+                <!-- 페이징 컨트롤을 표시할 영역 -->
+                <div class="pagination">
+                    <span th:if="${page.number > 0}">
+                        <a th:href="@{?page=0}">처음</a>
+                    </span>
+                    <span th:if="${page.number > 0}">
+                        <a th:href="@{?page=${page.number - 1}}">이전</a>
+                    </span>
+                    <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                          th:class="${page.number == i} ? 'active'">
+                        <a th:href="@{'/paper?page=' + ${i}}"><span th:text="${i + 1}">페이지 ${i + 1}</span></a>
+                    </span>
+                    <span th:if="${page.number < totalPages - 1}">
+                        <a th:href="@{?page=${page.number + 1}}">다음</a>
+                    </span>
+                    <span th:if="${page.number < totalPages - 1}">
+                        <a th:href="@{?page=${totalPages - 1}}">마지막</a>
+                    </span>
+                </div>
+            </div>
 <!--            &lt;!&ndash; 페이징 &ndash;&gt;-->
 <!--            <div class="paging-wrap">-->
 <!--                <a href="javascript:;" class="first"></a>-->
@@ -325,8 +332,10 @@
         const totalCount = document.querySelectorAll('.left-area .select-box option').length;
         document.getElementById('totalCount').innerText = totalCount;
     }
-
     updateTotalCount();
+
+    // 페이징
+
 </script>
 </body>
 
