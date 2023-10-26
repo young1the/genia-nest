@@ -1,8 +1,9 @@
 package com.chunjae.nest.domain.paper.controller;
 
-import com.chunjae.nest.domain.paper.dto.SearchPaperDTO;
 import com.chunjae.nest.domain.paper.entity.Paper;
 import com.chunjae.nest.domain.paper.service.PaperService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,7 +23,9 @@ public class PaperController {
     }
 
     @GetMapping("")
-    public String index(Model model) {
+    public String index(Model model, HttpServletRequest req) {
+        HttpSession session = req.getSession();
+        session.setAttribute("test", "test");
         // 전체 불러오기
         List<Paper> papers = paperService.findPapers();
         model.addAttribute("papers", papers);
