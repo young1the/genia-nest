@@ -2,11 +2,8 @@ import {useCallback, useRef, useState} from "react";
 import * as PDF_JS from "pdfjs-dist";
 import * as PDF_LIB from "pdf-lib";
 import { arrayMove } from "@dnd-kit/sortable";
-
-PDF_JS.GlobalWorkerOptions.workerSrc = new URL(
-  "pdfjs-dist/build/pdf.worker.js",
-  import.meta.url
-).toString();
+import pdfJSWorkerURL from "pdfjs-dist/build/pdf.worker?url";
+PDF_JS.GlobalWorkerOptions.workerSrc = pdfJSWorkerURL;
 const DOCUMENT_DEFAULT_CONFIG = {
   cMapUrl: "../../node_modules/pdfjs-dist/cmaps/",
   cMapPacked: true,
@@ -21,7 +18,7 @@ const usePDF = () => {
   let { current: pdfDocs } = useRef({});
   const [files, setFiles] = useState([]);
   const [pages, setPages] = useState([]);
-  const [pdfFileUrl, setPDFFileUrl] = useState();
+  const [pdfBlob, setPdfBlob] = useState();
 
   const addPDF = useCallback(async (pdfFile) => {
   const _getPDFDocPromise = (pdfFile) => {
@@ -97,8 +94,7 @@ const usePDF = () => {
     }
     const pdfBytes = await newPDFDoc.save();
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
-    const docUrl = URL.createObjectURL(blob);
-    setPDFFileUrl(docUrl);
+    setPdfBlob(new Blob([pdfBytes], { type: "application/pdf" }));
   },[pages])
 
   return {
@@ -107,7 +103,7 @@ const usePDF = () => {
     deletePDFPage,
     deletePDFFile,
     generatePDFFile,
-    pdfFileUrl,
+    pdfFileUrl: pdfBlob,
     files,
     pages,
   };

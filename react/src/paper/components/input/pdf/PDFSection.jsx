@@ -6,9 +6,10 @@ import {rectSortingStrategy, SortableContext} from "@dnd-kit/sortable";
 import SortableItemContainer from "../../../../pdf/components/SortableItemContainer.jsx";
 import SortableItem from "../../../../pdf/components/SortableItem.jsx";
 import PDFCanvas from "../../../../pdf/components/PDFCanvas.jsx";
-import React from "react";
+import React, {useEffect, useState} from "react";
 
 const PDFSection = ({pdfSectionProps}) => {
+    const [fileURL, setFileURL] = useState();
     const {
         movePDFPage, deletePDFPage, pages,
         generatePDFFile,
@@ -18,6 +19,12 @@ const PDFSection = ({pdfSectionProps}) => {
         const { active, over } = event;
         movePDFPage(active.id, over.id);
     };
+    useEffect(() => {
+        if (pdfFileUrl) {
+            const url = URL.createObjectURL(pdfFileUrl);
+            setFileURL(url);
+        }
+    }, [pdfFileUrl]);
 
     return (
         <div className={styles.container}>
@@ -48,7 +55,7 @@ const PDFSection = ({pdfSectionProps}) => {
             </div>
             <div className={styles.buttonContainer}>
                 <Button color={pages.length > 0 ? "green" : "gray"} onClick={generatePDFFile}>PDF 생성</Button>
-                <Button color={pdfFileUrl ? "green" : "gray"} onClick={generatePDFFile}><a href={pdfFileUrl} download={true}>다운로드</a></Button>
+                <Button color={pdfFileUrl ? "green" : "gray"}><a className={styles.buttonA} href={fileURL} download={true}>다운로드</a></Button>
                 <Button color={pdfFileUrl ? "green" : "gray"}>전송</Button>
             </div>
         </div>
