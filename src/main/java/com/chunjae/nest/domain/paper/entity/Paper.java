@@ -1,17 +1,18 @@
 package com.chunjae.nest.domain.paper.entity;
 
 import com.chunjae.nest.common.BaseEntity;
+import com.chunjae.nest.domain.paper.dto.req.PaperRequest;
+import com.chunjae.nest.domain.question.entity.Question;
 import com.chunjae.nest.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Builder
+@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Entity
@@ -21,7 +22,7 @@ public class Paper extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(nullable = false)
@@ -58,6 +59,26 @@ public class Paper extends BaseEntity {
     @OneToMany(mappedBy = "paper")
     private List<PaperAssignment> paperAssignments = new ArrayList<>();
 
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "paper")
+    private PaperFile paperFile;
+
     @OneToMany(mappedBy = "paper")
-    private List<PaperFile> paperFiles = new ArrayList<>();
+    private List<Question> questions = new ArrayList<>();
+
+    public void paperToUpdate(PaperRequest paperRequest) {
+        this.year = paperRequest.getYear();
+        this.month = paperRequest.getMonth();
+        this.grade = paperRequest.getGrade();
+        this.name = paperRequest.getName();
+        this.totalCount = paperRequest.getTotalCount();
+        this.category = paperRequest.getCategory();
+        this.area = paperRequest.getArea();
+        this.subject = paperRequest.getSubject();
+    }
+
+
+    public void setPaperStatusToDelete() {
+        this.paperStatus = PaperStatus.DELETED;
+    }
+
 }

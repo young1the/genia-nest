@@ -46,6 +46,27 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
                 .fetch();
 
         return new PageImpl<>(results, pageable, total);
+    public List<SearchPaperDTO> searchByWhere(SearchKeywordDTO searchKeywordDTO) {
+        return null;
+//        QPaper paper = QPaper.paper;
+//        return queryFactory
+//                .select(new QSearchPaperDTO(
+//                        paper.id,
+//                        paper.year,
+//                        paper.category,
+//                        paper.month,
+//                        paper.grade,
+//                        paper.area,
+//                        paper.subject,
+//                        paper.name,
+//                        paper.paperStatus,
+//                        paper.totalCount.intValue(),
+//                        paper.user,
+//                        paper.createdAt
+//                ))
+//                .from(paper)
+//                .where()
+//                .fetch();
     }
 
     private BooleanExpression yearEq(String year) {
