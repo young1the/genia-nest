@@ -20,10 +20,6 @@ public class PaperService {
         this.paperRepository = paperRepository;
     }
 
-    public List<Paper> findPapers() { // 사용 x. 임시
-        return paperRepository.findAll(Sort.by(Sort.Order.desc("id")));
-    }
-
     public Page<Paper> searchResults(SearchKeywordDTO searchKeywordDTO, Pageable pageable) {
       return paperRepository.searchByWhere(searchKeywordDTO, pageable);
     }
