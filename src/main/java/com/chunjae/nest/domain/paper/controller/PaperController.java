@@ -10,6 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.util.List;
 
 @Controller
@@ -36,6 +38,22 @@ public class PaperController {
 
     @GetMapping("/upload")
     public String upload() {
+        return "forward:/react/paper.html";
+    }
+
+    @GetMapping("/test")
+    public String test() throws NoSuchFieldException {
+        Paper paper = new Paper();
+        System.out.println("Heelo");
+        Class<Paper> clazz = (Class<Paper>) paper.getClass();
+        System.out.println(clazz.getDeclaredField("year"));
+        for (Field field :clazz.getDeclaredFields()){
+            Annotation[] annotations = field.getAnnotations();
+            for (Annotation annotation: annotations) {
+            }
+            System.out.println(field.getName());
+        }
+
         return "forward:/react/paper.html";
     }
 }

@@ -1,18 +1,19 @@
 package com.chunjae.nest.domain.paper.entity;
 
 import com.chunjae.nest.common.BaseEntity;
+import com.chunjae.nest.domain.paper.dto.req.PaperRequest;
+import com.chunjae.nest.domain.question.entity.Question;
 import com.chunjae.nest.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@ToString
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
 @Entity
 public class Paper extends BaseEntity {
@@ -21,23 +22,23 @@ public class Paper extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(nullable = false)
-    private short year;
+    private int year;
 
     @Column(nullable = false)
-    private short month;
+    private int month;
 
     @Column(nullable = false)
-    private short grade;
+    private int grade;
 
     @Column(nullable = false)
     private String name;
 
     @Column(nullable = false)
-    private short totalCount;
+    private int totalCount;
 
     @Column(length = 5, nullable = false)
     private String category;
@@ -49,7 +50,7 @@ public class Paper extends BaseEntity {
     private String subject;
 
     @Column(nullable = false)
-    private short ocrCount;
+    private int ocrCount;
 
     @Column(length = 10, nullable = false)
     @Enumerated(EnumType.STRING)
@@ -58,6 +59,28 @@ public class Paper extends BaseEntity {
     @OneToMany(mappedBy = "paper")
     private List<PaperAssignment> paperAssignments = new ArrayList<>();
 
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "paper")
+    private PaperFile paperFile;
+
     @OneToMany(mappedBy = "paper")
-    private List<PaperFile> paperFiles = new ArrayList<>();
+    private List<Question> questions = new ArrayList<>();
+
+    public void paperToUpdate(PaperRequest paperRequest) {
+        this.year = paperRequest.getYear();
+        this.month = paperRequest.getMonth();
+        this.grade = paperRequest.getGrade();
+        this.name = paperRequest.getName();
+        this.totalCount = paperRequest.getTotalCount();
+        this.category = paperRequest.getCategory();
+        this.area = paperRequest.getArea();
+        this.subject = paperRequest.getSubject();
+    }
+
+    public void updatePaperStatus(PaperStatus paperStatus) {
+        this.paperStatus = paperStatus;
+    }
+
+    public void setOcrCount(int ocrCount) {
+        this.ocrCount = ocrCount;
+    }
 }
