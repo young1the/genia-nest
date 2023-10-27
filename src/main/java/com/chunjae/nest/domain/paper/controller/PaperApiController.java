@@ -18,9 +18,7 @@ public class PaperApiController {
 
     @PostMapping("/upload")
     public ResponseEntity<String> saveUploadedPaper(PaperRequest paperRequest) throws IOException {
-
-        String saveUploadedPaper = paperService.saveUploadedPaper(paperRequest);
-        if (saveUploadedPaper.equals("ok")) {
+        if ("ok".equals(paperService.saveUploadedPaper(paperRequest))) {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.badRequest().build();
@@ -39,9 +37,7 @@ public class PaperApiController {
     @PostMapping("/modify/{id}")
     public ResponseEntity<String> updatePaper(@PathVariable(name = "id") Long id,
                                               PaperRequest paperRequest) throws IOException {
-
-        String updatePaper = paperService.updatePaper(id, paperRequest);
-        if (updatePaper.equals("ok")) {
+        if ("ok".equals(paperService.updatePaper(id, paperRequest))) {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.badRequest().build();
@@ -49,10 +45,7 @@ public class PaperApiController {
 
     @PostMapping("/remove/{id}")
     public ResponseEntity<String> deletePaper(@PathVariable(name = "id") Long id) {
-
-        String deletedPaper = paperService.deletePaper(id);
-
-        if (deletedPaper.equals("ok")) {
+        if ("ok".equals(paperService.deletePaper(id))) {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.badRequest().build();
