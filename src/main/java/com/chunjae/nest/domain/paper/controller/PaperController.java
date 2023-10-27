@@ -10,6 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.util.List;
 
 @Controller
@@ -38,4 +40,5 @@ public class PaperController {
     public String upload() {
         return "forward:/react/paper.html";
     }
+
 }

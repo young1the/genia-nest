@@ -22,3 +22,11 @@
     gap: 20px;
     padding: 30px;
 }
+
+.buttonA {
+    text-decoration: none;
+}
+
+.buttonA:hover, .buttonA:link, .buttonA:visited, .buttonA:active {
+    color: inherit;
+}

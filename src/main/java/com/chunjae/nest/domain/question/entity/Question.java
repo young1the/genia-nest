@@ -32,7 +32,7 @@ public class Question extends BaseEntity {
     private User user;
 
     @Column(nullable = false)
-    private short num;
+    private int num;
 
     @Column(columnDefinition = "LONGTEXT", nullable = false)
     private String content;

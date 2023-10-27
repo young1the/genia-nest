@@ -2,24 +2,22 @@ package com.chunjae.nest.domain.user.entity;
 
 import com.chunjae.nest.common.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.time.LocalDateTime;
+import java.sql.Date;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
+@Builder
 public class Role extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -27,14 +25,17 @@ public class Role extends BaseEntity {
     private String role;
 
     @Column(nullable = false)
-    private LocalDateTime startDate;
+    private Date startDate;
 
     @Column(nullable = false)
-    private LocalDateTime endDate;
+    private Date endDate;
 
 
     @Enumerated(EnumType.STRING)
     @Column(length = 10, nullable = false)
     private RoleStatus roleStatus;
+
+
+
 
 }
