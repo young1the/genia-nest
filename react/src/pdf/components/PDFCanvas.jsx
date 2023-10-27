@@ -36,6 +36,6 @@ const PDFCanvas = forwardRef(({pdfPage}, ref) => {
       {loading ? <div className={styles.loaderWrapper}>로딩중</div> : null}
     </div>
   );
-};
+})
 
 export default PDFCanvas;

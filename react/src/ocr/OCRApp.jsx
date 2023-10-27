@@ -46,17 +46,32 @@ function OCRApp() {
     const divRef = useRef(null);
     const handleDownload = async () => {
       if(!divRef.current) return;
+      const formData = new FormData();
       try{
         const div = divRef.current;
         const canvas = await html2canvas(div, { scale:2 });
-        canvas.toBlob((blob) => {
-          if(blob !== null){
-            saveAs(blob, "result.png");
-          }
-        });
+        // canvas.toBlob((blob) => {
+        //   if(blob !== null){
+        //     saveAs(blob, "result.png");
+        //   }
+        // });
+        const blobData = await new Promise((resolve, reject)=> {
+            canvas.toBlob((blob)=>{
+                if (!blob) reject();
+                resolve(blob);
+            });
+        })
+        console.log(blobData);
       }catch(error){
         console.error("Error converting div to image:", error);
       }
+      formData.append("multipartFile", divRef.current, "resultTest" );
+      const response = await fetch(`/api/ocr/`, {
+          method: "POST",
+          body: formData,
+      });
+      if(response.ok) alert("ok");
+      else alert("not ok");
     };
 
     const [isLoading, setIsLoading] = useState(false);
@@ -75,10 +90,8 @@ function OCRApp() {
         }
         const stringifiedBody = JSON.stringify(body);
         setIsLoading(true);
-        const response = await fetch("https://api.mathpix.com/v3/text", {
+        const response = await fetch("/api/ocr/math", {
             headers: {
-                "app_id": import.meta.env.VITE_LATEX_API_ID,
-                "app_key": import.meta.env.VITE_LATEX_API_KEY,
                 "Content-Type": "application/json; charset=utf-8",
             },
             method: "POST",
@@ -88,6 +101,15 @@ function OCRApp() {
         setIsLoading(false);
         setResultText(result.text);
         console.log(result);
+    }
+
+    //db에서 이미지 url 가져오기
+    const ocrImageURLhandler = async () => {
+        const response = await fetch("/api/ocr/", {
+            method: "POST",
+            body: null,
+        //     body에 필요한것 문제지 정보, 문항정보
+        })
     }
 
     const transformtextOCR = async () => {
@@ -321,10 +343,9 @@ function OCRApp() {
                                                             <p className={styles.emptyTxt}>문제 텍스트를 캡쳐 해주세요.</p>}
                                                     </div>
                                                         {cropData.length > 0 ?
-                                                            <button onClick={handleDownload}>이미지 다운로드</button>:
-                                                            <button onClick={()=>{alert("문제 택스트를 캡쳐 해주세요")}}>이미지 다운로드</button>
+                                                            <button onClick={handleDownload}>이미지 업로드</button>:
+                                                            <button onClick={()=>{alert("문제 텍스트를 캡쳐 해주세요")}}>이미지 업로드</button>
                                                         }
-                                                        
                                                     <div className={styles.boxTop}>
                                                         <div className={styles.tit}>변환조건
                                                         </div>
@@ -364,6 +385,7 @@ function OCRApp() {
                                                                 }
                                                                 onClick={() => {
                                                                     console.log(questionNum, QuestionType, useLatex)
+                                                                    // db에서 이미지 url 가지고와서 ocr api에 보내기
                                                                     {useLatex === "N" ? transformtextOCR() : transformOCR()}
                                                                 }}
                                                             >
