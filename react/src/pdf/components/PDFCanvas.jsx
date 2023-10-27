@@ -24,7 +24,9 @@ const PDFCanvas = ({ pdfPage }) => {
     setLoading(false);
   };
   const cleanCanvas = () => {
-    pdfPage?.cleanup();
+    if (pdfPage) {
+      pdfPage.cleanup();
+    }
   };
 
   return (

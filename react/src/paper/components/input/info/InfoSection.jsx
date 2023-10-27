@@ -4,7 +4,7 @@ import PaperFileSelect from "./PaperFileSelect.jsx";
 const InfoSection = ({infoSectionProps}) => {
     return (
         <>
-            <PaperMetaForm />
+            <PaperMetaForm inputRefs={infoSectionProps.inputRefs}/>
             <PaperFileSelect infoSectionProps={infoSectionProps} />
         </>
     )

@@ -37,19 +37,4 @@ public class PaperController {
         return "forward:/react/paper.html";
     }
 
-    @GetMapping("/test")
-    public String test() throws NoSuchFieldException {
-        Paper paper = new Paper();
-        System.out.println("Heelo");
-        Class<Paper> clazz = (Class<Paper>) paper.getClass();
-        System.out.println(clazz.getDeclaredField("year"));
-        for (Field field :clazz.getDeclaredFields()){
-            Annotation[] annotations = field.getAnnotations();
-            for (Annotation annotation: annotations) {
-            }
-            System.out.println(field.getName());
-        }
-
-        return "forward:/react/paper.html";
-    }
 }
