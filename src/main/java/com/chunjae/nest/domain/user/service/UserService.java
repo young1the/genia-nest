@@ -1,5 +1,6 @@
 package com.chunjae.nest.domain.user.service;
 
+import com.chunjae.nest.common.util.EncodePasswordUtils;
 import com.chunjae.nest.domain.user.dto.CreateUserReqDTO;
 import com.chunjae.nest.domain.user.entity.Role;
 import com.chunjae.nest.domain.user.entity.RoleStatus;
@@ -10,8 +11,8 @@ import com.chunjae.nest.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
 
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,13 +23,15 @@ public class UserService {
 
     @Transactional
     public User createUser(CreateUserReqDTO userDTO) {
-
         User user = User.builder()
                 .userId(userDTO.getUserId())
-                .password(userDTO.getUserId())
                 .name(userDTO.getName())
+                .password(EncodePasswordUtils.passwordEncoder().encode(userDTO.getUserId()))
                 .userStatus(UserStatus.NEW_USER)
-                .part(userDTO.getPart()).build();
+                .part(userDTO.getPart())
+                .build();
+
+        // 비밀번호를 암호화하여 저장
         User dbUser = userRepository.save(user);
 
         Role role = Role.builder()
@@ -51,11 +54,18 @@ public class UserService {
         // 회원 정보 & 비밀번호 조회
         User user = userRepository.findByUserId(userId);
 
-        if (user == null || !password.equals(user.getPassword())) {
+        if (user == null || !EncodePasswordUtils.passwordEncoder().matches(password, user.getPassword())) {
             return null;
         }
 
         return user;
     }
 
+    public UserStatus getCurrentUserStatus(String userId) {
+        User user = userRepository.findByUserId(userId);
+        if (user != null) {
+            return user.getUserStatus();
+        }
+        return null;
+    }
 }

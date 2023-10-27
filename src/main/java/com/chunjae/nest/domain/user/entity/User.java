@@ -14,7 +14,6 @@ import java.util.List;
 @Entity
 public class User extends BaseEntity {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -40,6 +39,5 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     private List<PaperAssignment> paperAssignments = new ArrayList<>();
-
 
 }

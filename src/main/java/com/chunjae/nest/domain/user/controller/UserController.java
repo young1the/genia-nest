@@ -3,6 +3,7 @@ package com.chunjae.nest.domain.user.controller;
 import com.chunjae.nest.common.util.CookieUtil;
 import com.chunjae.nest.domain.user.dto.CreateUserReqDTO;
 import com.chunjae.nest.domain.user.entity.User;
+import com.chunjae.nest.domain.user.entity.UserStatus;
 import com.chunjae.nest.domain.user.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -66,8 +67,22 @@ public class UserController {
                     cookieUtil.deleteCookie(request, response);
                 }
 
-                // 로그인에 성공한 후, 원하는 페이지로 리다이렉트
-                return "redirect:/";
+                // 로그인에 성공한 후, 원하는 페이지로 리다이렉트 하기전에
+                // userStatus 확인해서 NEW_USER면
+                // 비밀번호 변경 페이지로 보내기
+                // 아니면 원하는 페이지로 리다이렉트
+
+                UserStatus userStatus = userService.getCurrentUserStatus(userId);
+                System.out.println("------컨트롤러--------");
+                System.out.println(userStatus);
+                if (userStatus == UserStatus.NEW_USER) {
+
+                    return "redirect:/user/password/modify";
+                } else {
+
+                    return "redirect:/";
+                }
+
             } else {
                 // 로그인 실패 시 오류 메시지 추가
                 attributes.addFlashAttribute("message", "아이디 혹은 비밀번호가 일치하지 않습니다!");
@@ -111,8 +126,9 @@ public class UserController {
         return "redirect:/user/login";
     }
 
-    @GetMapping("/modPassword")
-    public String modPassword(){
+
+    @GetMapping("/password/modify")
+    public String modPassword() {
         return "pages/user/modPassword";
     }
 
