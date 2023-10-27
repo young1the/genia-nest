@@ -79,7 +79,6 @@ public class PaperService {
     @Transactional(readOnly = true)
     public PaperResponse getPaperDetail(Long id) {
         Paper paper = paperRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("시험지가 없습니다."));
-
         return PaperResponse.builder()
                 .year(paper.getYear())
                 .month(paper.getMonth())

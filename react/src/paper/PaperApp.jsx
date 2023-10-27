@@ -4,10 +4,19 @@ import H1 from "./components/common/H1.jsx";
 import InfoSection from "./components/input/info/InfoSection.jsx";
 import PDFSection from "./components/input/pdf/PDFSection.jsx";
 import usePDF from "../pdf/hooks/usePDF.js";
-import {useEffect, useRef} from "react";
+import {useEffect, useRef, useState} from "react";
 
 function PaperApp() {
-    const inputRefs = useRef();
+    const inputRefs = useRef({
+        area: {},
+        category: {},
+        grade: {},
+        month: {},
+        name: {},
+        subject: {},
+        totalCount: {},
+        year: {},
+    });
     const {
         addPDF,
         deletePDFFile,
@@ -17,8 +26,8 @@ function PaperApp() {
         pages,
         generatePDFFile,
         pdfBlob,
-    } = usePDF();
-    useEffect(() => {
+    } = usePDF()
+    useEffect( () => {
         getInitialValue();
     }, []);
     const getInitialValue = async () => {
@@ -32,7 +41,10 @@ function PaperApp() {
             if (result.url) {
                 await addPDF({name:result.name, url:result.url});
             }
-            console.log(result);
+            Object.entries(result).forEach(([name, value])=>{
+                console.log("name : " + name + " / value : " + value)
+                inputRefs.current[name] = {value};
+            })
         }
     }
 
@@ -40,7 +52,7 @@ function PaperApp() {
         if (!pdfBlob) return ;
         const formData = new FormData();
         let fileName;
-        for (const [name, elem] of Object.entries(inputRefs)) {
+        for (const [name, elem] of Object.entries(inputRefs.current)) {
             if (elem?.value) {
                 formData.append(name, elem.value);
                 if (name === "name") {
