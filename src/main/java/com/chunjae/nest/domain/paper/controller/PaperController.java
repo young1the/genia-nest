@@ -12,8 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.data.domain.Pageable;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/paper")
@@ -31,22 +30,35 @@ public class PaperController {
         System.out.println("==============================================");
         System.out.println("컨트롤러 부분 - " + searchKeywordDTO.toString());
 
-        int pageSize = 10; // 페이지 크기
+        int pageSize = 10;
         int currentPage = pageable.getPageNumber();
 
         if (currentPage < 0) {
             currentPage = 0; // 페이지 번호가 음수이면 0으로 설정
         }
 
+        // 검색
         Pageable adjustedPageable = PageRequest.of(currentPage, pageSize);
         Page<Paper> papers = paperService.searchResults(searchKeywordDTO, adjustedPageable);
-
-        //Page<Paper> papers = paperService.searchResults(searchKeywordDTO, pageable); // 조건에 따른 조회
         model.addAttribute("papers", papers);
-
-        int totalPages = papers.getTotalPages(); // 전체 페이지 수
-        model.addAttribute("totalPages", totalPages);
         model.addAttribute("page", papers);
+
+        // 페이징
+        String pageLink = "/paper?";
+        if (searchKeywordDTO.getYear() != null) {
+            pageLink += "year=" + searchKeywordDTO.getYear() + "&";
+        }
+        if (searchKeywordDTO.getMonth() != 0) {
+            pageLink += "month=" + searchKeywordDTO.getMonth() + "&";
+        }
+        if (searchKeywordDTO.getArea() != null) {
+            pageLink += "area=" + searchKeywordDTO.getArea() + "&";
+        }
+        if (searchKeywordDTO.getSubject() != null) {
+            pageLink += "subject=" + searchKeywordDTO.getSubject() + "&";
+        }
+        pageLink += "page=";
+        model.addAttribute("pageLink", pageLink);
 
         return "pages/paper/index";
     }

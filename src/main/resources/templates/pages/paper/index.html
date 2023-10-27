@@ -17,14 +17,14 @@
                         <div class="box">
                             <span>검색 조건</span>
                             <div class="select-wrap">
-                                <select class="select-box" name="year">
+                                <select class="select-box" id="year" name="year">
                                     <option value="전체">년도</option>
                                     <option value="2023">2023</option>
                                     <option value="2022">2022</option>
                                 </select>
                             </div>
                             <div class="select-wrap">
-                                <select class="select-box" name="month">
+                                <select class="select-box" id="month" name="month">
                                     <option value="0">출제 월</option>
                                     <option value="1">1월</option>
                                     <option value="2">2월</option>
@@ -59,13 +59,13 @@
                                 </select>
                             </div>
                             <div class="select-wrap">
-                                <select class="select-box" name="searchOption">
+                                <select class="select-box" id="searchOption" name="searchOption">
                                     <option value="전체">전체</option>
                                     <option value="name">시험지 명</option>
                                     <option value="user_id">등록자</option>
                                 </select>
                             </div>
-                            <input type="text" placeholder="검색어" class="search-form" name="searchKeyword">
+                            <input type="text" placeholder="검색어" class="search-form" id="searchKeyword" name="searchKeyword">
                         </div>
                         <div class="btn-wrap">
                             <button class="btn-green" type="submit">검색</button>
@@ -77,7 +77,7 @@
                         <div class="search-box">
                             <div class="box">
                                 <span>시험 종류</span>
-                                <div class="check-wrap">
+                                <div class="check-wrap" id="category">
                                     <input type="checkbox" id="grade00" name="category" value="수능">
                                     <label for="grade00">수능</label>
                                     <input type="checkbox" id="grade01" name="category" value="모의고사">
@@ -90,7 +90,7 @@
                         <div class="search-box">
                             <div class="box">
                                 <span>업로드 상태</span>
-                                <div class="radio-wrap">
+                                <div class="radio-wrap" id="paperStatus">
                                     <input type="radio" id="radio01_01" name="paperStatus" value="전체" checked>
                                     <label for="radio01_01">전체</label>
                                     <input type="radio" id="radio01_02" name="paperStatus" value="완료">
@@ -103,7 +103,7 @@
                         <div class="search-box">
                             <div class="box">
                                 <span>학년</span>
-                                <div class="radio-wrap">
+                                <div class="radio-wrap" id="grade">
                                     <input type="radio" id="radio02_01" name="grade" value="전체" checked="">
                                     <label for="radio02_01">전체</label>
                                     <input type="radio" id="radio02_02" name="grade" value="1">
@@ -117,7 +117,7 @@
                         </div>
                     </div>
                 </form>
-            </div>
+            </div> <!--search-box-wrap end-->
             <div class="table-wrap">
                 <div class="tab-top">
                     <div class="left-area">
@@ -179,10 +179,8 @@
 <!--                            <div class="check-wrap"><input type="checkbox" id="chk100_30" name="numChk">-->
 <!--                                <label for="chk100_30"></label></div>-->
 <!--                        </td>-->
-<!--                        <td th:text="${iterStat.count}" />-->
-<!--                        <td th:text="${#numbers.sequence(papers.size(), 1, -1)[iterStat.index]}" />-->
                         <td th:text="${#numbers.sequence(papers.number * papers.size + 1, (papers.number + 1) * papers.size)[iterStat.index]}" />
-<!--                    <td th:text="${#numbers.sequence((papers.number + 1) * papers.size, papers.number * papers.size + 1)[iterStat.index]}" />-->
+<!--                        <td th:text="${#numbers.sequence((papers.number + 1) * papers.size, papers.number * papers.size + 1)[iterStat.index]}" />-->
                         <td th:text="${paper.id}" style="display: none;" />
                         <td th:text="${paper.year}" />
                         <td th:text="${paper.month}" />
@@ -199,37 +197,17 @@
                 </table>
             </div>
             <div class="paging-wrap">
-                <!-- 페이징 컨트롤을 표시할 영역 -->
-                <div class="pagination">
-                    <span th:if="${page.number > 0}">
-                        <a th:href="@{?page=0}">처음</a>
-                    </span>
-                    <span th:if="${page.number > 0}">
-                        <a th:href="@{?page=${page.number - 1}}">이전</a>
-                    </span>
-                    <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                          th:class="${page.number == i} ? 'active'">
-                        <a th:href="@{'/paper?page=' + ${i}}"><span th:text="${i + 1}">페이지 ${i + 1}</span></a>
-                    </span>
-                    <span th:if="${page.number < totalPages - 1}">
-                        <a th:href="@{?page=${page.number + 1}}">다음</a>
-                    </span>
-                    <span th:if="${page.number < totalPages - 1}">
-                        <a th:href="@{?page=${totalPages - 1}}">마지막</a>
-                    </span>
-                </div>
+                <!-- 페이징 영역 -->
+                <a href="javascript:;" class="first" th:if="${page.number != 0}" th:href="@{${pageLink + (page.number - 1)}}"></a>
+                <a href="javascript:;" class="prev" th:if="${page.number == 0}"></a>
+                &nbsp;&nbsp;
+                <th:block th:each="pageNumber : ${#numbers.sequence(0, page.totalPages - 1)}">
+                    <a href="javascript:;" class="page" th:class="${page.number == pageNumber} ? active" th:href="@{${pageLink + pageNumber}}"><span th:text="${pageNumber + 1}"></span></a>
+                </th:block>
+                &nbsp;&nbsp;
+                <a href="javascript:;" class="next" th:if="${page.number != page.totalPages - 1}" th:href="@{${pageLink + (page.number + 1)}}"></a>
+                <a href="javascript:;" class="last" th:if="${page.number == page.totalPages - 1}"></a>
             </div>
-<!--            &lt;!&ndash; 페이징 &ndash;&gt;-->
-<!--            <div class="paging-wrap">-->
-<!--                <a href="javascript:;" class="first"></a>-->
-<!--                <a href="javascript:;" class="prev"></a>-->
-<!--                <a href="javascript:;" class="page active"><span>1</span></a>-->
-<!--                <a href="javascript:;" class="page"><span>2</span></a>-->
-<!--                <a href="javascript:;" class="page"><span>3</span></a>-->
-<!--                <a href="javascript:;" class="page"><span>4</span></a>-->
-<!--                <a href="javascript:;" class="next"></a>-->
-<!--                <a href="javascript:;" class="last"></a>-->
-<!--            </div>-->
         </div>
     </div>
 
@@ -332,11 +310,82 @@
         const totalCount = document.querySelectorAll('.left-area .select-box option').length;
         document.getElementById('totalCount').innerText = totalCount;
     }
-    updateTotalCount();
 
-    // 페이징
+    document.addEventListener('DOMContentLoaded', function() {
+        updateTotalCount();
+    });
+
+    // // 검색 조건 = url
+    // function saveSearchCondition() { // 검색 조건 저장
+    //     const selectedYear = document.querySelector('#year').value;
+    //     const selectedMonth = document.querySelector('#month').value;
+    //     const selectedArea = document.querySelector('#areaSelect').value;
+    //     const selectedSubject = document.querySelector('#subjectSelect').value;
+    //     const selectedOption = document.querySelector('#searchOption').value;
+    //     const selectedKeyword = document.querySelector('#searchKeyword').value;
+    //     const selectedCategory = document.querySelector('#category').value;
+    //     const selectedPaperStatus = document.querySelector('#paperStatus').value;
+    //     const selectedGrade = document.querySelector('#grade').value;
+    //
+    //     localStorage.setItem('selectedYear', selectedYear);
+    //     localStorage.setItem('selectedMonth', selectedMonth);
+    //     localStorage.setItem('selectedArea', selectedArea);
+    //     localStorage.setItem('selectedSubject', selectedSubject);
+    //     localStorage.setItem('selectedOption', selectedOption);
+    //     localStorage.setItem('selectedKeyword', selectedKeyword);
+    //     localStorage.setItem('selectedCategory', selectedCategory);
+    //     localStorage.setItem('selectedPaperStatus', selectedPaperStatus);
+    //     localStorage.setItem('selectedGrade', selectedGrade);
+    // }
+    //
+    // // 페이지 로드 시 검색 조건 복원
+    // window.onload = function () {
+    //     const selectedYear = localStorage.getItem('selectedYear');
+    //     const selectedMonth = localStorage.getItem('selectedMonth');
+    //     const selectedArea = localStorage.getItem('selectedArea');
+    //     const selectedSubject = localStorage.getItem('selectedSubject');
+    //     const selectedOption = localStorage.getItem('selectedOption');
+    //     const selectedKeyword = localStorage.getItem('selectedKeyword');
+    //     const selectedCategory = localStorage.getItem('selectedCategory');
+    //     const selectedPaperStatus = localStorage.getItem('selectedPaperStatus');
+    //     const selectedGrade = localStorage.getItem('selectedGrade');
+    //
+    //     if (selectedYear) {
+    //         document.querySelector('#year').value = selectedYear;
+    //     }
+    //     if (selectedMonth) {
+    //         document.querySelector('#month').value = selectedMonth;
+    //     }
+    //     if (selectedArea) {
+    //         document.querySelector('#areaSelect').value = selectedArea;
+    //     }
+    //     if (selectedSubject) {
+    //         document.querySelector('#subjectSelect').value = selectedSubject;
+    //     }
+    //     if (selectedOption) {
+    //         document.querySelector('#searchOption').value = selectedOption;
+    //     }
+    //     if (selectedKeyword) {
+    //         document.querySelector('#searchKeyword').value = selectedKeyword;
+    //     }
+    //     if (selectedCategory) {
+    //         document.querySelector('#category').value = selectedCategory;
+    //     }
+    //     if (selectedPaperStatus) {
+    //         document.querySelector('#paperStatus').value = selectedPaperStatus;
+    //     }
+    //     if (selectedGrade) {
+    //         document.querySelector('#grade').value = selectedGrade;
+    //     }
+    // }
+    //
+    // // 검색 버튼 클릭 이벤트 핸들러
+    // document.querySelector('button.btn-green[type="submit"]').addEventListener('click', function (e) {
+    //     e.preventDefault(); // 기본 동작 방지
+    //     saveSearchCondition();
+    //     // 나머지 검색 로직 추가
+    // });
 
 </script>
 </body>
-
 </html>
