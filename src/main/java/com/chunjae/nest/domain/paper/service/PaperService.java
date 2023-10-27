@@ -3,7 +3,6 @@ package com.chunjae.nest.domain.paper.service;
 import com.chunjae.nest.domain.paper.dto.SearchKeywordDTO;
 import com.chunjae.nest.domain.paper.dto.req.PaperRequest;
 import com.chunjae.nest.domain.paper.dto.res.PaperResponse;
-import com.chunjae.nest.domain.paper.dto.SearchPaperDTO;
 import com.chunjae.nest.domain.paper.entity.Paper;
 import com.chunjae.nest.domain.paper.entity.PaperFile;
 import com.chunjae.nest.domain.paper.entity.PaperLog;
