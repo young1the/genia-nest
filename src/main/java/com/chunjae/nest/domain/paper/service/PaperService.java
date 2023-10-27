@@ -58,6 +58,7 @@ public class PaperService {
                         .userId(user.getUserId())
                         .paperUrl(url)
                         .paperName(paperRequest.getName())
+                        .paperStatus(PaperStatus.TO_DO)
                         .build();
 
                 paperRepository.save(paper);
@@ -118,15 +119,10 @@ public class PaperService {
 
                 if (!url.equals("failed")) {
                     paperFile.updatePaperFile(fileName, url);
-                    PaperLog paperLog = PaperLog.builder()
-                            .userId(user.getUserId())
-                            .paperUrl(url)
-                            .paperName(paperRequest.getName())
-                            .build();
+
 
                     paperFileRepository.save(paperFile);
                     paperRepository.save(paper);
-                    paperLogRepository.save(paperLog);
 
                     return "ok";
                 }
@@ -135,12 +131,6 @@ public class PaperService {
                 s3UploadService.deletePaper(paper.getPaperFile().getUrl());
                 paperFile.updatePaperFile("", "");
                 paperFileRepository.save(paperFile);
-                PaperLog paperLog = PaperLog.builder()
-                        .userId(user.getUserId())
-                        .paperUrl("")
-                        .paperName(paperRequest.getName())
-                        .build();
-                paperLogRepository.save(paperLog);
                 return "ok";
             }
 
@@ -160,13 +150,14 @@ public class PaperService {
 
         if (0 == paper.getOcrCount()) {
             s3UploadService.deletePaper(url);
-            paper.setPaperStatusToDelete();
+            paper.updatePaperStatus(PaperStatus.DELETED);
             paperRepository.save(paper);
             paperFileRepository.delete(paper.getPaperFile());
             PaperLog paperLog = PaperLog.builder()
                     .userId(paper.getUser().getUserId())
                     .paperName(paper.getName())
                     .paperUrl("")
+                    .paperStatus(PaperStatus.DELETED)
                     .build();
             paperLogRepository.save(paperLog);
             return "ok";

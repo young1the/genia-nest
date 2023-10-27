@@ -47,7 +47,7 @@ public class Question extends BaseEntity {
         this.content = content;
     }
 
-    public void setQuestionStatusToCompleted() {
-        this.questionStatus = QuestionStatus.COMPLETED;
+    public void updateQuestionStatus(QuestionStatus questionStatus) {
+        this.questionStatus = questionStatus;
     }
 }
