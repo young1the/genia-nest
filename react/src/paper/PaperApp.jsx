@@ -6,7 +6,7 @@ import PDFSection from "./components/input/pdf/PDFSection.jsx";
 import usePDF from "../pdf/hooks/usePDF.js";
 import {useEffect, useRef, useState} from "react";
 
-function PaperApp() {
+function PaperApp({idParam}) {
     const inputRefs = useRef({
         area: {},
         category: {},
@@ -27,32 +27,29 @@ function PaperApp() {
         generatePDFFile,
         pdfBlob,
     } = usePDF()
-    useEffect( () => {
+    useEffect(() => {
         getInitialValue();
     }, []);
     const getInitialValue = async () => {
-        let url = new URL(window.location.href);
-        let params = new URLSearchParams(url.search);
-        if (!params.has("id")) {
-            return ;
-        } else {
-            const response = await fetch(`/api/paper/detail/${params.get("id")}`);
+        if (idParam) {
+            const response = await fetch(`/api/paper/detail/${idParam}`);
             const result = await response.json();
             if (result.url) {
-                await addPDF({name:result.name, url:result.url});
+                await addPDF({name: result.name, url: result.url});
             }
-            Object.entries(result).forEach(([name, value])=>{
-                console.log("name : " + name + " / value : " + value)
+            Object.entries(result).forEach(([name, value]) => {
                 inputRefs.current[name] = {value};
             })
         }
     }
-
     const paperFileSubmitHandler = async () => {
-        if (!pdfBlob) return ;
+        if (!idParam && !pdfBlob) {
+            return ;
+        }
         const formData = new FormData();
         let fileName;
         for (const [name, elem] of Object.entries(inputRefs.current)) {
+            console.log(`${name} : ${elem.value}`)
             if (elem?.value) {
                 formData.append(name, elem.value);
                 if (name === "name") {
@@ -60,8 +57,9 @@ function PaperApp() {
                 }
             }
         }
-        formData.append("multipartFile", pdfBlob, fileName);
-        const response = await fetch(`/api/paper/upload`, {
+        if (pdfBlob) formData.append("multipartFile", pdfBlob, fileName);
+        const requestURL = !idParam ?  `/api/paper/upload` : `/api/paper/modify/${idParam}`;
+        const response = await fetch(requestURL, {
             method: "POST",
             body: formData,
         })
@@ -81,7 +79,9 @@ function PaperApp() {
         <main className={styles.wrapper}>
             <header className={styles.header}>
                 <H1>시험지 업로드 페이지</H1>
-                <Button color="gray" onClick={()=>{window.close()}}>닫기</Button>
+                <Button color="gray" onClick={() => {
+                    window.close()
+                }}>닫기</Button>
             </header>
             <div className={styles.inputContainer}>
                 <section className={styles.info}><InfoSection infoSectionProps={infoSectionProps}/></section>

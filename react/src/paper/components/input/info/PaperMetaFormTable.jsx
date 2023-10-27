@@ -44,7 +44,7 @@ const PaperMetaFormTable = ({inputRefs}) => {
             <tr className={styles.tr}>
                 <th className={styles.th}>출제년도</th>
                 <td className={styles.td}><input ref={(ref) => inputRefs.current.year = ref} type={"number"}
-                                                 defaultValue={inputRefs.current?.year?.value ?? 2023}/>
+                                                 defaultValue={inputRefs.current?.year?.value} key={inputRefs.current?.year?.value}/>
                 </td>
             </tr>
             <tr className={styles.tr}>
@@ -90,7 +90,7 @@ const PaperMetaFormTable = ({inputRefs}) => {
             <tr className={styles.tr}>
                 <th className={styles.th}>영역</th>
                 <td className={styles.td}>
-                    <select ref={(ref) => inputRefs.current.area = ref} value={areaValue} defaultValue={inputRefs.current?.area?.value} key={inputRefs.current?.area?.value}
+                    <select ref={(ref) => inputRefs.current.area = ref} defaultValue={inputRefs.current?.area?.value} key={inputRefs.current?.area?.value}
                             onChange={(e) => setAreaValue(e.target.value)}>
                         <option value={"전체"}>전체</option>
                         {Object.keys(area).map((value) => <option key={`area-${value}`} value={value} >{value}</option>)}
@@ -100,11 +100,11 @@ const PaperMetaFormTable = ({inputRefs}) => {
             <tr className={styles.tr}>
                 <th className={styles.th}>과목</th>
                 <td className={styles.td}>
-                    <select ref={(ref) => inputRefs.current.subject = ref} defaultValue={inputRefs.current?.subject?.value} key={inputRefs.current?.subject?.value}
+                    <select ref={(ref) => inputRefs.current.subject = ref} defaultValue={inputRefs.current?.subject?.value} key={inputRefs.current?.area?.value}
                     >
                         <option value={"전체"}>전체</option>
-                        {area[areaValue] ? area[areaValue].map((value) => <option key={`area-${value}`} value={value}
-                                                                                  >{value}</option>) : <option value={inputRefs.current?.subject?.value}>{inputRefs.current?.subject?.value}</option> }
+                        {area[inputRefs.current.area.value] ? area[inputRefs.current.area.value].map((value) => <option key={`area-${value}`} value={value}
+                        >{value}</option>) : null}
                     </select>
                 </td>
             </tr>

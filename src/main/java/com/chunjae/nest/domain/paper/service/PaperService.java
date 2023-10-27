@@ -142,7 +142,6 @@ public class PaperService {
                 paperLogRepository.save(paperLog);
                 return "ok";
             }
-
             return "failed";
         } catch (Exception e) {
             return "failed";
