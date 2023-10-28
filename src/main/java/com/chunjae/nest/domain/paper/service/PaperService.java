@@ -10,19 +10,16 @@ import com.chunjae.nest.domain.paper.entity.PaperStatus;
 import com.chunjae.nest.domain.paper.repository.PaperFileRepository;
 import com.chunjae.nest.domain.paper.repository.PaperLogRepository;
 import com.chunjae.nest.domain.paper.repository.PaperRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import com.chunjae.nest.domain.user.entity.User;
 import com.chunjae.nest.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import java.util.List;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -193,5 +190,4 @@ public class PaperService {
     public Page<Paper> searchResults(SearchKeywordDTO searchKeywordDTO, Pageable pageable) {
       return paperRepository.searchByWhere(searchKeywordDTO, pageable);
     }
-
 }

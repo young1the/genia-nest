@@ -2,8 +2,9 @@ package com.chunjae.nest.domain.paper.controller;
 
 import com.chunjae.nest.domain.paper.dto.SearchKeywordDTO;
 import com.chunjae.nest.domain.paper.entity.Paper;
+import com.chunjae.nest.domain.paper.entity.PaperStatus;
 import com.chunjae.nest.domain.paper.service.PaperService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
@@ -14,14 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.data.domain.Pageable;
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/paper")
 public class PaperController {
 
     private final PaperService paperService;
-    @Autowired
-    public PaperController(PaperService paperService) {
-        this.paperService = paperService;
-    }
 
     @GetMapping("")
     public String index(Model model, @ModelAttribute SearchKeywordDTO searchKeywordDTO, Pageable pageable) {
