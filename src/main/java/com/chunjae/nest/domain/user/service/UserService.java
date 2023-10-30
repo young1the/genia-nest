@@ -68,4 +68,19 @@ public class UserService {
         }
         return null;
     }
+
+    public void modPassword(String userId, String newPassword) {
+
+        User user = userRepository.findByUserId(userId);
+
+        if (user != null) {
+            System.out.println("비밀번호 : " + newPassword);
+            String encoded = EncodePasswordUtils.passwordEncoder().encode(newPassword);
+            user.setPassword(encoded);
+
+            userRepository.save(user);
+        }
+    }
 }
+
+

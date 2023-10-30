@@ -30,6 +30,7 @@ public class UserController {
     private final UserService userService;
     private final CookieUtil cookieUtil;
 
+
     @GetMapping("/login")
     public String showLoginPage(HttpServletRequest request, Model model) {
         //이전 아이디 값 읽어오기
@@ -37,7 +38,6 @@ public class UserController {
         userIdCookie.ifPresent(cookie -> model.addAttribute(USER_ID_COOKIE_NAME, cookie.getValue()));
         return "pages/user/login";
     }
-
 
 
     @PostMapping("/login")
@@ -121,7 +121,7 @@ public class UserController {
     public String logout(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 
         session.invalidate();
-        deleteCookie(request,response);
+        deleteCookie(request, response);
 
         return "redirect:/user/login";
     }
@@ -132,5 +132,26 @@ public class UserController {
         return "pages/user/modPassword";
     }
 
+    @PostMapping("/password/modify")
+    public String modifyPassword(
+            @RequestParam("password") String newPassword,
+            HttpSession session
+    ) {
+        String userId = (String) session.getAttribute("userId");
 
+        if (userId != null) {
+            try {
+
+                userService.modPassword(userId, newPassword);
+
+                session.invalidate();
+
+                return "redirect:/user/login";
+            } catch (Exception e) {
+                System.out.println();
+                return "redirect:/user/password/modify";
+            }
+        }
+        return "redirect:/user/password/modify";
+    }
 }
