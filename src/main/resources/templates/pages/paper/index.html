@@ -1,479 +1,218 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns="http://www.w3.org/1999/html">
 <head>
-	<title>교재 관리</title>
-	<th:block th:replace="~{fragments/include:: include}"/>
+    <title>수능/모의 관리</title>
+    <th:block th:replace="~{fragments/include:: include}"/>
 </head>
 <body>
 <div id="wrap">
-	<th:block th:replace="~{fragments/header:: header}"/>
-		<div class="container">
-			<div class="inner">
-				<div class="index-tit">교재 관리 > 교재 관리</div>
-				<h1 class="page-tit">교재 관리</h1>
+    <th:block th:replace="~{fragments/header:: header}"/>
+    <div class="container">
+        <div class="inner">
+            <div class="index-tit">수능/모의 관리 > 수능/모의 관리</div>
+            <h1 class="page-tit">수능/모의 관리</h1>
+            <div class="search-box-wrap">
+                <form action="/paper" method="GET">
+                    <div class="search-box">
+                        <div class="box">
+                            <span>검색 조건</span>
+                            <div class="select-wrap">
+                                <select class="select-box" name="year">
+                                    <option value="전체년도">년도</option>
+                                    <option value="2023">2023</option>
+                                    <option value="2022">2022</option>
+                                </select>
+                            </div>
+                            <div class="select-wrap">
+                                <select class="select-box" name="month">
+                                    <option value="전체월">출제 월</option>
+                                    <option value="1">1월</option>
+                                    <option value="2">2월</option>
+                                    <option value="3">3월</option>
+                                    <option value="4">4월</option>
+                                    <option value="5">5월</option>
+                                    <option value="6">6월</option>
+                                    <option value="7">7월</option>
+                                    <option value="8">8월</option>
+                                    <option value="9">9월</option>
+                                    <option value="10">10월</option>
+                                    <option value="11">11월</option>
+                                    <option value="12">12월</option>
+                                </select>
+                            </div>
+                            <div class="select-wrap">
+                                <select class="select-box" name="area">
+                                    <option value="전체영역">영역</option>
+                                    <option value="국어">국어</option>
+                                    <option value="수학">수학</option>
+                                    <option value="영어">영어</option>
+                                    <option value="한국사">한국사</option>
+                                    <option value="사회탐구">사회탐구</option>
+                                    <option value="과학탐구">과학탐구</option>
+                                    <option value="직업탐구">직업탐구</option>
+                                    <option value="제2외국어/한문">제 2외국어/한문</option>
 
-				<div class="search-box-wrap">
-					<div class="search-box">
-						<div class="box">
-							<span>검색 조건</span>
-							<div class="select-wrap">
-								<select class="select-box">
-									<option value="">구분</option>
-									<option value="">구분1</option>
-									<option value="">구분2</option>
-								</select>
-							</div>
-							<div class="select-wrap">
-								<select class="select-box">
-									<option value="">출판사</option>
-									<option value="">출판사1</option>
-									<option value="">출판사2</option>
-								</select>
-							</div>
-							<div class="select-wrap">
-								<select class="select-box">
-									<option value="">시리즈</option>
-									<option value="">시리즈1</option>
-									<option value="">시리즈2</option>
-								</select>
-							</div>
-							<div class="select-wrap">
-								<select class="select-box">
-									<option value="">년도</option>
-									<option value="">2023</option>
-									<option value="">2022</option>
-								</select>
-							</div>
-							<div class="select-wrap">
-								<select class="select-box">
-									<option value="">전체</option>
-									<option value="">츨처ID</option>
-									<option value="">교재명</option>
-									<option value="">상세분류명</option>
-									<option value="">등록자</option>
-								</select>
-							</div>
-							<input type="text" placeholder="검색어" class="search-form">
-						</div>
-						<div class="btn-wrap">
-							<button class="btn-green">검색</button>
-							<button class="btn-gray">초기화</button>
-							<button class="btn-toggle"></button>
-						</div>
-					</div>
-					<div class="toggle-box">
-						<div class="search-box">
-							<div class="box">
-								<span>교육과정</span>
-								<div class="radio-wrap">
-									<input type="radio" id="radio01_01" name="radio01" checked="">
-									<label for="radio01_01">전체</label>
-									<input type="radio" id="radio01_02" name="radio01">
-									<label for="radio01_02">초등</label>
-									<input type="radio" id="radio01_03" name="radio01">
-									<label for="radio01_03">중등</label>
-									<input type="radio" id="radio01_04" name="radio01">
-									<label for="radio01_04">고등</label>
-								</div>
-							</div>
-						</div>
-						<div class="search-box">
-							<div class="box">
-								<span>학년</span>
-								<!--상단 조건 선택 전-->
-								<!-- <div class="box-txt">학교급을 선택해주세요.</div> -->
-								<!--상단 조건 선택 후-->
-								<div class="check-wrap">
-									<input type="checkbox" id="grade00" name="gradeCode">
-									<label for="grade00">전체</label>
-									<input type="checkbox" id="grade01" name="gradeCode">
-									<label for="grade01">중1</label>
-									<input type="checkbox" id="grade02" name="gradeCode">
-									<label for="grade02">중2</label>
-									<input type="checkbox" id="grade03" name="gradeCode">
-									<label for="grade03">중3</label>
-								</div>
-							</div>
-						</div>
-						<div class="search-box">
-							<div class="box">
-								<span>학기</span>
-								<div class="radio-wrap">
-									<input type="radio" id="radio02_01" name="radio02" checked="">
-									<label for="radio02_01">전체</label>
-									<input type="radio" id="radio02_02" name="radio02">
-									<label for="radio02_02">공통</label>
-									<input type="radio" id="radio02_03" name="radio02">
-									<label for="radio02_03">1학기</label>
-									<input type="radio" id="radio02_04" name="radio02">
-									<label for="radio02_04">2학기</label>
-								</div>
-							</div>
-						</div>
-						<div class="search-box">
-							<div class="box">
-								<span>영역</span>
-								<div class="select-wrap">
-									<select class="select-box">
-										<option value="">선택</option>
-										<option value="">선택1</option>
-										<option value="">선택2</option>
-									</select>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
+                                </select>
+                            </div>
+                            <div class="select-wrap">
+                                <select class="select-box" name="subject">
+                                    <option value="전체과목">과목</option>
+                                    <option value=""></option>
+                                </select>
+                            </div>
+                            <div class="select-wrap">
+                                <select class="select-box">
+                                    <option value="전체">전체</option>
+                                    <option value="name">시험지 명</option>
+                                    <option value="user_id">등록자</option>
+                                </select>
+                            </div>
+                            <input type="text" placeholder="검색어" class="search-form" name="searchKeyword">
+                        </div>
+                        <div class="btn-wrap">
+                            <button class="btn-green" type="submit">검색</button>
+                            <button class="btn-gray" type="reset">초기화</button>
+                            <button class="btn-toggle"></button>
+                        </div>
+                    </div>
+                    <div class="toggle-box">
+                        <div class="search-box">
+                            <div class="box">
+                                <span>시험 종류</span>
+                                <div class="check-wrap">
+                                    <input type="checkbox" id="grade00" name="category">
+                                    <label for="grade00">수능</label>
+                                    <input type="checkbox" id="grade01" name="category">
+                                    <label for="grade01">모의</label>
+                                    <input type="checkbox" id="grade02" name="category">
+                                    <label for="grade02">학력</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="search-box">
+                            <div class="box">
+                                <span>업로드 상태</span>
+                                <div class="radio-wrap">
+                                    <input type="radio" id="radio01_01" name="paperStatus" checked="">
+                                    <label for="radio01_01">전체</label>
+                                    <input type="radio" id="radio01_02" name="paperStatus">
+                                    <label for="radio01_02">완료</label>
+                                    <input type="radio" id="radio01_03" name="paperStatus">
+                                    <label for="radio01_03">진행</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="search-box">
+                            <div class="box">
+                                <span>학년</span>
+                                <div class="radio-wrap">
+                                    <input type="radio" id="radio02_01" name="grade" checked="">
+                                    <label for="radio02_01">전체</label>
+                                    <input type="radio" id="radio02_02" name="grade">
+                                    <label for="radio02_02">1학년</label>
+                                    <input type="radio" id="radio02_03" name="grade">
+                                    <label for="radio02_03">2학년</label>
+                                    <input type="radio" id="radio02_04" name="grade">
+                                    <label for="radio02_04">3학년</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="table-wrap">
+                <div class="tab-top">
+                    <div class="left-area">
+                        <span class="total">총 <em>000</em>건</span>
+                        <div class="select-wrap">
+                            <select class="select-box w140">
+                                <option value="">10개 보기</option>
+                                <option value="">30개 보기</option>
+                                <option value="">50개 보기</option>
+                                <option value="">100개 보기</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="btn-wrap">
+                        <a class="btn-gray w120" href="javascript:;">엑셀 다운로드</a>
+                        <a class="btn-green w100" href="/paper/upload" target="_blank">시험지 업로드</a>
+                    </div>
+                </div>
+                <table class="tbl-list">
+                    <caption></caption>
+                    <colgroup>
+                        <col style="width: 3%;">
+                        <col style="width: 4%;">
+                        <col style="width: 6%;">
+                        <col style="width: 6%;">
+                        <col style="width: 6%;">
+                        <col style="width: 4%;">
+                        <col style="width: 8%;">
+                        <col style="width: 8%;">
+                        <col style="width: 20%;">
+                        <col style="width: 6%;">
+                        <col style="width: 8%;">
+                        <col style="width: 6%;">
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th >
+                            <div class="check-wrap">
+                                <input type="checkbox" id="chk100_00" name="numChk" class="allCheck">
+                                <label for="chk100_00"></label>
+                            </div>
+                        </th>
+                        <th>NO</th>
+                        <th>출제 년도</th>
+                        <th>월</th>
+                        <th>시험 종류</th>
+                        <th>학년</th>
+                        <th>영역</th>
+                        <th>과목</th>
+                        <th>시험지 명</th>
+                        <th>등록자</th>
+                        <th>등록일</th>
+                        <th>업로드 상태</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="paper : ${papers}">
+                        <td>
+                            <div class="check-wrap"><input type="checkbox" id="chk100_30" name="numChk">
+                                <label for="chk100_30"></label></div>
+                        </td>
+                        <td th:text="${paper.id}" />
+                        <td th:text="${paper.year}" />
+                        <td th:text="${paper.month}" />
+                        <td th:text="${paper.category}" />
+                        <td th:text="${paper.grade}" />
+                        <td th:text="${paper.area}" />
+                        <td th:text="${paper.subject}" />
+                        <td class="tit"><a th:href="@{/paper/upload(id=paper.id)}" target="_blank" th:text="${paper.name}"/></td>
+                        <td>홍길동</td>
+                        <td>YYYY.MM.DD</td>
+                        <td th:text="${paper.paperStatus}" />
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- 페이징 -->
+            <div class="paging-wrap">
+                <a href="javascript:;" class="first"></a>
+                <a href="javascript:;" class="prev"></a>
+                <a href="javascript:;" class="page active"><span>1</span></a>
+                <a href="javascript:;" class="page"><span>2</span></a>
+                <a href="javascript:;" class="page"><span>3</span></a>
+                <a href="javascript:;" class="page"><span>4</span></a>
+                <a href="javascript:;" class="next"></a>
+                <a href="javascript:;" class="last"></a>
+            </div>
+        </div>
+    </div>
 
-				<div class="table-wrap">
-					<div class="tab-top">
-						<div class="left-area">
-							<span class="total">총 <em>000</em>건</span>
-							<div class="select-wrap">
-								<select class="select-box w140">
-									<option value="">10개 보기</option>
-									<option value="">30개 보기</option>
-									<option value="">50개 보기</option>
-									<option value="">100개 보기</option>
-								</select>
-							</div>
-						</div>
-						<div class="btn-wrap">
-							<a class="btn-gray w120" href="javascript:;">엑셀 다운로드</a>
-							<a class="btn-green w100" href="javascript:;">교재 업로드</a>
-						</div>
-					</div>
-					<table class="tbl-list">
-						<caption></caption>
-						<colgroup>
-							<col style="width: 3%;">
-							<col style="width: 4%;">
-							<col style="width: 6%;">
-							<col style="width: 6%;">
-							<col style="width: 8%;">
-							<col style="width: 6%;">
-							<col style="width: 8%;">
-							<col style="width: 6%;">
-							<col style="width: 6%;">
-							<col style="width: 12%;">
-							<col style="width: 17%;">
-							<col style="width: 8%;">
-							<col style="width: 10%;">
-						</colgroup>
-						<thead>
-							<tr>
-								<th>
-									<div class="check-wrap">
-										<input type="checkbox" id="chk100_00" name="numChk" class="allCheck">
-										<label for="chk100_00"></label>
-									</div>
-								</th>
-								<th>번호</th>
-								<th>츨처 ID</th>
-								<th>구분</th>
-								<th>시리즈</th>
-								<th>년도</th>
-								<th>학교급</th>
-								<th>학년</th>
-								<th>영역</th>
-								<th>교재명</th>
-								<th>상세 분류명</th>
-								<th>등록자</th>
-								<th>등록일</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>
-									<div class="check-wrap"><input type="checkbox" id="chk100_30" name="numChk">
-										<label for="chk100_30"></label></div>
-								</td>
-								<td>30</td>
-								<td>0000</td>
-								<td>교재</td>
-								<td>체크체크</td>
-								<td>2022</td>
-								<td>초등</td>
-								<td>초2</td>
-								<td>수학</td>
-								<td class="tit">체크체크 2-1</td>
-								<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
-								<td>홍길동</td>
-								<td>YYYY.MM.DD</td>
-							</tr>
-							<tr>
-								<td>
-									<div class="check-wrap"><input type="checkbox" id="chk100_29" name="numChk">
-										<label for="chk100_29"></label></div>
-								</td>
-								<td>29</td>
-								<td>0000</td>
-								<td>교재</td>
-								<td>체크체크</td>
-								<td>2022</td>
-								<td>초등</td>
-								<td>초2</td>
-								<td>수학</td>
-								<td class="tit">체크체크 2-1</td>
-								<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
-								<td>홍길동</td>
-								<td>YYYY.MM.DD</td>
-							</tr>
-							<tr>
-								<td>
-									<div class="check-wrap"><input type="checkbox" id="chk100_28" name="numChk">
-										<label for="chk100_28"></label></div>
-								</td>
-								<td>28</td>
-								<td>0000</td>
-								<td>교재</td>
-								<td>체크체크</td>
-								<td>2022</td>
-								<td>초등</td>
-								<td>초2</td>
-								<td>수학</td>
-								<td class="tit">체크체크 2-1</td>
-								<td>-</td>
-								<td>홍길동</td>
-								<td>YYYY.MM.DD</td>
-							</tr>
-							<tr>
-								<td>
-									<div class="check-wrap"><input type="checkbox" id="chk100_27" name="numChk">
-										<label for="chk100_27"></label></div>
-								</td>
-								<td>27</td>
-								<td>0000</td>
-								<td>교재</td>
-								<td>체크체크</td>
-								<td>2022</td>
-								<td>초등</td>
-								<td>초2</td>
-								<td>수학</td>
-								<td class="tit">체크체크 2-1</td>
-								<td>-</a></td>
-								<td>홍길동</td>
-								<td>YYYY.MM.DD</td>
-							</tr>
-							<tr>
-								<td>
-									<div class="check-wrap"><input type="checkbox" id="chk100_26" name="numChk">
-										<label for="chk100_26"></label></div>
-								</td>
-								<td>26</td>
-								<td>0000</td>
-								<td>교재</td>
-								<td>체크체크</td>
-								<td>2022</td>
-								<td>초등</td>
-								<td>초2</td>
-								<td>수학</td>
-								<td class="tit">체크체크 2-1</td>
-								<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
-								<td>홍길동</td>
-								<td>YYYY.MM.DD</td>
-							</tr>
-							<tr>
-								<td>
-									<div class="check-wrap"><input type="checkbox" id="chk100_25" name="numChk">
-										<label for="chk100_25"></label></div>
-								</td>
-								<td>25</td>
-								<td>0000</td>
-								<td>교재</td>
-								<td>체크체크</td>
-								<td>2022</td>
-								<td>초등</td>
-								<td>초2</td>
-								<td>수학</td>
-								<td class="tit">체크체크 2-1</td>
-								<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
-								<td>홍길동</td>
-								<td>YYYY.MM.DD</td>
-							</tr>
-							<tr>
-								<td>
-									<div class="check-wrap"><input type="checkbox" id="chk100_24" name="numChk">
-										<label for="chk100_24"></label></div>
-								</td>
-								<td>24</td>
-								<td>0000</td>
-								<td>교재</td>
-								<td>체크체크</td>
-								<td>2022</td>
-								<td>초등</td>
-								<td>초2</td>
-								<td>수학</td>
-								<td class="tit">체크체크 2-1</td>
-								<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
-								<td>홍길동</td>
-								<td>YYYY.MM.DD</td>
-							</tr>
-							<tr>
-								<td>
-									<div class="check-wrap"><input type="checkbox" id="chk100_23" name="numChk">
-										<label for="chk100_23"></label></div>
-								</td>
-								<td>23</td>
-								<td>0000</td>
-								<td>교재</td>
-								<td>체크체크</td>
-								<td>2022</td>
-								<td>초등</td>
-								<td>초2</td>
-								<td>수학</td>
-								<td class="tit">체크체크 2-1</td>
-								<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
-								<td>홍길동</td>
-								<td>YYYY.MM.DD</td>
-							</tr>
-							<tr>
-								<td>
-									<div class="check-wrap"><input type="checkbox" id="chk100_22" name="numChk">
-										<label for="chk100_22"></label></div>
-								</td>
-								<td>22</td>
-								<td>0000</td>
-								<td>교재</td>
-								<td>체크체크</td>
-								<td>2022</td>
-								<td>초등</td>
-								<td>초2</td>
-								<td>수학</td>
-								<td class="tit">체크체크 2-1</td>
-								<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
-								<td>홍길동</td>
-								<td>YYYY.MM.DD</td>
-							</tr>
-							<tr>
-								<td>
-									<div class="check-wrap"><input type="checkbox" id="chk100_21" name="numChk">
-										<label for="chk100_21"></label></div>
-								</td>
-								<td>21</td>
-								<td>0000</td>
-								<td>교재</td>
-								<td>체크체크</td>
-								<td>2022</td>
-								<td>초등</td>
-								<td>초2</td>
-								<td>수학</td>
-								<td class="tit">체크체크 2-1</td>
-								<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
-								<td>홍길동</td>
-								<td>YYYY.MM.DD</td>
-							</tr>
-							<tr>
-								<td>
-									<div class="check-wrap"><input type="checkbox" id="chk100_20" name="numChk">
-										<label for="chk100_20"></label></div>
-								</td>
-								<td>20</td>
-								<td>0000</td>
-								<td>교재</td>
-								<td>체크체크</td>
-								<td>2022</td>
-								<td>초등</td>
-								<td>초2</td>
-								<td>수학</td>
-								<td class="tit">체크체크 2-1</td>
-								<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
-								<td>홍길동</td>
-								<td>YYYY.MM.DD</td>
-							</tr>
-							<tr>
-								<td>
-									<div class="check-wrap"><input type="checkbox" id="chk100_19" name="numChk">
-										<label for="chk100_19"></label></div>
-								</td>
-								<td>19</td>
-								<td>0000</td>
-								<td>교재</td>
-								<td>체크체크</td>
-								<td>2022</td>
-								<td>초등</td>
-								<td>초2</td>
-								<td>수학</td>
-								<td class="tit">체크체크 2-1</td>
-								<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
-								<td>홍길동</td>
-								<td>YYYY.MM.DD</td>
-							</tr>
-							<tr>
-								<td>
-									<div class="check-wrap"><input type="checkbox" id="chk100_18" name="numChk">
-										<label for="chk100_18"></label></div>
-								</td>
-								<td>18</td>
-								<td>0000</td>
-								<td>교재</td>
-								<td>체크체크</td>
-								<td>2022</td>
-								<td>초등</td>
-								<td>초2</td>
-								<td>수학</td>
-								<td class="tit">체크체크 2-1</td>
-								<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
-								<td>홍길동</td>
-								<td>YYYY.MM.DD</td>
-							</tr>
-							<tr>
-								<td>
-									<div class="check-wrap"><input type="checkbox" id="chk100_17" name="numChk">
-										<label for="chk100_17"></label></div>
-								</td>
-								<td>17</td>
-								<td>0000</td>
-								<td>교재</td>
-								<td>체크체크</td>
-								<td>2022</td>
-								<td>초등</td>
-								<td>초2</td>
-								<td>수학</td>
-								<td class="tit">체크체크 2-1</td>
-								<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
-								<td>홍길동</td>
-								<td>YYYY.MM.DD</td>
-							</tr>
-							<tr>
-								<td>
-									<div class="check-wrap"><input type="checkbox" id="chk100_16" name="numChk">
-										<label for="chk100_16"></label></div>
-								</td>
-								<td>16</td>
-								<td>0000</td>
-								<td>교재</td>
-								<td>체크체크</td>
-								<td>2022</td>
-								<td>초등</td>
-								<td>초2</td>
-								<td>수학</td>
-								<td class="tit">체크체크 2-1</td>
-								<td class="tit"><a href="javascript:;">10. 여러 가지 사각형</a></td>
-								<td>홍길동</td>
-								<td>YYYY.MM.DD</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-
-
-				<div class="paging-wrap">
-					<a href="javascript:;" class="first"></a>
-					<a href="javascript:;" class="prev"></a>
-					<a href="javascript:;" class="page active"><span>1</span></a>
-					<a href="javascript:;" class="page"><span>2</span></a>
-					<a href="javascript:;" class="page"><span>3</span></a>
-					<a href="javascript:;" class="page"><span>4</span></a>
-					<a href="javascript:;" class="next"></a>
-					<a href="javascript:;" class="last"></a>
-				</div>
-			</div>
-		</div>
-
-	</div>
-	<script>
-	</script>
+</div>
+<script>
+</script>
 </body>
 
 </html>
