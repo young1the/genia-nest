@@ -35,6 +35,14 @@ const grade = [
     {"value": 3, "name": "3학년"},
 ]
 
+const year = [
+    {"value": 2023, name: "2023년"},
+    {"value": 2022, name: "2022년"},
+    {"value": 2021, name: "2021년"},
+    {"value": 2020, name: "2020년"},
+    {"value": 2019, name: "2019년"},
+]
+
 const PaperMetaFormTable = ({inputRefs}) => {
     const [areaValue, setAreaValue] = useState(inputRefs.current?.area?.value);
 
@@ -43,8 +51,12 @@ const PaperMetaFormTable = ({inputRefs}) => {
             <tbody className={styles.tbody}>
             <tr className={styles.tr}>
                 <th className={styles.th}>출제년도</th>
-                <td className={styles.td}><input ref={(ref) => inputRefs.current.year = ref} type={"number"}
-                                                 defaultValue={inputRefs.current?.year?.value} key={inputRefs.current?.year?.value}/>
+                <td className={styles.td}>
+                    <select ref={(ref) => inputRefs.current.year = ref}
+                                                  defaultValue={inputRefs.current?.year?.value}
+                                                  key={inputRefs.current?.year?.value}>
+                    {year.map(({name, value}) => <option key={`year-${value}`} value={value}>{name}</option>)}
+                </select>
                 </td>
             </tr>
             <tr className={styles.tr}>
@@ -74,36 +86,40 @@ const PaperMetaFormTable = ({inputRefs}) => {
             </tr>
             <tr className={styles.tr}>
                 <th className={styles.th}>총문제수</th>
-                <td className={styles.td}><input ref={(ref) => inputRefs.current.totalCount = ref} type={"text"}
-                                                 defaultValue={inputRefs.current?.totalCount?.value}/></td>
+                <td className={styles.td}><input ref={(ref) => inputRefs.current.totalCount = ref} type={"number"}
+                                                 defaultValue={inputRefs.current?.totalCount?.value} min={0}/></td>
             </tr>
             <tr className={styles.tr}>
                 <th className={styles.th}>시험종류</th>
                 <td className={styles.td}>
-                    <select ref={(ref) => inputRefs.current.category = ref} defaultValue={inputRefs.current?.category?.value} key={inputRefs.current?.category?.value}>
+                    <select ref={(ref) => inputRefs.current.category = ref}
+                            defaultValue={inputRefs.current?.category?.value} key={inputRefs.current?.category?.value}>
                         <option value={"전체"}>전체</option>
                         {category.map((value) => <option key={`category-${value}`} value={value}
-                                                         >{value}</option>)}
+                        >{value}</option>)}
                     </select>
                 </td>
             </tr>
             <tr className={styles.tr}>
                 <th className={styles.th}>영역</th>
                 <td className={styles.td}>
-                    <select ref={(ref) => inputRefs.current.area = ref} defaultValue={inputRefs.current?.area?.value} key={inputRefs.current?.area?.value}
+                    <select ref={(ref) => inputRefs.current.area = ref} defaultValue={inputRefs.current?.area?.value}
+                            key={inputRefs.current?.area?.value}
                             onChange={(e) => setAreaValue(e.target.value)}>
                         <option value={"전체"}>전체</option>
-                        {Object.keys(area).map((value) => <option key={`area-${value}`} value={value} >{value}</option>)}
+                        {Object.keys(area).map((value) => <option key={`area-${value}`} value={value}>{value}</option>)}
                     </select>
                 </td>
             </tr>
             <tr className={styles.tr}>
                 <th className={styles.th}>과목</th>
                 <td className={styles.td}>
-                    <select ref={(ref) => inputRefs.current.subject = ref} defaultValue={inputRefs.current?.subject?.value} key={inputRefs.current?.area?.value}
+                    <select ref={(ref) => inputRefs.current.subject = ref}
+                            defaultValue={inputRefs.current?.subject?.value} key={inputRefs.current?.area?.value}
                     >
                         <option value={"전체"}>전체</option>
-                        {area[inputRefs.current.area.value] ? area[inputRefs.current.area.value].map((value) => <option key={`area-${value}`} value={value}
+                        {area[inputRefs.current.area.value] ? area[inputRefs.current.area.value].map((value) => <option
+                            key={`area-${value}`} value={value}
                         >{value}</option>) : null}
                     </select>
                 </td>
