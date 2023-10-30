@@ -123,7 +123,7 @@
             <div class="table-wrap">
                 <div class="tab-top">
                     <div class="left-area">
-                        <span class="total">총 <em>000</em>건</span>
+                        <span class="total">총 <em th:text="${paperCount}">000</em>건</span>
                         <div class="select-wrap">
                             <select class="select-box w140">
                                 <option value="">10개 보기</option>
@@ -134,7 +134,7 @@
                         </div>
                     </div>
                     <div class="btn-wrap">
-                        <a class="btn-gray w120" href="javascript:;">엑셀 다운로드</a>
+                        <a class="btn-gray w120" download href="/paper/download">엑셀 다운로드</a>
                         <a class="btn-green w100" href="/paper/upload" target="_blank">시험지 업로드</a>
                     </div>
                 </div>
@@ -188,9 +188,9 @@
                         <td th:text="${paper.grade}" />
                         <td th:text="${paper.area}" />
                         <td th:text="${paper.subject}" />
-                        <td class="tit"><a th:href="@{/paper/upload(id=paper.id)}" target="_blank" th:text="${paper.name}"/></td>
-                        <td>홍길동</td>
-                        <td>YYYY.MM.DD</td>
+                        <td class="tit"><a th:href="@{/paper/upload(id=${paper.id})}" target="_blank" th:text="${paper.name}"/></td>
+                        <td th:text="${paper.user.getName()}">홍길동</td>
+                        <td th:text="${#temporals.format(paper.getCreatedAt(), 'yyyy-MM-dd')}">YYYY.MM.DD</td>
                         <td th:text="${paper.paperStatus}" />
                     </tr>
                     </tbody>
