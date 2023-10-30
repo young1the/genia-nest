@@ -1,5 +1,6 @@
 package com.chunjae.nest.domain.paper.service;
 
+import com.chunjae.nest.domain.paper.dto.SearchKeywordDTO;
 import com.chunjae.nest.domain.paper.dto.req.PaperRequest;
 import com.chunjae.nest.domain.paper.dto.res.PaperResponse;
 import com.chunjae.nest.domain.paper.entity.Paper;
@@ -9,12 +10,16 @@ import com.chunjae.nest.domain.paper.entity.PaperStatus;
 import com.chunjae.nest.domain.paper.repository.PaperFileRepository;
 import com.chunjae.nest.domain.paper.repository.PaperLogRepository;
 import com.chunjae.nest.domain.paper.repository.PaperRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import com.chunjae.nest.domain.user.entity.User;
 import com.chunjae.nest.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Pageable;
+
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -177,8 +182,8 @@ public class PaperService {
         return fileName != null && fileName.toLowerCase().endsWith(".pdf");
     }
 
-    public List<Paper> findPapers() {
-        return paperRepository.findAll(Sort.by(Sort.Order.desc("id")));
+    public Page<Paper> searchResults(SearchKeywordDTO searchKeywordDTO, Pageable pageable) {
+      return paperRepository.searchByWhere(searchKeywordDTO, pageable);
     }
 
 }
