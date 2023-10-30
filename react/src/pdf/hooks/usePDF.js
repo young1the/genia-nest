@@ -42,7 +42,7 @@ const usePDF = () => {
     setPages((prev) => [...prev, ...newPages]);
     setFiles((prev) => [...prev, pdfDoc.id]);
   };
-    const src = pdfFile?.data.slice(0) ?? pdfFile.url;
+    const src = pdfFile?.data?.slice(0) ?? pdfFile.url;
     const newDoc = await _getPDFDocPromise(pdfFile);
     pdfDocs[pdfFile.name] = { data: newDoc, id: pdfFile.name, src };
     await _addPDFPages(pdfDocs[pdfFile.name]);
@@ -85,7 +85,11 @@ const usePDF = () => {
       const docId = pageId.slice(0, dotIndex);
       const pageIdx = pageId.slice(dotIndex + 1) - 1;
       if (!docMap.has(docId)) {
-        const doc = await PDF_LIB.PDFDocument.load(pdfDocs[docId].src);
+        let src = pdfDocs[docId].src;
+        if (typeof src === "string") {
+           src = await fetch(src).then(res => res.arrayBuffer())
+        }
+        const doc = await PDF_LIB.PDFDocument.load(src);
         docMap.set(docId, doc);
       }
       const docSrc = docMap.get(docId);

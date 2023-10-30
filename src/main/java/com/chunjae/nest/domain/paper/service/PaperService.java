@@ -85,7 +85,6 @@ public class PaperService {
     @Transactional(readOnly = true)
     public PaperResponse getPaperDetail(Long id) {
         Paper paper = paperRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("시험지가 없습니다."));
-
         return PaperResponse.builder()
                 .year(paper.getYear())
                 .month(paper.getMonth())
@@ -114,6 +113,10 @@ public class PaperService {
             paperRepository.save(paper);
             return "ok";
         }
+        if (multipartFile == null) {
+            paperRepository.save(paper);
+            return "ok";
+        }
         try {
 
             if (isAllowedFileType(multipartFile) && !multipartFile.isEmpty()) {
@@ -138,7 +141,6 @@ public class PaperService {
                 paperFileRepository.save(paperFile);
                 return "ok";
             }
-
             return "failed";
         } catch (Exception e) {
             return "failed";

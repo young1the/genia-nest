@@ -132,8 +132,8 @@
                         </div>
                     </div>
                     <div class="btn-wrap">
-                        <a class="btn-gray w120" href="javascript:;">엑셀 다운로드</a>
-                        <a class="btn-green w100" href="/paper/upload">시험지 업로드</a>
+                        <a class="btn-gray w120" id="excelDownload" download href="/paper/download">엑셀 다운로드</a>
+                        <a class="btn-green w100" href="/paper/upload" target="_blank">시험지 업로드</a>
                     </div>
                 </div>
                 <table class="tbl-list">
@@ -188,9 +188,9 @@
                         <td th:text="${paper.grade}" />
                         <td th:text="${paper.area}" />
                         <td th:text="${paper.subject}" />
-                        <td th:text="${paper.name}" class="tit"><a href="javascript:;" /></td>
-                        <td th:text="${paper.user.name}" />
-                        <td th:text="${#temporals.format(paper.createdAt, 'yyyy-MM-dd')}"></td>
+                        <td class="tit"><a th:href="@{/paper/upload(id=${paper.id})}" target="_blank" th:text="${paper.name}"/></td>
+                        <td th:text="${paper.user.getName()}">홍길동</td>
+                        <td th:text="${#temporals.format(paper.getCreatedAt(), 'yyyy-MM-dd')}">YYYY.MM.DD</td>
                         <td th:text="${paper.paperStatus.displayValue}" />
                     </tr>
                     </tbody>
@@ -315,6 +315,13 @@
         updateTotalCount();
     });
 
+    const setDownloadLink = () => {
+        const downloadElem = document.getElementById("excelDownload")
+        let url = new URL(window.location.href);
+        url.pathname="/paper/download";
+        downloadElem.href = url.toString();
+    }
+    setDownloadLink();
     // // 검색 조건 = url
     // function saveSearchCondition() { // 검색 조건 저장
     //     const selectedYear = document.querySelector('#year').value;
