@@ -48,6 +48,9 @@
                             <li>
                                 <a href="/user/management">계정 관리</a>
                             </li>
+                            <li>
+                                <a href="/user/management/assignment">작업 현황 관리</a>
+                            </li>
                         </ul>
                     </li>
                 </ul>
@@ -60,7 +63,7 @@
             const aTags = nav.getElementsByTagName("a");
             const currentPath = window.location.href;
             for (const aTag of aTags) {
-                if (currentPath === aTag.href) {
+                if (aTag.href.indexOf(currentPath) >= 0) {
                     aTag.parentElement.classList.add("active");
                     break ;
                 }
