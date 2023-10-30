@@ -1,13 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import OCRApp from "./ocr/OCRApp.jsx";
+import OCRAppEntry from "./ocr/OCRAppEntry.jsx";
 
-
-
-
-
+let url = new URL(window.location.href);
+let params = new URLSearchParams(url.search)
+const idParam = params.get("id");
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <OCRApp />
+    <OCRAppEntry idParam={idParam} />
   </React.StrictMode>,
 )

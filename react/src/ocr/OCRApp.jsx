@@ -1,4 +1,4 @@
-import React, {useState, useRef} from "react";
+import React, {useState, useRef, useEffect} from "react";
 import {Cropper} from "react-cropper";
 import "cropperjs/dist/cropper.css"
 import styles from "./OCRApp.module.css";
@@ -9,23 +9,57 @@ import saveAs from "file-saver";
 import LoaderIcon from "react-loader-icon";
 
 
-function OCRApp() {
+function OCRApp({initialData}) {
+    const {addPDF, pages} = usePDF();
     const [iscaptureStart, setIscaptureStart] = useState(false);
     const [cropData, setCropData] = useState([]);
     const cropperRef = useRef();
-    const {addPDF, pages} = usePDF();
     const [currentPage, setCurrentPage] = useState(0);
     const canvasRef = useRef();
-    const [QuestionType, setQuestionType] = useState();
+    const [questionType, setQuestionType] = useState(); // 재밌는 일
+    const [questionContent, setQuestionContent] = useState("");
+    const [questionNum, setQuestionNum] = useState(1);
+    const [questionImage, setQuestionImage] = useState("");
+    const [useLatex, setUseLatex] = useState("N");
+    const divRef = useRef(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const initialPDF = async () => {
+        console.log(initialData);
+        if (initialData.url) {
+            await addPDF({name: initialData.name, url: initialData.url})
+        }
+    }
+    useEffect(()=>{
+        initialPDF();
+    },[])
+
     const handleQuestionType = (e) => {
         setQuestionType(e.target.value);
     }
-    const [useLatex, setUseLatex] = useState("N");
     const handleUseLatex = (e) => {
         setUseLatex(e.target.value);
     }
-    const totalQuestion = 25;
-    const [questionNum, setQuestionNum] = useState(1);
+
+    const getQuestionInfo = async () => {
+        const idParam= 37;
+        const getInfo = await fetch(`/api/question/detail/${idParam}?num=${questionNum}`, {
+            headers: {
+                "Content-Type" : "application/json",
+            },
+            method: "GET",
+        });
+        const result = await getInfo.json();
+        setQuestionContent(result.content);
+        setQuestionType(result.type);
+        setQuestionImage(result.url);
+        console.log(result);
+        console.log("result type : " + result.type);
+    }
+    const handleOnKeyPress = e => {
+        if (e.key === 'Enter') {
+            getQuestionInfo(); // Enter 입력이 되면 클릭 이벤트 실행
+        }
+    };
 
     const onChange = async (e) => {
         e.preventDefault();
@@ -43,39 +77,43 @@ function OCRApp() {
         }
     };
 
-    const divRef = useRef(null);
-    const handleDownload = async () => {
-      if(!divRef.current) return;
-      const formData = new FormData();
-      try{
-        const div = divRef.current;
-        const canvas = await html2canvas(div, { scale:2 });
-        // canvas.toBlob((blob) => {
-        //   if(blob !== null){
-        //     saveAs(blob, "result.png");
-        //   }
-        // });
-        const blobData = await new Promise((resolve, reject)=> {
-            canvas.toBlob((blob)=>{
-                if (!blob) reject();
-                resolve(blob);
-            });
-        })
-        console.log(blobData);
-      }catch(error){
-        console.error("Error converting div to image:", error);
-      }
-      formData.append("multipartFile", divRef.current, "resultTest" );
-      const response = await fetch(`/api/ocr/`, {
-          method: "POST",
-          body: formData,
-      });
-      if(response.ok) alert("ok");
-      else alert("not ok");
+    const handleDownload = async () => { //이미지 업로드 버튼 클릭시 실행됨! 500error! 뭔지 모르겠음! 내일 하겠음!
+        if(!divRef.current) return;
+        const formData = new FormData();
+        var blobData;
+        try{
+            const div = divRef.current;
+            const canvas = await html2canvas(div, { scale:2 });
+            // canvas.toBlob((blob) => {
+            //   if(blob !== null){
+            //     saveAs(blob, "result.png");
+            //   }
+            // });
+            blobData = await new Promise((resolve, reject)=> {
+                canvas.toBlob((blob)=>{
+                    if (!blob) reject();
+                    resolve(blob);
+                });
+            })
+            console.log(blobData);
+        }catch(error){
+            console.error("Error converting div to image:", error);
+        }
+        formData.set("num", questionNum.toString());
+        formData.set("type", questionType);
+        formData.set("paper", initialData)
+        formData.set("multipartFile", blobData)
+        const response = await fetch(`/api/question/upload`, {
+            headers:{
+                "Content-Type" : "application/json",
+            },
+            method: "POST",
+            body: formData,
+        });
+        if(response.ok) alert("ok");
+        else alert("not ok");
     };
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [resultText, setResultText] = useState();
     const transformOCR = async () => {
         const src = "https://genia-fs1-nest-s3.s3.ap-northeast-2.amazonaws.com/math.png"
         const formats = ["text", "html"]
@@ -99,17 +137,8 @@ function OCRApp() {
         })
         const result = await response.json();
         setIsLoading(false);
-        setResultText(result.text);
+        setQuestionContent(result.text);
         console.log(result);
-    }
-
-    //db에서 이미지 url 가져오기
-    const ocrImageURLhandler = async () => {
-        const response = await fetch("/api/ocr/", {
-            method: "POST",
-            body: null,
-        //     body에 필요한것 문제지 정보, 문항정보
-        })
     }
 
     const transformtextOCR = async () => {
@@ -118,7 +147,7 @@ function OCRApp() {
         const body = {src}
         const stringifiedRequest = JSON.stringify(body)
         const textresponse = await fetch("/api/ocr/text", {
-            headers: {                
+            headers: {
                 "Content-Type" : "application/json",
             },
             method: "POST",
@@ -126,8 +155,8 @@ function OCRApp() {
         })
         const textresult = await textresponse.json();
         setIsLoading(false);
-        setResultText(textresult.text);
-        console.log(textresult);
+        setQuestionContent(textresult.text);
+        console.log(questionContent);
     }
 
     return (
@@ -140,17 +169,11 @@ function OCRApp() {
                             <div className={styles.popHeader}>
                                 <div className={styles.titBox}>
                                     <ul className={styles.title}>
-                                        <li>2023</li>
-                                        <li>중등</li>
-                                        <li>2학년</li>
-                                        <li>0학기</li>
-                                        <li>수학</li>
-                                        <li>체크체크 2-1</li>
-                                        <li>10. 여러 가지 사각형</li>
+                                        <li >{initialData.name}</li>
                                     </ul>
                                     <span className={styles.total}>
-                    총 <em>25</em>문제
-                  </span>
+                                        총 <em>{initialData.totalCount}</em>문제
+                                    </span>
                                 </div>
                                 <div className={styles.btnWrap}>
                                     <button
@@ -175,9 +198,9 @@ function OCRApp() {
                                             </div>
                                             <div className="right-area">
                                                 <div className={styles.btnWrap}>
-                                                
+
                                                     <div style={{width: "100%"}}>
-                                                        <input type="file" onChange={onChange}/>                                                        
+                                                        <input type="file" onChange={onChange}/>
                                                     </div>
                                                 </div>
                                             </div>
@@ -223,7 +246,7 @@ function OCRApp() {
                                                         }}><span className={styles.icon}>arrow_forward</span>
                                                         </button>
                                                     </div>
-                                                </div>    
+                                                </div>
                                                 <div className={styles.typeBoxWrap}>
                                                     <div className={styles.radioWrap}>
                                                         {iscaptureStart ?
@@ -247,16 +270,17 @@ function OCRApp() {
                                                                 }}
                                                             >
                                                                 캡쳐시작
-                                                            </button>                                                        
+                                                            </button>
                                                         }
-                                                        
-                                                    </div>                                                
+
+                                                    </div>
                                                     <div>
-                                                        <button onClick={getCropData}>
+                                                        <button onClick={
+                                                            getCropData}>
                                                             Crop Image
                                                         </button>
                                                     </div>
-                                                </div>                                         
+                                                </div>
                                                 <div className={styles.imgBox}>
                                                     <div className="pdf-area">
                                                         {pages.length > 0 ? iscaptureStart ? <Cropper
@@ -285,38 +309,41 @@ function OCRApp() {
                                         <div className={styles.viewTop}>
                                             <span className={styles.tit}>문제 변환</span>
                                             <div className={styles.pageWrap}>
-                                                <button 
-                                                  className={styles.icon}
-                                                  onClick={() =>{
-                                                    setQuestionNum(1);
-                                                  }}
+                                                <button
+                                                    className={styles.icon}
+                                                    onClick={() =>{
+                                                        setQuestionNum(1);
+                                                    }}
                                                 >first_page</button>
-                                                <button 
-                                                  className={styles.icon}
-                                                  onClick={() => {
-                                                    if(questionNum === 1){
-                                                      setQuestionNum(1);
-                                                      console.log("첫번째 문제");
-                                                    }
-                                                    else setQuestionNum(questionNum => questionNum-1)
-                                                  }}
+                                                <button
+                                                    className={styles.icon}
+                                                    onClick={() => {
+                                                        if(questionNum === 1){
+                                                            setQuestionNum(1);
+                                                            console.log("첫번째 문제");
+                                                        }
+                                                        else setQuestionNum(questionNum => questionNum-1)
+                                                    }}
                                                 >chevron_left</button>
-                                                <input type="text" value={questionNum} onChange={(e)=>{setQuestionNum(e.target.value)}} />/<input type="text" defaultValue={totalQuestion} />
-                                                <button 
-                                                  className={styles.icon}
-                                                  onClick={() =>{
-                                                    if(questionNum === totalQuestion){
-                                                      setQuestionNum(totalQuestion);
-                                                      console.log("마지막 문제");
-                                                    }
-                                                    else setQuestionNum(questionNum => questionNum+1)
-                                                  }}
+                                                <input type="text" value={questionNum}
+                                                       onChange={(e)=>{setQuestionNum(parseInt(e.target.value))}}
+                                                       onKeyPress={handleOnKeyPress}
+                                                />/<input type="text" defaultValue={initialData.totalCount} />
+                                                <button
+                                                    className={styles.icon}
+                                                    onClick={() =>{
+                                                        if(questionNum === initialData.totalCount){
+                                                            setQuestionNum(initialData.totalCount);
+                                                            console.log(initialData.totalCount + "번이 마지막 문제입니다.");
+                                                        }
+                                                        else setQuestionNum(questionNum => questionNum+1)
+                                                    }}
                                                 >chevron_right</button>
-                                                <button 
-                                                  className={styles.icon}
-                                                  onClick={() =>{                                                    
-                                                    setQuestionNum(totalQuestion);
-                                                  }}
+                                                <button
+                                                    className={styles.icon}
+                                                    onClick={() =>{
+                                                        setQuestionNum(initialData.totalCount);
+                                                    }}
                                                 >last_page</button>
                                             </div>
                                         </div>
@@ -329,36 +356,36 @@ function OCRApp() {
                                                                 styles.geniaButton + " " + styles.geniaButtonGray
                                                             }
                                                             onClick={() => {
-                                                                setCropData([])
+                                                                setCropData([]);
+                                                                setQuestionContent();
                                                             }}
                                                         >
                                                             초기화
                                                         </button>
                                                     </div>
                                                     <div className={styles.box} ref={divRef}>
-                                                        {cropData.length > 0 ?
-                                                            cropData.map((data, index) => <img
-                                                                key={`image-${index}`} style={{width: "100%"}}
-                                                                src={data} alt="cropped"/>) :
-                                                            <p className={styles.emptyTxt}>문제 텍스트를 캡쳐 해주세요.</p>}
+                                                        {cropData.length > 0 ? cropData.map((data, index) =>
+                                                                <img key={`image-${index}`} style={{width: "100%"}} src={data} alt="cropped"/>) :
+                                                                <p className={styles.emptyTxt}>문제 텍스트를 캡쳐 해주세요.</p>}
                                                     </div>
-                                                        {cropData.length > 0 ?
-                                                            <button onClick={handleDownload}>이미지 업로드</button>:
-                                                            <button onClick={()=>{alert("문제 텍스트를 캡쳐 해주세요")}}>이미지 업로드</button>
-                                                        }
+                                                    {cropData.length > 0 ?
+                                                        <button onClick={handleDownload}>이미지 업로드</button>:
+                                                        <button onClick={()=>{alert("문제 텍스트를 캡쳐 해주세요")}}>이미지 업로드</button>
+                                                    }
                                                     <div className={styles.boxTop}>
-                                                        <div className={styles.tit}>변환조건
-                                                        </div>
+                                                        <div className={styles.tit}>변환조건</div>
                                                         <div className={styles.radioWrap}>
-                                                            <input type="radio" id="term01_01" name="term" value="S"
+                                                            <input type="radio" id="term01_01" name="term" value="MULTIPLE"
                                                                    onChange={handleQuestionType}/>
-                                                            <label htmlFor="term01_01">주관식</label>
-                                                            <input type="radio" id="term01_02" name="term" value="M"
+                                                            <label htmlFor="term01_01">객관식</label>
+                                                            <input type="radio" id="term01_02" name="term" value="SHORT_ANSWER"
                                                                    onChange={handleQuestionType}/>
-                                                            <label htmlFor="term01_02">객관식</label>
+                                                            <label htmlFor="term01_02">단답형</label>
+                                                            <input type="radio" id="term01_03" name="term" value="ESSAY"
+                                                                   onChange={handleQuestionType}/>
+                                                            <label htmlFor="term01_02">서술형</label>
                                                         </div>
-                                                        <div className={styles.tit}>수식유무
-                                                        </div>
+                                                        <div className={styles.tit}>수식유무</div>
                                                         <div className={styles.radioWrap}>
                                                             <input
                                                                 type="radio"
@@ -384,8 +411,7 @@ function OCRApp() {
                                                                     styles.geniaButton + " " + styles.geniaButtonGreen
                                                                 }
                                                                 onClick={() => {
-                                                                    console.log(questionNum, QuestionType, useLatex)
-                                                                    // db에서 이미지 url 가지고와서 ocr api에 보내기
+                                                                    console.log(questionNum, questionType, useLatex)
                                                                     {useLatex === "N" ? transformtextOCR() : transformOCR()}
                                                                 }}
                                                             >
@@ -394,22 +420,22 @@ function OCRApp() {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div
                                                     className={`${styles.boxWrap} ${styles.resultBox}`}
                                                 >
                                                     <div className={styles.boxTop}>
                                                         <div className={styles.tit}>OCR 인식 결과</div>
-                                                    </div>                                                    
-                                                    {resultText ? 
-                                                    <textarea className={`${styles.box} ${styles.geniaTextarea}`} style={{}} value={resultText} onChange={(e) => {setResultText(e.target.value)}}></textarea> :
-                                                    <div className={styles.box}>
-                                                        <p className={styles.emptyTxt}>
-                                                            캡쳐한 이미지의 OCR 결과가 노출 됩니다.
-                                                            {isLoading ? <LoaderIcon /> : <></>}                                                        
-                                                        </p>
-                                                        
                                                     </div>
+                                                    {questionContent ?
+                                                        <textarea className={`${styles.box} ${styles.geniaTextarea}`} style={{}} value={questionContent} onChange={(e) => {setQuestionContent(e.target.value)}}></textarea> :
+                                                        <div className={styles.box}>
+                                                            <p className={styles.emptyTxt}>
+                                                                캡쳐한 이미지의 OCR 결과가 노출 됩니다.
+                                                                {isLoading ? <LoaderIcon /> : <></>}
+                                                            </p>
+
+                                                        </div>
                                                     }
                                                     <div className={styles.btnWrap}>
                                                         <button
@@ -431,7 +457,7 @@ function OCRApp() {
                         </div>
                     </div>
                 </div>
-            </div>            
+            </div>
             <div className={styles.dimPop}></div>
         </>
     );

@@ -106,8 +106,8 @@ public class QuestionService {
     }
 
     @Transactional(readOnly = true)
-    public QuestionResponse getQuestionDetail(Long id) {
-        return questionRepository.findById(id)
+    public QuestionResponse getQuestionDetail(Long id, int num) {
+        return questionRepository.findByPaperIdAndNum(id, num)
                 .map(questionData -> QuestionResponse.builder()
                         .num(questionData.getNum())
                         .type(questionData.getType())
