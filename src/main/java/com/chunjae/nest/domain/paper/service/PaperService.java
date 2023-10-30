@@ -107,6 +107,10 @@ public class PaperService {
             paperRepository.save(paper);
             return "ok";
         }
+        if (multipartFile == null) {
+            paperRepository.save(paper);
+            return "ok";
+        }
         try {
 
             if (isAllowedFileType(multipartFile) && !multipartFile.isEmpty()) {

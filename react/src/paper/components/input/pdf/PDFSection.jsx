@@ -57,7 +57,7 @@ const PDFSection = ({pdfSectionProps}) => {
             <div className={styles.buttonContainer}>
                 <Button color={pages.length > 0 ? "green" : "gray"} onClick={generatePDFFile}>PDF 생성</Button>
                 <Button color={pdfFileUrl ? "green" : "gray"}><a className={styles.buttonA} href={fileURL} download={true}>다운로드</a></Button>
-                <Button color={pdfFileUrl ? "green" : "gray"} onClick={paperFileSubmitHandler}>전송</Button>
+                <Button color={pdfFileUrl ? "green" : "gray"} onClick={paperFileSubmitHandler}>저장</Button>
             </div>
         </div>
     )

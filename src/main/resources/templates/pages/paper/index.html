@@ -135,7 +135,7 @@
                     </div>
                     <div class="btn-wrap">
                         <a class="btn-gray w120" href="javascript:;">엑셀 다운로드</a>
-                        <a class="btn-green w100" href="/paper/upload">시험지 업로드</a>
+                        <a class="btn-green w100" href="/paper/upload" target="_blank">시험지 업로드</a>
                     </div>
                 </div>
                 <table class="tbl-list">
@@ -188,7 +188,7 @@
                         <td th:text="${paper.grade}" />
                         <td th:text="${paper.area}" />
                         <td th:text="${paper.subject}" />
-                        <td th:text="${paper.name}" class="tit"><a href="javascript:;" /></td>
+                        <td class="tit"><a th:href="@{/paper/upload(id=paper.id)}" target="_blank" th:text="${paper.name}"/></td>
                         <td>홍길동</td>
                         <td>YYYY.MM.DD</td>
                         <td th:text="${paper.paperStatus}" />

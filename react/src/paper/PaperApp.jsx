@@ -44,7 +44,7 @@ function PaperApp({idParam}) {
     }
     const paperFileSubmitHandler = async () => {
         if (!idParam && !pdfBlob) {
-            return ;
+            return;
         }
         const formData = new FormData();
         let fileName;
@@ -58,7 +58,7 @@ function PaperApp({idParam}) {
             }
         }
         if (pdfBlob) formData.append("multipartFile", pdfBlob, fileName);
-        const requestURL = !idParam ?  `/api/paper/upload` : `/api/paper/modify/${idParam}`;
+        const requestURL = !idParam ? `/api/paper/upload` : `/api/paper/modify/${idParam}`;
         const response = await fetch(requestURL, {
             method: "POST",
             body: formData,
@@ -75,13 +75,25 @@ function PaperApp({idParam}) {
         paperFileSubmitHandler,
     }
 
+    const deleteHandler = async () => {
+        const response = await fetch(`/api/paper/remove/${idParam}`, {
+            method: "POST",
+        });
+        if (response.ok) {
+            window.close();
+        }
+    }
+
     return (
         <main className={styles.wrapper}>
             <header className={styles.header}>
                 <H1>시험지 업로드 페이지</H1>
-                <Button color="gray" onClick={() => {
-                    window.close()
-                }}>닫기</Button>
+                <div className={styles.buttonContainer}>
+                {idParam ? <Button color="red" onClick={deleteHandler}>삭제</Button> : null}
+                    <Button color="gray" onClick={() => {
+                        window.close()
+                    }}>닫기</Button>
+                </div>
             </header>
             <div className={styles.inputContainer}>
                 <section className={styles.info}><InfoSection infoSectionProps={infoSectionProps}/></section>
