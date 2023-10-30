@@ -16,6 +16,7 @@ const DOCUMENT_DEFAULT_CONFIG = {
 
 const usePDF = () => {
   let { current: pdfDocs } = useRef({});
+  let { current: initialPage } = useRef({});
   const [files, setFiles] = useState([]);
   const [pages, setPages] = useState([]);
   const [pdfBlob, setPdfBlob] = useState();
@@ -39,6 +40,9 @@ const usePDF = () => {
       id: `${pdfDoc.id}.${idx + 1}`,
       data: page,
     }));
+    if (pages.length === 0) {
+      initialPage = [...newPages];
+    }
     setPages((prev) => [...prev, ...newPages]);
     setFiles((prev) => [...prev, pdfDoc.id]);
   };
@@ -75,7 +79,10 @@ const usePDF = () => {
   },[pages]);
 
   const generatePDFFile = useCallback(async () => {
-    if (pages.length === 0) return;
+    if (pages.length === 0) return null;
+    for (let i = 0; i <pages.length && i <initialPage.length; ++i) {
+      if (pages[i].id !== initialPage[i]) return null;
+    }
     const docMap = new Map();
     const newPDFDoc = await PDF_LIB.PDFDocument.create();
     for (const page of pages) {
@@ -96,8 +103,7 @@ const usePDF = () => {
       const [copiedPage] = await newPDFDoc.copyPages(docSrc, [pageIdx]);
       newPDFDoc.addPage(copiedPage);
     }
-    const pdfBytes = await newPDFDoc.save();
-    setPdfBlob(new Blob([pdfBytes], { type: "application/pdf" }));
+    return await newPDFDoc.save();
   },[pages])
 
   return {

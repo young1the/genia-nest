@@ -37,6 +37,8 @@ public class PaperController {
     public String index(Model model, @ModelAttribute SearchKeywordDTO searchKeywordDTO, Pageable pageable) {
 
         System.out.println("==============================================");
+        System.out.println(searchKeywordDTO);
+
         System.out.println("컨트롤러 부분 - " + searchKeywordDTO.toString());
 
         int pageSize = 10;
@@ -81,6 +83,7 @@ public class PaperController {
     public void download(@ModelAttribute SearchKeywordDTO searchKeywordDTO, HttpServletResponse response) {
         Pageable adjustedPageable = PageRequest.of(0, Integer.MAX_VALUE);
         Page<Paper> papers = paperService.searchResults(searchKeywordDTO, adjustedPageable);
+        System.out.println(searchKeywordDTO);
         try {
             List<PaperExcelDTO> cells = papers.stream().map(paper -> PaperExcelDTO.
                     builder()
