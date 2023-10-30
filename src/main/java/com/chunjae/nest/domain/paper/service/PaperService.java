@@ -2,7 +2,6 @@ package com.chunjae.nest.domain.paper.service;
 
 import com.chunjae.nest.domain.paper.dto.req.PaperRequest;
 import com.chunjae.nest.domain.paper.dto.res.PaperResponse;
-import com.chunjae.nest.domain.paper.dto.SearchPaperDTO;
 import com.chunjae.nest.domain.paper.entity.Paper;
 import com.chunjae.nest.domain.paper.entity.PaperFile;
 import com.chunjae.nest.domain.paper.entity.PaperLog;
@@ -18,8 +17,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import java.util.List;
+
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -47,7 +47,7 @@ public class PaperService {
 
             log.info(" url: {}, fileName: {}", url, fileName);
 
-            if (!url.equals("failed")) {
+            if (!"failed".equals(url)) {
                 Paper paper = paperRequest.createPaper(user);
                 PaperFile paperFile = PaperFile.builder()
                         .name(fileName)
@@ -117,7 +117,7 @@ public class PaperService {
                 String fileName = s3UploadService.getFileName(url);
                 log.info("url:{}, fileName:{}", url, fileName);
 
-                if (!url.equals("failed")) {
+                if (!"failed".equals(url)) {
                     paperFile.updatePaperFile(fileName, url);
 
 

@@ -19,28 +19,24 @@ public class QuestionApiController {
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadQuestionFile(QuestionRequest questionRequest) throws IOException {
-
-        String savedUploadedQuestion = questionService.uploadQuestionFile(questionRequest);
-
-        if (savedUploadedQuestion.equals("ok")) {
+        if ("ok".equals(questionService.uploadQuestionFile(questionRequest))) {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.badRequest().build();
     }
 
     @PostMapping("/save/{id}")
-    public ResponseEntity<String> saveQuestion(@PathVariable(value = "id") Long id, String content) {
-
-        String savedQuestion = questionService.saveQuestion(id, content);
-        if (savedQuestion.equals("ok")) {
+    public ResponseEntity<String> saveQuestion(@PathVariable(name = "id") Long id, String content) {
+        if ("ok".equals(questionService.saveQuestion(id, content))) {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.badRequest().build();
     }
 
     @GetMapping("/detail/{id}")
-    public ResponseEntity<QuestionResponse> getQuestionDetail(@PathVariable(value = "id") Long id) {
-        return ResponseEntity.ok().body(questionService.getQuestionDetail(id));
+    public ResponseEntity<QuestionResponse> getQuestionDetail(@PathVariable(name = "id") Long id,
+                                                              @RequestParam(name = "num") int num) {
+        return ResponseEntity.ok().body(questionService.getQuestionDetail(id, num));
     }
 
 }
