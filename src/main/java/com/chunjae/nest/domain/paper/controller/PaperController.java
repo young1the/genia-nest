@@ -16,11 +16,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+
 import org.springframework.data.domain.Pageable;
 
 @Controller
@@ -79,8 +78,9 @@ public class PaperController {
     }
 
     @GetMapping("/download")
-    public void download(HttpServletResponse response) {
-        List<Paper> papers = paperService.findPapers();
+    public void download(@ModelAttribute SearchKeywordDTO searchKeywordDTO, HttpServletResponse response) {
+        Pageable adjustedPageable = PageRequest.of(0, Integer.MAX_VALUE);
+        Page<Paper> papers = paperService.searchResults(searchKeywordDTO, adjustedPageable);
         try {
             List<PaperExcelDTO> cells = papers.stream().map(paper -> PaperExcelDTO.
                     builder()

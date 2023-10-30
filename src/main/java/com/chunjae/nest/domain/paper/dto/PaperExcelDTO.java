@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaperExcelDTO {
-    @ExcelColumn(headerName = "NO")
+    @ExcelColumn(headerName = "ID")
     private Long id;
     @ExcelColumn(headerName = "출제년도")
     private int year;

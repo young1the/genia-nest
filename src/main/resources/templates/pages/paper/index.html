@@ -132,7 +132,7 @@
                         </div>
                     </div>
                     <div class="btn-wrap">
-                        <a class="btn-gray w120" download href="/paper/download">엑셀 다운로드</a>
+                        <a class="btn-gray w120" id="excelDownload" download href="/paper/download">엑셀 다운로드</a>
                         <a class="btn-green w100" href="/paper/upload" target="_blank">시험지 업로드</a>
                     </div>
                 </div>
@@ -315,6 +315,13 @@
         updateTotalCount();
     });
 
+    const setDownloadLink = () => {
+        const downloadElem = document.getElementById("excelDownload")
+        let url = new URL(window.location.href);
+        url.pathname="/paper/download";
+        downloadElem.href = url.toString();
+    }
+    setDownloadLink();
     // // 검색 조건 = url
     // function saveSearchCondition() { // 검색 조건 저장
     //     const selectedYear = document.querySelector('#year').value;
