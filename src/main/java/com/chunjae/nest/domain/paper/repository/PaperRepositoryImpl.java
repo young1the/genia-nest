@@ -4,6 +4,7 @@ import com.chunjae.nest.domain.paper.dto.SearchKeywordDTO;
 import com.chunjae.nest.domain.paper.entity.Paper;
 import com.chunjae.nest.domain.paper.entity.PaperStatus;
 import com.chunjae.nest.domain.paper.entity.QPaper;
+import com.chunjae.nest.domain.user.dto.AssignmentSearchReqDTO;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -22,6 +23,41 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
     QPaper paper = QPaper.paper;
+
+    private BooleanExpression nameLike(String name) {
+        if (name == null) return null;
+        return paper.name.like(name);
+    }
+    private BooleanExpression userIdLike(String id) {
+        if (id == null) return null;
+        return paper.user.userId.like(id);
+    }
+    private BooleanExpression searchByOption(AssignmentSearchReqDTO searchKeywordDTO) {
+        String keyword = searchKeywordDTO.getSearchKeyword();
+        String option = searchKeywordDTO.getSearchOption();
+        if (keyword == null || option == null) return null;
+        if (option.equals("name")) {
+            return nameLike(keyword);
+        }
+        if (option.equals("user_id")) {
+            return userIdLike(keyword);
+        }
+        return null;
+    }
+
+    public Page<Paper> searchByWhere(AssignmentSearchReqDTO searchKeywordDTO, Pageable pageable) {
+        JPAQuery<Paper> query = queryFactory.selectFrom(paper);
+        if (searchKeywordDTO != null) {
+            query = query.where(searchByOption(searchKeywordDTO));
+        }
+
+        List<Paper> results = query
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        return new PageImpl<>(results, pageable, 100);
+    }
 
     public Page<Paper> searchByWhere(SearchKeywordDTO searchKeywordDTO, Pageable pageable) {
         JPAQuery<Paper> query = queryFactory
@@ -99,10 +135,10 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
             BooleanExpression userSearch = paper.user.name.like("%" + searchKeyword + "%");
             BooleanExpression nameSearch = paper.name.like("%" + searchKeyword + "%");
             return userSearch.or(nameSearch);
-        } else if ("user_id".equals(searchOption) && searchKeyword != null && !searchKeyword.isEmpty()){
+        } else if ("user_id".equals(searchOption) && searchKeyword != null && !searchKeyword.isEmpty()) {
             BooleanExpression userSearch = Expressions.booleanTemplate("lower({0}) like lower({1})", paper.user.name, "%" + searchKeyword + "%");
             return userSearch;
-        } else if ("name".equals(searchOption) && searchKeyword != null && !searchKeyword.isEmpty()){
+        } else if ("name".equals(searchOption) && searchKeyword != null && !searchKeyword.isEmpty()) {
             BooleanExpression nameSearch = Expressions.booleanTemplate("lower({0}) like lower({1})", paper.name, "%" + searchKeyword + "%");
             return nameSearch;
         } else {
@@ -139,7 +175,7 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
         System.out.println("레파지토리 부분 - 받은 paperStatus 값 : " + paperStatus);
         BooleanExpression result = paper.paperStatus.ne(PaperStatus.valueOf("DELETED"));
 
-        if ("전체".equals(paperStatus)){
+        if ("전체".equals(paperStatus)) {
             return result;
         } else if ("완료".equals(paperStatus)) {
             return paper.paperStatus.eq(PaperStatus.valueOf("DONE"));

@@ -21,7 +21,7 @@
 <!--                        </ul>-->
 <!--                    </li>-->
                     <li>
-                        <a href="/paper">수능/모의 관리</a>
+                        <a href="/paper" class="location">수능/모의 관리</a>
                         <ul class="depth2">
                             <li>
                                 <a href="/paper">수능/모의 관리</a>
@@ -32,7 +32,7 @@
                         </ul>
                     </li>
                     <li>
-                        <a href="/ocr">OCR 변환</a>
+                        <a href="/ocr" class="location">OCR 변환</a>
                         <ul class="depth2">
                             <li>
                                 <a href="/ocr">OCR 변환 관리</a>
@@ -43,7 +43,7 @@
                         </ul>
                     </li>
                     <li>
-                        <a href="/user/management">시스템 관리</a>
+                        <a href="/user/management" class="location">시스템 관리</a>
                         <ul class="depth2">
                             <li>
                                 <a href="/user/management">계정 관리</a>
@@ -59,12 +59,11 @@
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            const nav = document.querySelector(".nav");
-            const aTags = nav.getElementsByTagName("a");
+            const locations = document.getElementsByClassName("location");
             const currentPath = window.location.href;
-            for (const aTag of aTags) {
-                if (aTag.href.indexOf(currentPath) >= 0) {
-                    aTag.parentElement.classList.add("active");
+            for (const location of locations) {
+                if (currentPath.indexOf(location.href) >= 0) {
+                    location.parentElement.classList.add("active");
                     break ;
                 }
             }

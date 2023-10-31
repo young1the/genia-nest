@@ -1,5 +1,6 @@
 package com.chunjae.nest.domain.user.controller;
 
+import com.chunjae.nest.domain.paper.entity.Paper;
 import com.chunjae.nest.domain.user.dto.AssignmentDTO;
 import com.chunjae.nest.domain.user.dto.AssignmentSearchReqDTO;
 import com.chunjae.nest.domain.user.service.UserAssignmentService;
@@ -13,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -22,8 +24,9 @@ import java.util.List;
 public class UserAssignmentController {
     @Autowired
     private final UserAssignmentService userAssignmentService;
+
     @GetMapping("")
-    public String index(Model model, @ModelAttribute AssignmentSearchReqDTO assignSearchDTO, Pageable pageable) {
+    public String index(Model model, AssignmentSearchReqDTO assignSearchDTO, Pageable pageable) {
         System.out.println(assignSearchDTO);
         int pageSize = 10;
         int currentPage = pageable.getPageNumber();
@@ -32,7 +35,10 @@ public class UserAssignmentController {
         }
         Pageable adjustedPageable = PageRequest.of(currentPage, pageSize);
 
-        Page<AssignmentDTO> assignments = userAssignmentService.searchResults();
+        Page<Paper> assignments = userAssignmentService.searchResults(assignSearchDTO, pageable);
+        if (assignments != null) {
+            assignments.stream().forEach(e -> System.out.println(e.getName()));
+        }
         model.addAttribute("assignments", assignments);
         return "pages/assignment/index";
 
