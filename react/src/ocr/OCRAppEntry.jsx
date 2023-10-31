@@ -1,13 +1,12 @@
 import OCRApp from "./OCRApp.jsx";
 import { useEffect, useState } from "react";
 
-const OCRAppEntry = () => {
+const OCRAppEntry = ({idParam}) => {
   const [initialData, setInitialData] = useState();
   useEffect(() => {
     getInitialValue();
   }, []);
   const getInitialValue = async () => {
-    let idParam = 3;
     if (idParam) {
       const response = await fetch(`/api/paper/detail/${idParam}`);
       const result = await response.json();

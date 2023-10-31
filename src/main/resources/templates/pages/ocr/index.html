@@ -193,7 +193,7 @@
 										<td th:text="${paper.grade}" />
 										<td th:text="${paper.area}" />
 										<td th:text="${paper.subject}" />
-										<td th:text="${paper.name}" class="tit"><a href="javascript:;" /></td>
+										<td class="tit"><a th:href="@{/ocr/transform(id=${paper.id})}" target="_blank" th:text="${paper.name}"/></td>
 										<td th:text="${paper.ocrCount}" />
 										<td th:text="${paper.totalCount}" />
 										<td th:text="${paper.user.name}" />
