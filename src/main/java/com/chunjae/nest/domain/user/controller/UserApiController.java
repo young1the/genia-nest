@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -53,9 +55,4 @@ public class UserApiController {
 
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<User> searchUser(@RequestParam String userId){
-
-        return ResponseEntity.ok().build();
-    }
 }

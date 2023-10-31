@@ -98,12 +98,25 @@ public class UserController {
     }
 
     @GetMapping("/management")
-    public String showAccountManagementPage(Model model) {
-        List<User> users = userService.getAllUsersOrderedByIdDesc()
-                .stream().filter(user->user.getUserStatus() != UserStatus.DELETE).toList();
+    public String showAccountManagementPage(Model model,
+                                            @RequestParam(required = false) String searchKeyword,
+                                            @RequestParam(required = false, defaultValue = "userId") String searchOption) {
+
+        List<User> users;
+
+        if (searchKeyword != null && !searchKeyword.isEmpty()) {
+
+            users = userService.searchUsers(searchKeyword, searchOption);
+        } else {
+
+            users = userService.getAllUsersOrderedByIdDesc()
+                    .stream().filter(user -> user.getUserStatus() != UserStatus.DELETE).toList();
+        }
+
         model.addAttribute("users", users);
         return "pages/user/management";
     }
+
 
     @GetMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response, HttpSession session) {

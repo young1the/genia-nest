@@ -50,10 +50,6 @@ public class UserService {
     }
 
 
-    /*public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }*/
-
     public User login(String userId, String password) {
         // 회원 정보 & 비밀번호 조회
         User user = userRepository.findByUserId(userId);
@@ -108,6 +104,33 @@ public class UserService {
         user.setUserStatus(UserStatus.DELETE);
         userRepository.save(user);
         log.info("user: {}", user.getUserStatus());
+    }
+
+    public List<User> searchUsers(String searchKeyword, String searchOption) {
+//        List<User> userList = new ArrayList<>();
+//
+//        for (User user : getAllUsersOrderedByIdDesc()) {
+//            if (user.getUserStatus() != UserStatus.DELETE) {
+//                if (("userId".equals(searchOption) && user.getUserId().contains(searchKeyword)) ||
+//                        ("name".equals(searchOption) && user.getName().contains(searchKeyword))) {
+//                    userList.add(user);
+//                }
+//            }
+//        }
+//        return userList;
+
+        if (searchOption.equals("userId")) {
+            return userRepository.findByUserIdContaining(searchKeyword);
+        }
+            // 유저 레포지토리에서 userId가 searchKeyword로 받은 값을 가지고 있는 유저 가져오기
+            // 가져와서 바로 리턴
+        if (searchOption.equals("name")) {
+            // 유저 레포지토리에서 name이 searchKeyword로 받은 값을 가지고 있는 유저 가져오기
+            // 얘도
+            return userRepository.findByNameContaining(searchKeyword);
+        }
+        return null;
+
     }
 
 }

@@ -13,6 +13,12 @@
     .hidden {
         display: none;
     }
+    .center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
 </style>
 <body>
 
@@ -44,16 +50,19 @@
             <h1 class="page-tit">사용자 관리</h1>
 
             <div class="search-box-wrap">
-                <div class="search-box">
+                <form class="search-box" action="/user/management" method="get">
                     <div class="box">
-                        <span>검색</span>
-                        <input type="text" placeholder="검색어" class="search-form">
+                        <select name="searchOption" style="width: 90px">
+                            <option value="userId" selected="selected">아이디</option>
+                            <option value="name">이름</option>
+                        </select>
+                        <input name="searchKeyword" type="text" placeholder="검색어" class="search-form" id="searchKeyword">
                     </div>
                     <div class="btn-wrap">
-                        <button class="btn-green">검색</button>
-                        <button class="btn-gray">초기화</button>
+                        <button class="btn-green" type="submit">검색</button>
+                        <button class="btn-gray" type="reset">초기화</button>
                     </div>
-                </div>
+                </form>
             </div>
 
             <div class="table-wrap">
@@ -70,11 +79,11 @@
                         </div>
                     </div>
                     <div class="btn-wrap">
-                        <button class="btn-gray w120" onclick="toggleAddUser()">추가</button>
+                        <button class="btn-gray w100" onclick="toggleAddUser()">추가</button>
                     </div>
                 </div>
-                <form action="/user/add" method="POST">
-                    <table class="tbl-list">
+                <form action="/user/add" method="POST" >
+                    <table class="tbl-list" style="text-align: center;">
                         <thead>
                         <tr>
                             <th>NO</th>
@@ -93,17 +102,14 @@
                             <td> <input type="text" id="part" name="part"></td>
                             <td> <input type="text" id="name" name="name"></td>
                             <td> <input type="text" id="userId" name="userId"></td>
-                            <form id="dateForm">
                                 <td style="display: flex; height: 43.33px;">
                                     <input type="date" id="startDate" name="startDate" style="width: 140px;">
                                     ~
                                     <input type="date" id="endDate" name="endDate" style="width: 140px;">
                                 </td>
-                                <button type="submit">저장</button>
-                            </form>
-                            <th style="border-bottom: 1px solid #ccc;
-           border-left:   1px solid #ccc;">-</th>
-                            <th><a class="btn-gray w120" href="#" onclick="createUser();">저장</a></th>
+                            <th style="border-left: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: 1px solid #ccc; text-align: center;">-</th>
+
+                            <th style="border-bottom: 1px solid #ccc;"><button  class="btn-gray w100" type="button" style=" color: white; background-color: gray;" th:attr="onclick=|createUser()|">저장</button></th>
 
                         </tr>
                         <tr th:each="user, iterStat : ${users}">
@@ -117,9 +123,11 @@
                                 <span th:text="${user.role.endDate}"></span>
                             </td>
                             <td>
-                                <a class="btn-gray w120" href="#" th:attr="onclick=|resetUser('${user.id}')|">초기화</a>
-                                <button class="btn-gray" type="button" th:attr="onclick=|resetUser('${user.id}')|">초기화</button></td>
-                            <td><button class="btn-gray" type="button" th:attr="onclick=|deleteUser('${user.id}')|">삭제</button></td>
+                                <button class="btn-gray w100" type="button" th:attr="onclick=|resetUser('${user.id}')|" style="color: white; background-color: gray;">초기화</button>
+                            </td>
+                            <td>
+                                <button class="btn-gray w100" type="button" th:attr="onclick=|deleteUser('${user.id}')|" style="color: white; background-color: gray;">삭제</button>
+                            </td>
 
                         </tr>
                     </table>
@@ -138,15 +146,18 @@
         const startDateValue = document.querySelector("input[name='startDate']").value;
         const endDateValue = document.querySelector("input[name='endDate']").value;
 
-
-        const userDTO = {
-            role: roleValue,
-            part: partValue,
-            name: nameValue,
-            userId: userIdValue,
-            startDate: startDateValue,
-            endDate: endDateValue
-        };
+        if (!roleValue || !partValue || !nameValue || !userIdValue || !startDateValue || !endDateValue) {
+            alert("모든 필드를 입력해야 합니다.");
+        } else {
+            const userDTO = {
+                role: roleValue,
+                part: partValue,
+                name: nameValue,
+                userId: userIdValue,
+                startDate: startDateValue,
+                endDate: endDateValue
+            };
+        }
         console.log(startDateValue, endDateValue);
 
         // 서버로 데이터를 전송하고 결과에 따라 경고 메시지를 표시
@@ -205,8 +216,8 @@
     const toggleAddUser = () => {
         const addFormElem = document.getElementById("addForm");
         addFormElem.classList.toggle("hidden");
-    }
 
+    }
 </script>
 </body>
 </html>
