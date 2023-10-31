@@ -10,9 +10,11 @@
     .tbl-list {
         width: 100%;
     }
+
     .hidden {
         display: none;
     }
+
     .center {
         display: flex;
         justify-content: center;
@@ -23,7 +25,7 @@
 <body>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         const now = new Date();
         const nextYear = new Date();
         nextYear.setFullYear(now.getFullYear() + 1);
@@ -56,7 +58,8 @@
                             <option value="userId" selected="selected">아이디</option>
                             <option value="name">이름</option>
                         </select>
-                        <input name="searchKeyword" type="text" placeholder="검색어" class="search-form" id="searchKeyword">
+                        <input name="searchKeyword" type="text" placeholder="검색어" class="search-form"
+                               id="searchKeyword">
                     </div>
                     <div class="btn-wrap">
                         <button class="btn-green" type="submit">검색</button>
@@ -82,7 +85,7 @@
                         <button class="btn-gray w100" onclick="toggleAddUser()">추가</button>
                     </div>
                 </div>
-                <form action="/user/add" method="POST" >
+                <form action="/user/add" method="POST">
                     <table class="tbl-list" style="text-align: center;">
                         <thead>
                         <tr>
@@ -98,22 +101,29 @@
                         </thead>
                         <tr class="hidden" id="addForm">
                             <td></td>
-                            <td> <input type="text" id="role" name="role"></td>
-                            <td> <input type="text" id="part" name="part"></td>
-                            <td> <input type="text" id="name" name="name"></td>
-                            <td> <input type="text" id="userId" name="userId"></td>
-                                <td style="display: flex; height: 43.33px;">
-                                    <input type="date" id="startDate" name="startDate" style="width: 140px;">
-                                    ~
-                                    <input type="date" id="endDate" name="endDate" style="width: 140px;">
-                                </td>
-                            <th style="border-left: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: 1px solid #ccc; text-align: center;">-</th>
+                            <td><input type="text" id="role" name="role"></td>
+                            <td><input type="text" id="part" name="part"></td>
+                            <td><input type="text" id="name" name="name"></td>
+                            <td><input type="text" id="userId" name="userId"></td>
+                            <td style="display: flex; height: 43.33px;">
+                                <input type="date" id="startDate" name="startDate" style="width: 140px;">
+                                ~
+                                <input type="date" id="endDate" name="endDate" style="width: 140px;">
+                            </td>
+                            <th style="border-left: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: 1px solid #ccc; text-align: center;">
+                                -
+                            </th>
 
-                            <th style="border-bottom: 1px solid #ccc;"><button  class="btn-gray w100" type="button" style=" color: white; background-color: gray;" th:attr="onclick=|createUser()|">저장</button></th>
+                            <th style="border-bottom: 1px solid #ccc;">
+                                <button class="btn-gray w100" type="button"
+                                        style=" color: white; background-color: gray;" th:attr="onclick=|createUser()|">
+                                    저장
+                                </button>
+                            </th>
 
                         </tr>
                         <tr th:each="user, iterStat : ${users}">
-                            <td th:text="${users.size() - iterStat.index}" />
+                            <td th:text="${users.size() - iterStat.index}"/>
                             <td th:text="${user.role.role}"></td>
                             <td th:text="${user.part}"></td>
                             <td th:text="${user.name}"></td>
@@ -123,10 +133,14 @@
                                 <span th:text="${user.role.endDate}"></span>
                             </td>
                             <td>
-                                <button class="btn-gray w100" type="button" th:attr="onclick=|resetUser('${user.id}')|" style="color: white; background-color: gray;">초기화</button>
+                                <button class="btn-gray w100" type="button" th:attr="onclick=|resetUser('${user.id}')|"
+                                        style="color: white; background-color: gray;">초기화
+                                </button>
                             </td>
                             <td>
-                                <button class="btn-gray w100" type="button" th:attr="onclick=|deleteUser('${user.id}')|" style="color: white; background-color: gray;">삭제</button>
+                                <button class="btn-gray w100" type="button" th:attr="onclick=|deleteUser('${user.id}')|"
+                                        style="color: white; background-color: gray;">삭제
+                                </button>
                             </td>
 
                         </tr>
@@ -148,16 +162,16 @@
 
         if (!roleValue || !partValue || !nameValue || !userIdValue || !startDateValue || !endDateValue) {
             alert("모든 필드를 입력해야 합니다.");
-        } else {
-            const userDTO = {
-                role: roleValue,
-                part: partValue,
-                name: nameValue,
-                userId: userIdValue,
-                startDate: startDateValue,
-                endDate: endDateValue
-            };
+            return;
         }
+        const userDTO = {
+            role: roleValue,
+            part: partValue,
+            name: nameValue,
+            userId: userIdValue,
+            startDate: startDateValue,
+            endDate: endDateValue
+        };
         console.log(startDateValue, endDateValue);
 
         // 서버로 데이터를 전송하고 결과에 따라 경고 메시지를 표시
@@ -176,10 +190,11 @@
         }
         location.reload();
     }
+
     async function resetUser(id) {
 
 
-        const response = await fetch(`/user/reset/${id}` ,{
+        const response = await fetch(`/user/reset/${id}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -198,7 +213,7 @@
     async function deleteUser(id) {
 
         console.log(id);
-        const response = await fetch(`/user/delete/${id}`,{
+        const response = await fetch(`/user/delete/${id}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
