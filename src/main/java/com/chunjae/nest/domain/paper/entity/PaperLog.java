@@ -25,5 +25,9 @@ public class PaperLog extends BaseLogEntity {
     @Column(length = 255, nullable = false)
     private String paperName;
 
+    @Column(length = 10, nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PaperStatus paperStatus;
+
 }
 
