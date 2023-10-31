@@ -1,4 +1,4 @@
-import {useCallback, useRef, useState} from "react";
+import { useCallback, useRef, useState } from "react";
 import * as PDF_JS from "pdfjs-dist";
 import * as PDF_LIB from "pdf-lib";
 import { arrayMove } from "@dnd-kit/sortable";
@@ -80,7 +80,7 @@ const usePDF = () => {
 
   const generatePDFFile = useCallback(async () => {
     if (pages.length === 0) return null;
-    for (let i = 0; i <pages.length && i <initialPage.length; ++i) {
+    for (let i = 0; i < pages.length && i < initialPage.length; ++i) {
       if (pages[i].id !== initialPage[i]) return null;
     }
     const docMap = new Map();
@@ -96,7 +96,9 @@ const usePDF = () => {
         if (typeof src === "string") {
           src = await fetch(src).then((res) => res.arrayBuffer());
         }
-        const doc = await PDF_LIB.PDFDocument.load(src);
+        const doc = await PDF_LIB.PDFDocument.load(src, {
+          ignoreEncryption: true,
+        });
         docMap.set(docId, doc);
       }
       const docSrc = docMap.get(docId);
@@ -104,7 +106,7 @@ const usePDF = () => {
       newPDFDoc.addPage(copiedPage);
     }
     return await newPDFDoc.save();
-  },[pages])
+  }, [pages]);
 
   return {
     addPDF,
