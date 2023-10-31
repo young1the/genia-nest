@@ -54,9 +54,8 @@ public class UserController {
         try {
             User loginRequest = userService.login(userId, password);
             if (loginRequest != null) {
-                String loginUserId = loginRequest.getUserId();
                 // 로그인에 성공한 경우
-                session.setAttribute("userId", loginUserId);
+                session.setAttribute("user", loginRequest);
                 session.setMaxInactiveInterval(60 * 30); // 30분 동안 세션 유지
 
                 // 아이디 저장 체크박스 상태 확인
@@ -137,18 +136,18 @@ public class UserController {
             @RequestParam("password") String newPassword,
             HttpSession session
     ) {
-        String userId = (String) session.getAttribute("userId");
+        User user = (User) session.getAttribute("user");
 
-        if (userId != null) {
+        if (user != null) {
             try {
 
-                userService.modPassword(userId, newPassword);
+                userService.modPassword(user, newPassword);
 
                 session.invalidate();
 
                 return "redirect:/user/login";
             } catch (Exception e) {
-                System.out.println();
+                System.out.println("비밀번호 바꾸기 실패");
                 return "redirect:/user/password/modify";
             }
         }

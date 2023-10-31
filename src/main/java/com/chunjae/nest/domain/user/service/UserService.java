@@ -53,11 +53,13 @@ public class UserService {
     public User login(String userId, String password) {
         // 회원 정보 & 비밀번호 조회
         User user = userRepository.findByUserId(userId);
-
-        if (user == null || !EncodePasswordUtils.passwordEncoder().matches(password, user.getPassword())) {
+        if (user == null) return null;
+        if (!EncodePasswordUtils.passwordEncoder().matches(password, user.getPassword())) {
             return null;
         }
-
+        if (user.getRole().getRoleStatus() == RoleStatus.CANCELLED || user.getRole().getRoleStatus() == RoleStatus.TERMINATED) {
+            return null;
+        }
         return user;
     }
 
@@ -69,9 +71,7 @@ public class UserService {
         return null;
     }
 
-    public void modPassword(String userId, String newPassword) {
-
-        User user = userRepository.findByUserId(userId);
+    public void modPassword(User user, String newPassword) {
 
         if (user != null) {
             System.out.println("비밀번호 : " + newPassword);
@@ -109,17 +109,6 @@ public class UserService {
     }
 
     public List<User> searchUsers(String searchKeyword, String searchOption) {
-//        List<User> userList = new ArrayList<>();
-//
-//        for (User user : getAllUsersOrderedByIdDesc()) {
-//            if (user.getUserStatus() != UserStatus.DELETE) {
-//                if (("userId".equals(searchOption) && user.getUserId().contains(searchKeyword)) ||
-//                        ("name".equals(searchOption) && user.getName().contains(searchKeyword))) {
-//                    userList.add(user);
-//                }
-//            }
-//        }
-//        return userList;
 
         if (searchOption.equals("userId")) {
 
@@ -129,10 +118,9 @@ public class UserService {
                     .toList();
         }
             // 유저 레포지토리에서 userId가 searchKeyword로 받은 값을 가지고 있는 유저 가져오기
-            // 가져와서 바로 리턴
         if (searchOption.equals("name")) {
             // 유저 레포지토리에서 name이 searchKeyword로 받은 값을 가지고 있는 유저 가져오기
-            // 얘도
+
             return userRepository.findByNameContaining(searchKeyword)
                     .stream()
                     .filter(user -> user.getUserStatus() != UserStatus.DELETE && (user.getRole().getRoleStatus() != RoleStatus.CANCELLED || user.getRole().getRoleStatus() != RoleStatus.TERMINATED))

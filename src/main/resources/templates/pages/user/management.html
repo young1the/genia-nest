@@ -212,19 +212,23 @@
 
     async function deleteUser(id) {
 
-        console.log(id);
-        const response = await fetch(`/user/delete/${id}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+        const deleteYN = window.confirm("해당 회원을 삭제하시겠습니까?");
 
-        if (response.ok) {
-            alert("사용자 삭제 성공");
-            location.reload();
-        } else {
-            alert("사용자 삭제 실패");
+        console.log(id);
+        if (deleteYN) {
+            const response = await fetch(`/user/delete/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                alert("사용자 삭제 성공");
+                location.reload();
+            } else {
+                alert("사용자 삭제 실패");
+            }
         }
     }
 

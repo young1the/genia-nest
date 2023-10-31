@@ -10,10 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.Order;
 import java.io.IOException;
 
-@WebFilter(value = {"/user/login"})
+@WebFilter(value = {"/paper/*", "/user/management/*"})
 @RequiredArgsConstructor
-@Order(0)
-public class LoginFilter implements Filter {
+@Order(3)
+public class PaperFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -31,21 +31,16 @@ public class LoginFilter implements Filter {
         //String requestURI = req.getRequestURI();
         HttpSession session = req.getSession();
         User user = (User) session.getAttribute("user"); // 유저 정보
-        if (user != null) {
-            //Referer 헤더에 이전 페이지 URL이 있는 경우 그 페이지로 리다이렉트
-            if (req.getHeader("Referer") != null) {
-                res.sendRedirect(req.getHeader("Referer"));
-            } else{
-                res.sendRedirect("/");
-            }
-            return ;
-        }
-        chain.doFilter(request, response);
 
+        if (user.getRole().getRole().equals("문제담당자")) {
+            res.sendRedirect("/ocr");
+            return;
+}
+        chain.doFilter(request, response);
     }
 
     @Override
-    public void destroy() {
+    public void destroy () {
         Filter.super.destroy();
     }
 
