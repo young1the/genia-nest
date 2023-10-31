@@ -22,8 +22,9 @@ import org.springframework.data.domain.Pageable;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import java.util.List;
+
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -51,7 +52,7 @@ public class PaperService {
 
             log.info(" url: {}, fileName: {}", url, fileName);
 
-            if (!url.equals("failed")) {
+            if (!"failed".equals(url)) {
                 Paper paper = paperRequest.createPaper(user);
                 PaperFile paperFile = PaperFile.builder()
                         .name(fileName)
@@ -62,6 +63,7 @@ public class PaperService {
                         .userId(user.getUserId())
                         .paperUrl(url)
                         .paperName(paperRequest.getName())
+                        .paperStatus(PaperStatus.TO_DO)
                         .build();
 
                 paperRepository.save(paper);
@@ -123,17 +125,12 @@ public class PaperService {
                 String fileName = s3UploadService.getFileName(url);
                 log.info("url:{}, fileName:{}", url, fileName);
 
-                if (!url.equals("failed")) {
+                if (!"failed".equals(url)) {
                     paperFile.updatePaperFile(fileName, url);
-                    PaperLog paperLog = PaperLog.builder()
-                            .userId(user.getUserId())
-                            .paperUrl(url)
-                            .paperName(paperRequest.getName())
-                            .build();
+
 
                     paperFileRepository.save(paperFile);
                     paperRepository.save(paper);
-                    paperLogRepository.save(paperLog);
 
                     return "ok";
                 }
@@ -142,12 +139,6 @@ public class PaperService {
                 s3UploadService.deletePaper(paper.getPaperFile().getUrl());
                 paperFile.updatePaperFile("", "");
                 paperFileRepository.save(paperFile);
-                PaperLog paperLog = PaperLog.builder()
-                        .userId(user.getUserId())
-                        .paperUrl("")
-                        .paperName(paperRequest.getName())
-                        .build();
-                paperLogRepository.save(paperLog);
                 return "ok";
             }
             return "failed";
@@ -166,13 +157,14 @@ public class PaperService {
 
         if (0 == paper.getOcrCount()) {
             s3UploadService.deletePaper(url);
-            paper.setPaperStatusToDelete();
+            paper.updatePaperStatus(PaperStatus.DELETED);
             paperRepository.save(paper);
             paperFileRepository.delete(paper.getPaperFile());
             PaperLog paperLog = PaperLog.builder()
                     .userId(paper.getUser().getUserId())
                     .paperName(paper.getName())
                     .paperUrl("")
+                    .paperStatus(PaperStatus.DELETED)
                     .build();
             paperLogRepository.save(paperLog);
             return "ok";

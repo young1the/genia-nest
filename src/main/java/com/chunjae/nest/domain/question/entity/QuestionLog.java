@@ -2,12 +2,12 @@ package com.chunjae.nest.domain.question.entity;
 
 import com.chunjae.nest.common.BaseLogEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Getter
+@ToString
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -24,4 +24,8 @@ public class QuestionLog extends BaseLogEntity {
 
     @Column(nullable = false)
     private int questionNum;
+
+    @Column(length = 10, nullable = false)
+    @Enumerated(EnumType.STRING)
+    private QuestionStatus questionStatus;
 }
