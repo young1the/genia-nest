@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
@@ -17,31 +18,22 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import org.springframework.data.domain.Pageable;
+
 import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import org.springframework.data.domain.Pageable;
-
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/paper")
 public class PaperController {
 
     private final PaperService paperService;
 
-    @Autowired
-    public PaperController(PaperService paperService) {
-        this.paperService = paperService;
-    }
-
     @GetMapping("")
     public String index(Model model, @ModelAttribute SearchKeywordDTO searchKeywordDTO, Pageable pageable) {
-
-        System.out.println("==============================================");
-        System.out.println(searchKeywordDTO);
-
-        System.out.println("컨트롤러 부분 - " + searchKeywordDTO.toString());
 
         int pageSize = 10;
         int currentPage = pageable.getPageNumber();

@@ -18,58 +18,59 @@
                             <span>검색 조건</span>
                             <div class="select-wrap">
                                 <select class="select-box" id="year" name="year">
-                                    <option value="전체">년도</option>
-                                    <option value="2023">2023</option>
-                                    <option value="2022">2022</option>
+                                    <option value="전체" th:selected="${searchKeywordDTO.year =='전체'}">년도</option>
+                                    <option value="2023" th:selected="${searchKeywordDTO.year =='2023'}">2023</option>
+                                    <option value="2022" th:selected="${searchKeywordDTO.year =='2022'}">2022</option>
                                 </select>
                             </div>
                             <div class="select-wrap">
                                 <select class="select-box" id="month" name="month">
-                                    <option value="0">출제 월</option>
-                                    <option value="1">1월</option>
-                                    <option value="2">2월</option>
-                                    <option value="3">3월</option>
-                                    <option value="4">4월</option>
-                                    <option value="5">5월</option>
-                                    <option value="6">6월</option>
-                                    <option value="7">7월</option>
-                                    <option value="8">8월</option>
-                                    <option value="9">9월</option>
-                                    <option value="10">10월</option>
-                                    <option value="11">11월</option>
-                                    <option value="12">12월</option>
+                                    <option value="0" th:selected="${searchKeywordDTO.month ==0}">출제 월</option>
+                                    <option value="1" th:selected="${searchKeywordDTO.month ==1}">1월</option>
+                                    <option value="2" th:selected="${searchKeywordDTO.month ==2}">2월</option>
+                                    <option value="3" th:selected="${searchKeywordDTO.month ==3}">3월</option>
+                                    <option value="4" th:selected="${searchKeywordDTO.month ==4}">4월</option>
+                                    <option value="5" th:selected="${searchKeywordDTO.month ==5}">5월</option>
+                                    <option value="6" th:selected="${searchKeywordDTO.month ==6}">6월</option>
+                                    <option value="7" th:selected="${searchKeywordDTO.month ==7}">7월</option>
+                                    <option value="8" th:selected="${searchKeywordDTO.month ==8}">8월</option>
+                                    <option value="9" th:selected="${searchKeywordDTO.month ==9}">9월</option>
+                                    <option value="10" th:selected="${searchKeywordDTO.month ==10}">10월</option>
+                                    <option value="11" th:selected="${searchKeywordDTO.month ==11}">11월</option>
+                                    <option value="12" th:selected="${searchKeywordDTO.month ==12}">12월</option>
                                 </select>
                             </div>
                             <div class="select-wrap">
                                 <select class="select-box" id="areaSelect" name="area">
-                                    <option value="전체">영역</option>
-                                    <option value="국어">국어</option>
-                                    <option value="수학">수학</option>
-                                    <option value="영어">영어</option>
-                                    <option value="한국사">한국사</option>
-                                    <option value="사회탐구">사회탐구</option>
-                                    <option value="과학탐구">과학탐구</option>
-                                    <option value="직업탐구">직업탐구</option>
-                                    <option value="제2외국어/한문">제2외국어/한문</option>
+                                    <option value="전체" th:selected="${searchKeywordDTO.area =='전체'}">영역</option>
+                                    <option value="국어" th:selected="${searchKeywordDTO.area =='국어'}">국어</option>
+                                    <option value="수학" th:selected="${searchKeywordDTO.area =='수학'}">수학</option>
+                                    <option value="영어" th:selected="${searchKeywordDTO.area =='영어'}">영어</option>
+                                    <option value="한국사" th:selected="${searchKeywordDTO.area =='한국사'}">한국사</option>
+                                    <option value="사회탐구" th:selected="${searchKeywordDTO.area =='사회탐구'}">사회탐구</option>
+                                    <option value="과학탐구" th:selected="${searchKeywordDTO.area =='과학탐구'}">과학탐구</option>
+                                    <option value="직업탐구" th:selected="${searchKeywordDTO.area =='직업탐구'}">직업탐구</option>
+                                    <option value="제2외국어/한문" th:selected="${searchKeywordDTO.area =='제2외국어/한문'}">제2외국어/한문</option>
                                 </select>
                             </div>
                             <div class="select-wrap">
                                 <select class="select-box" id="subjectSelect" name="subject">
-                                    <option value="전체">과목</option>
+                                    <option th:value="전체" th:selected="${searchKeywordDTO.subject}">과목</option>
                                 </select>
                             </div>
                             <div class="select-wrap">
                                 <select class="select-box" id="searchOption" name="searchOption">
-                                    <option value="전체">전체</option>
-                                    <option value="name">시험지 명</option>
-                                    <option value="user_id">등록자</option>
+                                    <option value="전체" th:selected="${searchKeywordDTO.searchOption =='전체'}">전체</option>
+                                    <option value="name" th:selected="${searchKeywordDTO.searchOption =='name'}">시험지 명</option>
+                                    <option value="user_id" th:selected="${searchKeywordDTO.searchOption =='user_id'}">등록자</option>
                                 </select>
                             </div>
-                            <input type="text" placeholder="검색어" class="search-form" id="searchKeyword" name="searchKeyword">
+                            <input type="text" placeholder="검색어" class="search-form" id="searchKeyword" name="searchKeyword"
+                                   th:value="${searchKeywordDTO.searchKeyword}">
                         </div>
                         <div class="btn-wrap">
-                            <button class="btn-green" type="submit">검색</button>
-                            <button class="btn-gray" type="reset">초기화</button>
+                            <button class="btn-green" type="submit" id="search">검색</button>
+                            <button class="btn-gray" type="reset" id="reset">초기화</button>
                             <button class="btn-toggle"></button>
                         </div>
                     </div>
@@ -78,25 +79,27 @@
                             <div class="box">
                                 <span>시험 종류</span>
                                 <div class="check-wrap" id="category">
-                                    <input type="checkbox" id="grade00" name="category" value="수능">
+                                    <input type="checkbox" id="grade00" name="category" value="수능" th:checked="${searchKeywordDTO.category =='수능'}">
                                     <label for="grade00">수능</label>
-                                    <input type="checkbox" id="grade01" name="category" value="모의고사">
+                                    <input type="checkbox" id="grade01" name="category" value="모의고사" th:checked="${searchKeywordDTO.category =='모의고사'}">
                                     <label for="grade01">모의</label>
-                                    <input type="checkbox" id="grade02" name="category" value="학력고사">
+                                    <input type="checkbox" id="grade02" name="category" value="학력고사" th:checked="${searchKeywordDTO.category =='학력고사'}">
                                     <label for="grade02">학력</label>
                                 </div>
                             </div>
                         </div>
                         <div class="search-box">
                             <div class="box">
-                                <span>업로드 상태</span>
+                                <span>시험지 상태</span>
                                 <div class="radio-wrap" id="paperStatus">
-                                    <input type="radio" id="radio01_01" name="paperStatus" value="전체" checked>
+                                    <input type="radio" id="radio01_01" name="paperStatus" value="전체" checked th:checked="${searchKeywordDTO.paperStatus == '전체'}">
                                     <label for="radio01_01">전체</label>
-                                    <input type="radio" id="radio01_02" name="paperStatus" value="완료">
+                                    <input type="radio" id="radio01_02" name="paperStatus" value="완료" th:checked="${searchKeywordDTO.paperStatus == '완료'}">
                                     <label for="radio01_02">완료</label>
-                                    <input type="radio" id="radio01_03" name="paperStatus" value="진행중">
-                                    <label for="radio01_03">진행</label>
+                                    <input type="radio" id="radio01_03" name="paperStatus" value="진행중" th:checked="${searchKeywordDTO.paperStatus == '진행중'}">
+                                    <label for="radio01_03">진행중</label>
+                                    <input type="radio" id="radio01_04" name="paperStatus" value="진행 전" th:checked="${searchKeywordDTO.paperStatus == '진행 전'}">
+                                    <label for="radio01_03">진행 전</label>
                                 </div>
                             </div>
                         </div>
@@ -104,13 +107,13 @@
                             <div class="box">
                                 <span>학년</span>
                                 <div class="radio-wrap" id="grade">
-                                    <input type="radio" id="radio02_01" name="grade" value="전체" checked="">
+                                    <input type="radio" id="radio02_01" name="grade" value="전체" th:checked="${searchKeywordDTO.grade == '전체'}">
                                     <label for="radio02_01">전체</label>
-                                    <input type="radio" id="radio02_02" name="grade" value="1">
+                                    <input type="radio" id="radio02_02" name="grade" value="1" th:checked="${searchKeywordDTO.grade == '1'}">
                                     <label for="radio02_02">1학년</label>
-                                    <input type="radio" id="radio02_03" name="grade" value="2">
+                                    <input type="radio" id="radio02_03" name="grade" value="2" th:checked="${searchKeywordDTO.grade == '2'}">
                                     <label for="radio02_03">2학년</label>
-                                    <input type="radio" id="radio02_04" name="grade" value="3">
+                                    <input type="radio" id="radio02_04" name="grade" value="3" th:checked="${searchKeywordDTO.grade == '3'}">
                                     <label for="radio02_04">3학년</label>
                                 </div>
                             </div>
@@ -139,7 +142,6 @@
                 <table class="tbl-list">
                     <caption></caption>
                     <colgroup>
-<!--                        <col style="width: 3%;">-->
                         <col style="width: 4%;">
                         <col style="width: 6%;">
                         <col style="width: 6%;">
@@ -150,7 +152,6 @@
                         <col style="width: 20%;">
                         <col style="width: 6%;">
                         <col style="width: 8%;">
-                        <col style="width: 6%;">
                     </colgroup>
                     <thead>
                     <tr>
@@ -162,15 +163,14 @@
 <!--                        </th>-->
                         <th>NO</th>
                         <th>출제 년도</th>
+                        <th>출제 타입</th>
                         <th>월</th>
-                        <th>시험 종류</th>
                         <th>학년</th>
                         <th>영역</th>
                         <th>과목</th>
                         <th>시험지 명</th>
                         <th>등록자</th>
                         <th>등록일</th>
-                        <th>업로드 상태</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -181,33 +181,46 @@
 <!--                        </td>-->
                         <td th:text="${#numbers.sequence(papers.number * papers.size + 1, (papers.number + 1) * papers.size)[iterStat.index]}" />
 <!--                        <td th:text="${#numbers.sequence((papers.number + 1) * papers.size, papers.number * papers.size + 1)[iterStat.index]}" />-->
+<!--                        <td th:text="${paper.id}" />-->
                         <td th:text="${paper.id}" style="display: none;" />
                         <td th:text="${paper.year}" />
-                        <td th:text="${paper.month}" />
                         <td th:text="${paper.category}" />
+                        <td th:text="${paper.month}" />
                         <td th:text="${paper.grade}" />
                         <td th:text="${paper.area}" />
                         <td th:text="${paper.subject}" />
+                        <td th:text="${#temporals.format(paper.createdAt, 'yyyy-MM-dd')}"></td>
                         <td class="tit"><a th:href="@{/paper/upload(id=${paper.id})}" target="_blank" th:text="${paper.name}"/></td>
-                        <td th:text="${paper.user.getName()}">홍길동</td>
+                        <td th:text="${paper.user.name}">홍길동</td>
                         <td th:text="${#temporals.format(paper.getCreatedAt(), 'yyyy-MM-dd')}">YYYY.MM.DD</td>
-                        <td th:text="${paper.paperStatus.displayValue}" />
                     </tr>
                     </tbody>
                 </table>
             </div>
-            <div class="paging-wrap">
-                <!-- 페이징 영역 -->
-                <a href="javascript:;" class="first" th:if="${page.number != 0}" th:href="@{${pageLink + (page.number - 1)}}"></a>
-                <a href="javascript:;" class="prev" th:if="${page.number == 0}"></a>
-                &nbsp;&nbsp;
-                <th:block th:each="pageNumber : ${#numbers.sequence(0, page.totalPages - 1)}">
-                    <a href="javascript:;" class="page" th:class="${page.number == pageNumber} ? active" th:href="@{${pageLink + pageNumber}}"><span th:text="${pageNumber + 1}"></span></a>
-                </th:block>
-                &nbsp;&nbsp;
-                <a href="javascript:;" class="next" th:if="${page.number != page.totalPages - 1}" th:href="@{${pageLink + (page.number + 1)}}"></a>
-                <a href="javascript:;" class="last" th:if="${page.number == page.totalPages - 1}"></a>
+            <div th:if="${papers.isEmpty()}">
+                <ul>
+                    <li>검색 결과가 없습니다.</li>
+                </ul>
             </div>
+            <!-- 페이징 영역 -->
+            <div class="paging-wrap">
+                <a href="javascript:;" class="first" th:href="@{${pageLink + 0}}"></a>
+                <a href="javascript:;" class="prev"  th:if="${page.number >= 0}" th:href="@{${pageLink + (page.number - 1)}}"></a>
+                <th:block th:each="pageNumber : ${#numbers.sequence(0, page.totalPages - 1)}">
+                    <a href="javascript:;" class="page" th:class="${page.number == pageNumber} ? active" th:href="@{${pageLink + pageNumber}}">
+                        <span class="page active" th:text="${pageNumber + 1}"></span>
+                    </a>
+                </th:block>
+                <a href="javascript:;" class="next" th:if="${page.number <= page.totalPages - 1}" th:href="@{${pageLink + (page.number + 1)}}"></a>
+                <a href="javascript:;" class="last" th:href="@{${pageLink + (page.totalPages - 1)}}"></a>
+            </div>
+<!--                <a href="javascript:;" class="first" th:if="${page.number != 0}" th:href="@{${pageLink + (page.number - 1)}}"></a>-->
+<!--                <a href="javascript:;" class="prev" th:if="${page.number == 0}"></a>-->
+<!--                <th:block th:each="pageNumber : ${#numbers.sequence(0, page.totalPages - 1)}">-->
+<!--                    <a href="javascript:;" class="page active" th:class="${page.number == pageNumber} ? active" th:href="@{${pageLink + pageNumber}}"><span class="page" th:text="${pageNumber + 1}"></span></a>-->
+<!--                </th:block>-->
+<!--                <a href="javascript:;" class="next" th:if="${page.number != page.totalPages - 1}" th:href="@{${pageLink + (page.number + 1)}}"></a>-->
+<!--                <a href="javascript:;" class="last" th:if="${page.number == page.totalPages - 1}"></a>-->
         </div>
     </div>
 
@@ -285,10 +298,6 @@
 
         fetch('api/paper', {
             method : 'GET',
-            headers : {
-                'Content-Type' : 'application/json',
-            },
-            body : jsonData,
         })
             .then(response => response.json())
             .then(data => {
@@ -297,7 +306,7 @@
             })
             .catch(error => {
                 console.log('에러 발생 : ', error);
-            })
+            });
     });
 
     function addOption(selectBox, optionText) { // 영역 - 과목 셀렉트 박스
@@ -307,14 +316,20 @@
     }
 
     function updateTotalCount() { //  총 건수 세기
-        const totalCount = document.querySelectorAll('.left-area .select-box option').length;
-        document.getElementById('totalCount').innerText = totalCount;
+        const totalCountElement = document.getElementById('totalCount');
+        if (totalCountElement) {
+            const totalCount = document.querySelectorAll('.left-area .select-box option').length;
+            totalCountElement.innerText = totalCount;
+        }
     }
 
     document.addEventListener('DOMContentLoaded', function() {
         updateTotalCount();
     });
 
+    document.getElementById("reset").addEventListener("click", function() {
+        window.location.href = "/paper"; // 초기화
+    });
     const setDownloadLink = () => {
         const downloadElem = document.getElementById("excelDownload")
         let url = new URL(window.location.href);
@@ -322,76 +337,6 @@
         downloadElem.href = url.toString();
     }
     setDownloadLink();
-    // // 검색 조건 = url
-    // function saveSearchCondition() { // 검색 조건 저장
-    //     const selectedYear = document.querySelector('#year').value;
-    //     const selectedMonth = document.querySelector('#month').value;
-    //     const selectedArea = document.querySelector('#areaSelect').value;
-    //     const selectedSubject = document.querySelector('#subjectSelect').value;
-    //     const selectedOption = document.querySelector('#searchOption').value;
-    //     const selectedKeyword = document.querySelector('#searchKeyword').value;
-    //     const selectedCategory = document.querySelector('#category').value;
-    //     const selectedPaperStatus = document.querySelector('#paperStatus').value;
-    //     const selectedGrade = document.querySelector('#grade').value;
-    //
-    //     localStorage.setItem('selectedYear', selectedYear);
-    //     localStorage.setItem('selectedMonth', selectedMonth);
-    //     localStorage.setItem('selectedArea', selectedArea);
-    //     localStorage.setItem('selectedSubject', selectedSubject);
-    //     localStorage.setItem('selectedOption', selectedOption);
-    //     localStorage.setItem('selectedKeyword', selectedKeyword);
-    //     localStorage.setItem('selectedCategory', selectedCategory);
-    //     localStorage.setItem('selectedPaperStatus', selectedPaperStatus);
-    //     localStorage.setItem('selectedGrade', selectedGrade);
-    // }
-    //
-    // // 페이지 로드 시 검색 조건 복원
-    // window.onload = function () {
-    //     const selectedYear = localStorage.getItem('selectedYear');
-    //     const selectedMonth = localStorage.getItem('selectedMonth');
-    //     const selectedArea = localStorage.getItem('selectedArea');
-    //     const selectedSubject = localStorage.getItem('selectedSubject');
-    //     const selectedOption = localStorage.getItem('selectedOption');
-    //     const selectedKeyword = localStorage.getItem('selectedKeyword');
-    //     const selectedCategory = localStorage.getItem('selectedCategory');
-    //     const selectedPaperStatus = localStorage.getItem('selectedPaperStatus');
-    //     const selectedGrade = localStorage.getItem('selectedGrade');
-    //
-    //     if (selectedYear) {
-    //         document.querySelector('#year').value = selectedYear;
-    //     }
-    //     if (selectedMonth) {
-    //         document.querySelector('#month').value = selectedMonth;
-    //     }
-    //     if (selectedArea) {
-    //         document.querySelector('#areaSelect').value = selectedArea;
-    //     }
-    //     if (selectedSubject) {
-    //         document.querySelector('#subjectSelect').value = selectedSubject;
-    //     }
-    //     if (selectedOption) {
-    //         document.querySelector('#searchOption').value = selectedOption;
-    //     }
-    //     if (selectedKeyword) {
-    //         document.querySelector('#searchKeyword').value = selectedKeyword;
-    //     }
-    //     if (selectedCategory) {
-    //         document.querySelector('#category').value = selectedCategory;
-    //     }
-    //     if (selectedPaperStatus) {
-    //         document.querySelector('#paperStatus').value = selectedPaperStatus;
-    //     }
-    //     if (selectedGrade) {
-    //         document.querySelector('#grade').value = selectedGrade;
-    //     }
-    // }
-    //
-    // // 검색 버튼 클릭 이벤트 핸들러
-    // document.querySelector('button.btn-green[type="submit"]').addEventListener('click', function (e) {
-    //     e.preventDefault(); // 기본 동작 방지
-    //     saveSearchCondition();
-    //     // 나머지 검색 로직 추가
-    // });
 
 </script>
 </body>

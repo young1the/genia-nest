@@ -7,7 +7,7 @@ const OCRAppEntry = () => {
     getInitialValue();
   }, []);
   const getInitialValue = async () => {
-    let idParam = 37;
+    let idParam = 3;
     if (idParam) {
       const response = await fetch(`/api/paper/detail/${idParam}`);
       const result = await response.json();

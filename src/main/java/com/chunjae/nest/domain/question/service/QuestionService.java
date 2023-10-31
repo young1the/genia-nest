@@ -1,5 +1,6 @@
 package com.chunjae.nest.domain.question.service;
 
+import com.chunjae.nest.domain.paper.dto.SearchKeywordDTO;
 import com.chunjae.nest.domain.paper.entity.Paper;
 import com.chunjae.nest.domain.paper.entity.PaperLog;
 import com.chunjae.nest.domain.paper.entity.PaperStatus;
@@ -18,11 +19,14 @@ import com.chunjae.nest.domain.user.entity.User;
 import com.chunjae.nest.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -143,5 +147,17 @@ public class QuestionService {
                 .stream()
                 .filter(q -> q.getQuestionStatus() == QuestionStatus.COMPLETED)
                 .count();
+    }
+
+    public Page<Paper> searchOCR(SearchKeywordDTO searchKeywordDTO, Pageable pageable) { // OCR 작업중
+        return questionRepository.searchOCR(searchKeywordDTO, pageable);
+    }
+
+    public Page<Paper> searchOCRDone(SearchKeywordDTO searchKeywordDTO, Pageable pageable) { // OCR 작업 완료
+        return questionRepository.searchOCRDone(searchKeywordDTO, pageable);
+    }
+
+    public List<Question> searchResults() {
+        return questionRepository.findAll();
     }
 }
