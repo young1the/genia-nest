@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class NoticeController {
     @GetMapping("/")
     public String index() {
-        return "pages/index";
+        return "redirect:/paper";
     }
 }

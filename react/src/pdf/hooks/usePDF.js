@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import {useCallback, useRef, useState} from "react";
 import * as PDF_JS from "pdfjs-dist";
 import * as PDF_LIB from "pdf-lib";
 import { arrayMove } from "@dnd-kit/sortable";
@@ -16,6 +16,7 @@ const DOCUMENT_DEFAULT_CONFIG = {
 
 const usePDF = () => {
   let { current: pdfDocs } = useRef({});
+  let { current: initialPage } = useRef({});
   const [files, setFiles] = useState([]);
   const [pages, setPages] = useState([]);
   const [pdfBlob, setPdfBlob] = useState();
@@ -78,7 +79,10 @@ const usePDF = () => {
   );
 
   const generatePDFFile = useCallback(async () => {
-    if (pages.length === 0) return;
+    if (pages.length === 0) return null;
+    for (let i = 0; i <pages.length && i <initialPage.length; ++i) {
+      if (pages[i].id !== initialPage[i]) return null;
+    }
     const docMap = new Map();
     const newPDFDoc = await PDF_LIB.PDFDocument.create();
     for (const page of pages) {
@@ -99,9 +103,8 @@ const usePDF = () => {
       const [copiedPage] = await newPDFDoc.copyPages(docSrc, [pageIdx]);
       newPDFDoc.addPage(copiedPage);
     }
-    const pdfBytes = await newPDFDoc.save();
-    setPdfBlob(new Blob([pdfBytes], { type: "application/pdf" }));
-  }, [pages]);
+    return await newPDFDoc.save();
+  },[pages])
 
   return {
     addPDF,
