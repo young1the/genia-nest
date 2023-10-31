@@ -61,7 +61,6 @@ public class PaperService {
                         .userId(user.getUserId())
                         .paperUrl(url)
                         .paperName(paperRequest.getName())
-                        .paperStatus(PaperStatus.TO_DO)
                         .build();
 
                 paperRepository.save(paper);

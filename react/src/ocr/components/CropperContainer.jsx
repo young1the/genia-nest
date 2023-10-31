@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import usePDF from "../../pdf/hooks/usePDF";
 import styles from "../OCRApp.module.css";
 import "cropperjs/dist/cropper.css";
 import PDFCanvas from "../../pdf/components/PDFCanvas.jsx";
+import {Cropper} from "react-cropper";
 
 const CropperContainer = ({ getCropData, cropperRef, canvasRef, pdfURL }) => {
   const { addPDF, pages } = usePDF();
@@ -109,7 +110,6 @@ const CropperContainer = ({ getCropData, cropperRef, canvasRef, pdfURL }) => {
                     ref={cropperRef}
                     zoomTo={0.5}
                     initialAspectRatio={1}
-                    preview=".img-preview"
                     src={canvasRef.current?.toDataURL()}
                     viewMode={1}
                     minCropBoxHeight={10}

@@ -11,6 +11,7 @@ images=$(docker ps -qa)
 if [ -n "$images" ]; then
   docker rm -f $images
 else
-  echo "No $images to remove."
+  echo "No images to remove."
 fi
+sudo docker system prune --force
 echo "...Clean Docker Done..."
