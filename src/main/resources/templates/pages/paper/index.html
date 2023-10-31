@@ -189,7 +189,6 @@
                         <td th:text="${paper.grade}" />
                         <td th:text="${paper.area}" />
                         <td th:text="${paper.subject}" />
-                        <td th:text="${#temporals.format(paper.createdAt, 'yyyy-MM-dd')}"></td>
                         <td class="tit"><a th:href="@{/paper/upload(id=${paper.id})}" target="_blank" th:text="${paper.name}"/></td>
                         <td th:text="${paper.user.name}">홍길동</td>
                         <td th:text="${#temporals.format(paper.getCreatedAt(), 'yyyy-MM-dd')}">YYYY.MM.DD</td>
