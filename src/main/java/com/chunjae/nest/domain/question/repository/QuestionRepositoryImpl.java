@@ -1,4 +1,4 @@
-package com.chunjae.nest.domain.paper.repository;
+package com.chunjae.nest.domain.question.repository;
 
 import com.chunjae.nest.domain.paper.dto.SearchKeywordDTO;
 import com.chunjae.nest.domain.paper.entity.Paper;
@@ -11,19 +11,20 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class PaperRepositoryImpl implements PaperRepositoryCustom {
+public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
 
     private final JPAQueryFactory queryFactory;
     QPaper paper = QPaper.paper;
 
-    public Page<Paper> searchByWhere(SearchKeywordDTO searchKeywordDTO, Pageable pageable) {
+    @Override
+    public Page<Paper> searchOCR(SearchKeywordDTO searchKeywordDTO, Pageable pageable) {
         JPAQuery<Paper> query = queryFactory
                 .selectFrom(paper)
                 .where(
@@ -32,7 +33,7 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
                         areaAndSubjectEq(searchKeywordDTO.getArea(), searchKeywordDTO.getSubject()),
                         keyWordEq(searchKeywordDTO.getSearchOption(), searchKeywordDTO.getSearchKeyword()),
                         categoryEq(searchKeywordDTO.getCategory()),
-                        paperStatusEq(searchKeywordDTO.getPaperStatus()),
+                        paperStatusEq(),  // "TO_DO" 또는 "IN_PROGRESS"인 경우 필터링
                         gradeEq(searchKeywordDTO.getGrade())
                 )
                 .orderBy(paper.id.desc());
@@ -47,8 +48,32 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
         return new PageImpl<>(results, pageable, total);
     }
 
+    @Override
+    public Page<Paper> searchOCRDone(SearchKeywordDTO searchKeywordDTO, Pageable pageable) {
+        JPAQuery<Paper> query = queryFactory
+                .selectFrom(paper)
+                .where(
+                        yearEq(searchKeywordDTO.getYear()),
+                        monthEq(searchKeywordDTO.getMonth()),
+                        areaAndSubjectEq(searchKeywordDTO.getArea(), searchKeywordDTO.getSubject()),
+                        keyWordEq(searchKeywordDTO.getSearchOption(), searchKeywordDTO.getSearchKeyword()),
+                        categoryEq(searchKeywordDTO.getCategory()),
+                        paperStatusDoneEq(),  // "DONE"인 경우 필터링
+                        gradeEq(searchKeywordDTO.getGrade())
+                )
+                .orderBy(paper.id.desc());
+
+        long total = countOCRDoneResults(searchKeywordDTO);
+
+        List<Paper> results = query
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        return new PageImpl<>(results, pageable, total);
+    }
+
     private BooleanExpression yearEq(String year) {
-        System.out.println("레파지토리 부분 - 받은 year 값 : " + year);
 
         if ("년도".equals(year)) {
             return null;
@@ -62,7 +87,6 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
     }
 
     private BooleanExpression monthEq(int month) {
-        System.out.println("레파지토리 부분 - 받은 month 값 : " + month);
         BooleanExpression monthCondition = (month != 0) ? paper.month.eq(month) : null;
 
         // 생략해도 돌아가는지 확인하기
@@ -74,9 +98,6 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
     }
 
     private BooleanExpression areaAndSubjectEq(String area, String subject) {
-        System.out.println("레파지토리 부분 - 받은 area 값 : " + area);
-        System.out.println("레파지토리 부분 - 받은 subject 값 : " + subject);
-
         if ("전체".equals(area) && "전체".equals(subject)) {
             return null;
         } else if ("전체".equals(area)) {
@@ -93,7 +114,6 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
     }
 
     private BooleanExpression keyWordEq(String searchOption, String searchKeyword) {
-        System.out.println("레파지토리 부분 - 받은 keyword 값 : " + searchOption + ", " + searchKeyword);
 
         if ("전체".equals(searchOption) || (searchKeyword != null && searchKeyword.isEmpty())) {
             BooleanExpression userSearch = paper.user.name.like("%" + searchKeyword + "%");
@@ -118,7 +138,6 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
     }
 
     private BooleanExpression gradeEq(String grade) {
-        System.out.println("레파지토리 부분 - 받은 grade 값 : " + grade);
 
         if ("전체".equals(grade)) {
             return null;
@@ -134,23 +153,12 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
         }
     }
 
-    private BooleanExpression paperStatusEq(String paperStatus) {
+    private BooleanExpression paperStatusEq() {
+        return paper.paperStatus.in(PaperStatus.TO_DO, PaperStatus.IN_PROGRESS);
+    }
 
-        System.out.println("레파지토리 부분 - 받은 paperStatus 값 : " + paperStatus);
-        BooleanExpression result = paper.paperStatus.ne(PaperStatus.valueOf("DELETED"));
-
-        if ("전체".equals(paperStatus)){
-            return result;
-        } else if ("완료".equals(paperStatus)) {
-            return paper.paperStatus.eq(PaperStatus.valueOf("DONE"));
-        } else if ("진행중".equals(paperStatus)) {
-            return paper.paperStatus.eq(PaperStatus.valueOf("IN_PROGRESS"));
-        } else if ("진행 전".equals(paperStatus)) {
-            return paper.paperStatus.eq(PaperStatus.valueOf("TO_DO"));
-        } else {
-            // 두 값 모두 넘어오지 않았을 경우
-            return result;
-        }
+    private BooleanExpression paperStatusDoneEq() {
+        return paper.paperStatus.in(PaperStatus.DONE);
     }
 
     private Long countTotalResults(SearchKeywordDTO searchKeywordDTO) {
@@ -162,7 +170,22 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
                         areaAndSubjectEq(searchKeywordDTO.getArea(), searchKeywordDTO.getSubject()),
                         keyWordEq(searchKeywordDTO.getSearchOption(), searchKeywordDTO.getSearchKeyword()),
                         categoryEq(searchKeywordDTO.getCategory()),
-                        paperStatusEq(searchKeywordDTO.getPaperStatus()),
+                        paperStatusEq(),
+                        gradeEq(searchKeywordDTO.getGrade())
+                );
+        return query.fetchCount();
+    }
+
+    private Long countOCRDoneResults(SearchKeywordDTO searchKeywordDTO) {
+        JPAQuery<Paper> query = queryFactory
+                .selectFrom(paper)
+                .where(
+                        yearEq(searchKeywordDTO.getYear()),
+                        monthEq(searchKeywordDTO.getMonth()),
+                        areaAndSubjectEq(searchKeywordDTO.getArea(), searchKeywordDTO.getSubject()),
+                        keyWordEq(searchKeywordDTO.getSearchOption(), searchKeywordDTO.getSearchKeyword()),
+                        categoryEq(searchKeywordDTO.getCategory()),
+                        paperStatusDoneEq(),
                         gradeEq(searchKeywordDTO.getGrade())
                 );
         return query.fetchCount();

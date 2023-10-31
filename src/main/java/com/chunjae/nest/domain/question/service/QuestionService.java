@@ -143,5 +143,16 @@ public class QuestionService {
                 .stream()
                 .filter(q -> q.getQuestionStatus() == QuestionStatus.COMPLETED)
                 .count();
+
+    public Page<Paper> searchOCR(SearchKeywordDTO searchKeywordDTO, Pageable pageable) { // OCR 작업중
+        return questionRepository.searchOCR(searchKeywordDTO, pageable);
+    }
+
+    public Page<Paper> searchOCRDone(SearchKeywordDTO searchKeywordDTO, Pageable pageable) { // OCR 작업 완료
+        return questionRepository.searchOCRDone(searchKeywordDTO, pageable);
+    }
+
+    public List<Question> searchResults() {
+        return questionRepository.findAll();
     }
 }
