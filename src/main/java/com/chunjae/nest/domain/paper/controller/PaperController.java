@@ -20,6 +20,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.data.domain.Pageable;
 
+import java.io.OutputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/paper")
