@@ -17,6 +17,9 @@ const CropperContainer = ({ getCropData, cropperRef, canvasRef, pdfURL }) => {
   useEffect(() => {
     getPDF();
   }, []);
+  useEffect(()=>{
+    // 다시 받아오기
+  },[currentPage])
 
   return (
     <div className={styles.viewBox}>
