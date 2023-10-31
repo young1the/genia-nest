@@ -1,9 +1,15 @@
 package com.chunjae.nest.domain.user.dto;
 
 import com.chunjae.nest.common.excel.ExcelColumn;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
+@Builder
+@Data
 public class AssignmentDTO {
     @ExcelColumn(headerName = "ID")
     private Long id;
@@ -25,9 +31,11 @@ public class AssignmentDTO {
     private int ocrCount;
     @ExcelColumn(headerName = "문항수")
     private int totalCount;
-    @ExcelColumn(headerName = "담당자")
-    private String manager;
+    @ExcelColumn(headerName = "등록자")
+    private String uploader;
     @ExcelColumn(headerName = "등록일")
     private LocalDateTime createdAt;
+    @ExcelColumn(headerName = "담당자")
+    private String manager;
 
 }

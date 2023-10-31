@@ -15,6 +15,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Repository
@@ -24,14 +28,32 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
     private final JPAQueryFactory queryFactory;
     QPaper paper = QPaper.paper;
 
+    private BooleanExpression dateAfter(String date) {
+        if (date == null || date.isEmpty()) return null;
+        LocalDate localDate = LocalDate.parse(date);
+        LocalTime localTime = LocalTime.of(0, 0, 0);
+        LocalDateTime localDateTime = LocalDateTime.of(localDate, localTime);
+        return paper.createdAt.after(localDateTime);
+    }
+
+    private BooleanExpression dateBefore(String date) {
+        if (date == null || date.isEmpty()) return null;
+        LocalDate localDate = LocalDate.parse(date).plusDays(1);
+        LocalTime localTime = LocalTime.of(0, 0, 0);
+        LocalDateTime localDateTime = LocalDateTime.of(localDate, localTime);
+        return paper.createdAt.before(localDateTime);
+    }
+
     private BooleanExpression nameLike(String name) {
-        if (name == null) return null;
-        return paper.name.like(name);
+        if (name == null || name.isEmpty()) return null;
+        return paper.user.name.like("%" + name + "%");
     }
+
     private BooleanExpression userIdLike(String id) {
-        if (id == null) return null;
-        return paper.user.userId.like(id);
+        if (id == null || id.isEmpty()) return null;
+        return paper.user.userId.like("%" + id + "%");
     }
+
     private BooleanExpression searchByOption(AssignmentSearchReqDTO searchKeywordDTO) {
         String keyword = searchKeywordDTO.getSearchKeyword();
         String option = searchKeywordDTO.getSearchOption();
@@ -39,7 +61,8 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
         if (option.equals("name")) {
             return nameLike(keyword);
         }
-        if (option.equals("user_id")) {
+        if (option.equals("userId")) {
+            System.out.println("yes");
             return userIdLike(keyword);
         }
         return null;
@@ -47,8 +70,9 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
 
     public Page<Paper> searchByWhere(AssignmentSearchReqDTO searchKeywordDTO, Pageable pageable) {
         JPAQuery<Paper> query = queryFactory.selectFrom(paper);
+        System.out.println(searchKeywordDTO);
         if (searchKeywordDTO != null) {
-            query = query.where(searchByOption(searchKeywordDTO));
+            query = query.where(searchByOption(searchKeywordDTO), dateAfter(searchKeywordDTO.getStartDate()), dateBefore(searchKeywordDTO.getEndDate()));
         }
 
         List<Paper> results = query

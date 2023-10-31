@@ -23,9 +23,8 @@
                             </div>
                             <div class="select-wrap">
                                 <select class="select-box" id="condition" name="searchOption">
-                                    <option value="전체">전체</option>
-                                    <option value="name">아이디</option>
-                                    <option value="user_id">이름</option>
+                                    <option value="userId">아이디</option>
+                                    <option value="name">이름</option>
                                 </select>
                             </div>
                             <input type="text" placeholder="검색어" class="search-form" id="keyword" name="searchKeyword">
@@ -40,7 +39,8 @@
             <div class="table-wrap">
                 <div class="tab-top">
                     <div class="left-area">
-                        <span class="total">총 <em >0</em>건</span> <!--th:text="${papers.totalElements}"-->
+                        <span class="total">총 <em th:text="${assignments.getTotalElements()}">0</em>건</span>
+                        <!--th:text="${papers.totalElements}"-->
                         <div class="select-wrap">
                             <select class="select-box w140" id="pageSizeSelect">
                                 <option value="10">10개 보기</option>
@@ -92,35 +92,67 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="paper, iterStat : ${papers}">
-                        <td th:text="${#numbers.sequence(papers.number * papers.size + 1, (papers.number + 1) * papers.size)[iterStat.index]}" />
-                        <td th:text="${paper.id}" style="display: none;" />
-                        <td th:text="${paper.year}" />
-                        <td th:text="${paper.month}" />
-                        <td th:text="${paper.category}" />
-                        <td th:text="${paper.grade}" />
-                        <td th:text="${paper.area}" />
-                        <td th:text="${paper.subject}" />
-                        <td class="tit"><a th:href="@{/paper/upload(id=${paper.id})}" target="_blank" th:text="${paper.name}"/></td>
-                        <td th:text="${paper.user.getName()}">홍길동</td>
-                        <td th:text="${#temporals.format(paper.getCreatedAt(), 'yyyy-MM-dd')}">YYYY.MM.DD</td>
-                        <td th:text="${paper.paperStatus.displayValue}" />
+                    <tr th:each="assignment, iterStat : ${assignments}">
+                        <td th:text="${iterStat.index}"/>
+                        <td th:text="${assignment.id}" style="display: none;"/>
+                        <td th:text="${assignment.year}"/>
+                        <td th:text="${assignment.month}"/>
+                        <td th:text="${assignment.category}"/>
+                        <td th:text="${assignment.grade}"/>
+                        <td th:text="${assignment.area}"/>
+                        <td th:text="${assignment.subject}"/>
+                        <td th:text="${assignment.name}"/>
+                        <td th:text="${assignment.uploader}"/>
+                        <td th:text="${#temporals.format(assignment.createdAt, 'yyyy-MM-dd')}">YYYY.MM.DD</td>
+                        <td th:if="${assignment.manager}" th:text="${assignment.manager}">
+                        </td>
+                        <td th:unless="${assignment.manager}">
+                            <select style="width: 100%">
+                                <option value="">null</option>
+                            </select>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
             </div>
-<!--            <div class="paging-wrap">-->
-<!--                &lt;!&ndash; 페이징 영역 &ndash;&gt;-->
-<!--                <a href="javascript:;" class="first" th:if="${page.number != 0}" th:href="@{${pageLink + (page.number - 1)}}"></a>-->
-<!--                <a href="javascript:;" class="prev" th:if="${page.number == 0}"></a>-->
-<!--                &nbsp;&nbsp;-->
-<!--                <th:block th:each="pageNumber : ${#numbers.sequence(0, page.totalPages - 1)}">-->
-<!--                    <a href="javascript:;" class="page" th:class="${page.number == pageNumber} ? active" th:href="@{${pageLink + pageNumber}}"><span th:text="${pageNumber + 1}"></span></a>-->
-<!--                </th:block>-->
-<!--                &nbsp;&nbsp;-->
-<!--                <a href="javascript:;" class="next" th:if="${page.number != page.totalPages - 1}" th:href="@{${pageLink + (page.number + 1)}}"></a>-->
-<!--                <a href="javascript:;" class="last" th:if="${page.number == page.totalPages - 1}"></a>-->
-<!--            </div>-->
+            <div th:text="${#ctx.params}">
+            </div>
+
+
+
+
+
+
+		<!-- 현재페이지는 링크 없이 숫자만 -->
+            <span th:if="${page == postsPages.number + 1}" th:text="${page}"></span>
+                <!-- 현재페이지 링크 X, 다른 페이지번호에는 링크를 보여준다 -->
+            <span th:unless="${page == postsPages.number + 1}">
+        <a th:href="@{/posts/paging(page=${page})}" th:text="${page}"></a>
+            </span>
+        </span>
+
+            <!-- 마지막 페이지로 이동 -->
+            <a th:href="@{/posts/paging(page=${postsPages.totalPages})}"> 마지막 페이지</a>
+
+
+
+            <div class="paging-wrap">
+                <a href="javascript:;" class="first"
+                   th:href="@{/user/management/assignment(page=0, startDate=${#ctx.params.startDate}, endDate=${#ctx.params.endDate}, searchOption=${#ctx.params.searchOption}, searchKeyword=${#ctx.params.searchKeyword})}">처음</a>
+                <a href="javascript:;" class="prev"
+                   th:href="@{/user/management/assignment(page=${assignments.previousOrFirstPageable().getPageNumber()}, startDate=${#ctx.params.startDate}, endDate=${#ctx.params.endDate}, searchOption=${#ctx.params.searchOption}, searchKeyword=${#ctx.params.searchKeyword})} : '#'"></a>
+                <th:block th:each="num : ${#numbers.sequence(0, assignments.getTotalPages())}">
+                    <a href="javascript:;" class="page"
+                       th:href="@{/user/management/assignment(page=${num}, startDate=${#ctx.params.startDate}, endDate=${#ctx.params.endDate}, searchOption=${#ctx.params.searchOption}, searchKeyword=${#ctx.params.searchKeyword})}">
+                        <span th:text="${num}">1</span>
+                    </a>
+                </th:block>
+                <a href="javascript:;" class="last"></a>
+                <!--                <a href="javascript:;" class="page active"><span>2</span></a>-->
+                <!--                <a href="javascript:;" class="page"><span>3</span></a>-->
+                <!--                <a href="javascript:;" class="page"><span>4</span></a>-->
+                <!--                <a href="javascript:;" class="next"></a>-->
+            </div>
         </div>
     </div>
 
@@ -191,17 +223,17 @@
         }
 
         const selectedData = { // 선택 값들 객체화 시키기
-            area : selectArea,
-            subject : selectSubject
+            area: selectArea,
+            subject: selectSubject
         };
         const jsonData = JSON.stringify(selectedData); // JSON으로 변환
 
         fetch('api/paper', {
-            method : 'GET',
-            headers : {
-                'Content-Type' : 'application/json',
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
             },
-            body : jsonData,
+            body: jsonData,
         })
             .then(response => response.json())
             .then(data => {
@@ -224,14 +256,14 @@
         document.getElementById('totalCount').innerText = totalCount;
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         updateTotalCount();
     });
 
     const setDownloadLink = () => {
         const downloadElem = document.getElementById("excelDownload")
         let url = new URL(window.location.href);
-        url.pathname="/paper/download";
+        url.pathname = "/paper/download";
         downloadElem.href = url.toString();
     }
     setDownloadLink();

@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.sql.Date;
 import java.util.List;
 
 @Controller
@@ -26,20 +29,10 @@ public class UserAssignmentController {
     private final UserAssignmentService userAssignmentService;
 
     @GetMapping("")
-    public String index(Model model, AssignmentSearchReqDTO assignSearchDTO, Pageable pageable) {
-        System.out.println(assignSearchDTO);
-        int pageSize = 10;
-        int currentPage = pageable.getPageNumber();
-        if (currentPage < 0) {
-            currentPage = 0;
-        }
-        Pageable adjustedPageable = PageRequest.of(currentPage, pageSize);
-
-        Page<Paper> assignments = userAssignmentService.searchResults(assignSearchDTO, pageable);
-        if (assignments != null) {
-            assignments.stream().forEach(e -> System.out.println(e.getName()));
-        }
+    public String index(Model model, @ModelAttribute AssignmentSearchReqDTO assignmentSearchReqDTO, @PageableDefault(size=10, sort="id", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<AssignmentDTO> assignments = userAssignmentService.searchResults(assignmentSearchReqDTO, pageable);
         model.addAttribute("assignments", assignments);
+        model.addAttribute("params", assignmentSearchReqDTO);
         return "pages/assignment/index";
 
     }
