@@ -9,12 +9,15 @@ import com.chunjae.nest.domain.user.entity.UserStatus;
 import com.chunjae.nest.domain.user.repository.RoleRepository;
 import com.chunjae.nest.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
+
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class UserService {
 
@@ -46,9 +49,10 @@ public class UserService {
         return user;
     }
 
-    public List<User> getAllUsers() {
+
+    /*public List<User> getAllUsers() {
         return userRepository.findAll();
-    }
+    }*/
 
     public User login(String userId, String password) {
         // 회원 정보 & 비밀번호 조회
@@ -77,10 +81,35 @@ public class UserService {
             System.out.println("비밀번호 : " + newPassword);
             String encoded = EncodePasswordUtils.passwordEncoder().encode(newPassword);
             user.setPassword(encoded);
-
+            user.setUserStatus(UserStatus.ACTIVE);
             userRepository.save(user);
         }
     }
+
+    public List<User> getAllUsersOrderedByIdDesc() {
+        return userRepository.findAll(Sort.by(Sort.Order.desc("id")));
+    }
+
+    @Transactional
+    public void resetUser(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+        System.out.println(user.getUserId());
+        if (user != null) {
+            String encoded = EncodePasswordUtils.passwordEncoder().encode(user.getUserId());
+            user.setPassword(encoded);
+            userRepository.save(user);
+        }
+    }
+
+    @Transactional
+    public void deleteUser(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        user.setUserStatus(UserStatus.DELETE);
+        userRepository.save(user);
+        log.info("user: {}", user.getUserStatus());
+    }
+
 }
 
 

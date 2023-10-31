@@ -1,7 +1,6 @@
 package com.chunjae.nest.domain.user.controller;
 
 import com.chunjae.nest.common.util.CookieUtil;
-import com.chunjae.nest.domain.user.dto.CreateUserReqDTO;
 import com.chunjae.nest.domain.user.entity.User;
 import com.chunjae.nest.domain.user.entity.UserStatus;
 import com.chunjae.nest.domain.user.service.UserService;
@@ -11,13 +10,17 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import java.util.List;
 import java.util.Optional;
+
 import static com.chunjae.nest.common.util.CookieUtil.USER_ID_COOKIE_NAME;
 import static com.chunjae.nest.common.util.CookieUtil.deleteCookie;
 
@@ -30,7 +33,6 @@ public class UserController {
     private final UserService userService;
     private final CookieUtil cookieUtil;
 
-
     @GetMapping("/login")
     public String showLoginPage(HttpServletRequest request, Model model) {
         //이전 아이디 값 읽어오기
@@ -38,7 +40,6 @@ public class UserController {
         userIdCookie.ifPresent(cookie -> model.addAttribute(USER_ID_COOKIE_NAME, cookie.getValue()));
         return "pages/user/login";
     }
-
 
     @PostMapping("/login")
     public String login(
@@ -98,23 +99,10 @@ public class UserController {
 
     @GetMapping("/management")
     public String showAccountManagementPage(Model model) {
-        List<User> users = userService.getAllUsers();
+        List<User> users = userService.getAllUsersOrderedByIdDesc()
+                .stream().filter(user->user.getUserStatus() != UserStatus.DELETE).toList();
         model.addAttribute("users", users);
         return "pages/user/management";
-    }
-
-    @PostMapping("/add")
-    @ResponseBody
-    public ResponseEntity<Void> createUser(@RequestBody CreateUserReqDTO userDTO) {
-        log.info("userDTO: {}", userDTO);
-
-        try {
-            userService.createUser(userDTO);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            log.error("Create user error: " + e.getMessage(), e);
-            return ResponseEntity.badRequest().build();
-        }
     }
 
     @GetMapping("/logout")
@@ -125,7 +113,6 @@ public class UserController {
 
         return "redirect:/user/login";
     }
-
 
     @GetMapping("/password/modify")
     public String modPassword() {

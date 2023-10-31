@@ -38,7 +38,7 @@ public class PaperService {
         log.info(" paperRequest:{}", paperRequest.toString());
 
         Long id = 1L;
-        User user = userRepository.findById(1).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
+        User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
 
         if (isAllowedFileType(multipartFile)) {
             String url = s3UploadService.uploadPaper(multipartFile);
@@ -92,7 +92,7 @@ public class PaperService {
     public String updatePaper(Long id, PaperRequest paperRequest, MultipartFile multipartFile) throws IOException {
         log.info("id:{}, paperRequest:{}", id, paperRequest.toString());
         Long userId = 1L;
-        User user = userRepository.findById(1).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
         Paper paper = paperRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("시험지가 없습니다."));
         PaperFile paperFile = paper.getPaperFile();
         paper.paperToUpdate(paperRequest);
