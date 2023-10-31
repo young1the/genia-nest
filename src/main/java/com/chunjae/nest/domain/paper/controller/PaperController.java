@@ -2,7 +2,6 @@ package com.chunjae.nest.domain.paper.controller;
 
 import com.chunjae.nest.domain.paper.dto.SearchKeywordDTO;
 import com.chunjae.nest.domain.paper.entity.Paper;
-import com.chunjae.nest.domain.paper.entity.PaperStatus;
 import com.chunjae.nest.domain.paper.service.PaperService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,9 +22,6 @@ public class PaperController {
 
     @GetMapping("")
     public String index(Model model, @ModelAttribute SearchKeywordDTO searchKeywordDTO, Pageable pageable) {
-
-        System.out.println("==============================================");
-        System.out.println("컨트롤러 부분 - " + searchKeywordDTO.toString());
 
         int pageSize = 10;
         int currentPage = pageable.getPageNumber();

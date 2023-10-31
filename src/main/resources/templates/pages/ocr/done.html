@@ -31,39 +31,39 @@
 									<span>검색 조건</span>
 									<div class="select-wrap">
 										<select class="select-box" id="year" name="year">
-											<option value="전체">년도</option>
-											<option value="2023">2023</option>
-											<option value="2022">2022</option>
+											<option value="전체" th:selected="${searchKeywordDTO.year =='전체'}">년도</option>
+											<option value="2023" th:selected="${searchKeywordDTO.year =='2023'}">2023</option>
+											<option value="2022" th:selected="${searchKeywordDTO.year =='2022'}">2022</option>
 										</select>
 									</div>
 									<div class="select-wrap">
 										<select class="select-box" id="month" name="month">
-											<option value="0">출제 월</option>
-											<option value="1">1월</option>
-											<option value="2">2월</option>
-											<option value="3">3월</option>
-											<option value="4">4월</option>
-											<option value="5">5월</option>
-											<option value="6">6월</option>
-											<option value="7">7월</option>
-											<option value="8">8월</option>
-											<option value="9">9월</option>
-											<option value="10">10월</option>
-											<option value="11">11월</option>
-											<option value="12">12월</option>
+											<option value="0" th:selected="${searchKeywordDTO.month ==0}">출제 월</option>
+											<option value="1" th:selected="${searchKeywordDTO.month ==1}">1월</option>
+											<option value="2" th:selected="${searchKeywordDTO.month ==2}">2월</option>
+											<option value="3" th:selected="${searchKeywordDTO.month ==3}">3월</option>
+											<option value="4" th:selected="${searchKeywordDTO.month ==4}">4월</option>
+											<option value="5" th:selected="${searchKeywordDTO.month ==5}">5월</option>
+											<option value="6" th:selected="${searchKeywordDTO.month ==6}">6월</option>
+											<option value="7" th:selected="${searchKeywordDTO.month ==7}">7월</option>
+											<option value="8" th:selected="${searchKeywordDTO.month ==8}">8월</option>
+											<option value="9" th:selected="${searchKeywordDTO.month ==9}">9월</option>
+											<option value="10" th:selected="${searchKeywordDTO.month ==10}">10월</option>
+											<option value="11" th:selected="${searchKeywordDTO.month ==11}">11월</option>
+											<option value="12" th:selected="${searchKeywordDTO.month ==12}">12월</option>
 										</select>
 									</div>
 									<div class="select-wrap">
 										<select class="select-box" id="areaSelect" name="area">
-											<option value="전체">영역</option>
-											<option value="국어">국어</option>
-											<option value="수학">수학</option>
-											<option value="영어">영어</option>
-											<option value="한국사">한국사</option>
-											<option value="사회탐구">사회탐구</option>
-											<option value="과학탐구">과학탐구</option>
-											<option value="직업탐구">직업탐구</option>
-											<option value="제2외국어/한문">제2외국어/한문</option>
+											<option value="전체" th:selected="${searchKeywordDTO.area =='전체'}">영역</option>
+											<option value="국어" th:selected="${searchKeywordDTO.area =='국어'}">국어</option>
+											<option value="수학" th:selected="${searchKeywordDTO.area =='수학'}">수학</option>
+											<option value="영어" th:selected="${searchKeywordDTO.area =='영어'}">영어</option>
+											<option value="한국사" th:selected="${searchKeywordDTO.area =='한국사'}">한국사</option>
+											<option value="사회탐구" th:selected="${searchKeywordDTO.area =='사회탐구'}">사회탐구</option>
+											<option value="과학탐구" th:selected="${searchKeywordDTO.area =='과학탐구'}">과학탐구</option>
+											<option value="직업탐구" th:selected="${searchKeywordDTO.area =='직업탐구'}">직업탐구</option>
+											<option value="제2외국어/한문" th:selected="${searchKeywordDTO.area =='제2외국어/한문'}">제2외국어/한문</option>
 										</select>
 									</div>
 									<div class="select-wrap">
@@ -73,12 +73,13 @@
 									</div>
 									<div class="select-wrap">
 										<select class="select-box" id="searchOption" name="searchOption">
-											<option value="전체">전체</option>
-											<option value="name">시험지 명</option>
-											<option value="user_id">등록자</option>
+											<option value="전체" th:selected="${searchKeywordDTO.searchOption =='전체'}">전체</option>
+											<option value="name" th:selected="${searchKeywordDTO.searchOption =='name'}">시험지 명</option>
+											<option value="user_id" th:selected="${searchKeywordDTO.searchOption =='user_id'}">등록자</option>
 										</select>
 									</div>
-									<input type="text" placeholder="검색어" class="search-form" id="searchKeyword" name="searchKeyword">
+									<input type="text" placeholder="검색어" class="search-form" id="searchKeyword" name="searchKeyword"
+										   th:value="${searchKeywordDTO.searchKeyword}">
 								</div>
 								<div class="btn-wrap">
 									<button class="btn-green" type="submit">검색</button>
@@ -91,11 +92,11 @@
 									<div class="box">
 										<span>시험 종류</span>
 										<div class="check-wrap" id="category">
-											<input type="checkbox" id="grade00" name="category" value="수능">
+											<input type="checkbox" id="grade00" name="category" value="수능" th:checked="${searchKeywordDTO.category =='수능'}">
 											<label for="grade00">수능</label>
-											<input type="checkbox" id="grade01" name="category" value="모의고사">
+											<input type="checkbox" id="grade01" name="category" value="모의고사" th:checked="${searchKeywordDTO.category =='모의고사'}">
 											<label for="grade01">모의</label>
-											<input type="checkbox" id="grade02" name="category" value="학력고사">
+											<input type="checkbox" id="grade02" name="category" value="학력고사" th:checked="${searchKeywordDTO.category =='학력고사'}">
 											<label for="grade02">학력</label>
 										</div>
 									</div>
@@ -104,13 +105,13 @@
 									<div class="box">
 										<span>학년</span>
 										<div class="radio-wrap" id="grade">
-											<input type="radio" id="radio02_01" name="grade" value="전체" checked="">
+											<input type="radio" id="radio02_01" name="grade" value="전체" th:checked="${searchKeywordDTO.grade == '전체'}">
 											<label for="radio02_01">전체</label>
-											<input type="radio" id="radio02_02" name="grade" value="1">
+											<input type="radio" id="radio02_02" name="grade" value="1" th:checked="${searchKeywordDTO.grade == '1'}">
 											<label for="radio02_02">1학년</label>
-											<input type="radio" id="radio02_03" name="grade" value="2">
+											<input type="radio" id="radio02_03" name="grade" value="2" th:checked="${searchKeywordDTO.grade == '2'}">
 											<label for="radio02_03">2학년</label>
-											<input type="radio" id="radio02_04" name="grade" value="3">
+											<input type="radio" id="radio02_04" name="grade" value="3" th:checked="${searchKeywordDTO.grade == '3'}">
 											<label for="radio02_04">3학년</label>
 										</div>
 									</div>
@@ -183,8 +184,9 @@
 									<!--                            <div class="check-wrap"><input type="checkbox" id="chk100_30" name="numChk">-->
 									<!--                                <label for="chk100_30"></label></div>-->
 									<!--                        </td>-->
-									<td th:text="${#numbers.sequence(papers.number * papers.size + 1, (papers.number + 1) * papers.size)[iterStat.index]}" />
-									<!--                        <td th:text="${#numbers.sequence((papers.number + 1) * papers.size, papers.number * papers.size + 1)[iterStat.index]}" />-->
+<!--									<td th:text="${#numbers.sequence(papers.number * papers.size + 1, (papers.number + 1) * papers.size)[iterStat.index]}" />-->
+<!--                	                <td th:text="${#numbers.sequence((papers.number + 1) * papers.size, papers.number * papers.size + 1)[iterStat.index]}" />-->
+									<td th:text="${paper.id}" />
 									<td th:text="${paper.id}" style="display: none;" />
 									<td th:text="${paper.year}" />
 									<td th:text="${paper.category}" />
@@ -202,17 +204,17 @@
 								</tbody>
 							</table>
 						</div>
+						<!-- 페이징 영역 -->
 						<div class="paging-wrap">
-							<!-- 페이징 영역 -->
-							<a href="javascript:;" class="first" th:if="${papers.number != 0}" th:href="@{${ocrPageLink + (papers.number - 1)}}"></a>
-							<a href="javascript:;" class="prev" th:if="${papers.number == 0}"></a>
-							&nbsp;&nbsp;
-							<th:block th:each="pageNumber : ${#numbers.sequence(0, papers.totalPages - 1)}">
-								<a href="javascript:;" class="page" th:class="${papers.number == pageNumber} ? active" th:href="@{${ocrPageLink + pageNumber}}"><span th:text="${pageNumber + 1}"></span></a>
+							<a href="javascript:;" class="first" th:href="@{${ocrPageLink + 0}}"></a>
+							<a href="javascript:;" class="prev"  th:if="${page.number >= 0}" th:href="@{${ocrPageLink + (page.number - 1)}}"></a>
+							<th:block th:each="pageNumber : ${#numbers.sequence(0, page.totalPages - 1)}">
+								<a href="javascript:;" class="page active" th:class="${page.number == pageNumber} ? active" th:href="@{${ocrPageLink + pageNumber}}">
+									<span class="page" th:text="${pageNumber + 1}"></span>
+								</a>
 							</th:block>
-							&nbsp;&nbsp;
-							<a href="javascript:;" class="next" th:if="${papers.number != papers.totalPages - 1}" th:href="@{${ocrPageLink + (papers.number + 1)}}"></a>
-							<a href="javascript:;" class="last" th:if="${papers.number == papers.totalPages - 1}"></a>
+							<a href="javascript:;" class="next" th:if="${page.number <= page.totalPages - 1}" th:href="@{${ocrPageLink + (page.number + 1)}}"></a>
+							<a href="javascript:;" class="last" th:href="@{${ocrPageLink + (page.totalPages - 1)}}"></a>
 						</div>
 					</div>
 				</div>

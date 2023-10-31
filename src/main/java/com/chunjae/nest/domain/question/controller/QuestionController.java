@@ -2,9 +2,6 @@ package com.chunjae.nest.domain.question.controller;
 
 import com.chunjae.nest.domain.paper.dto.SearchKeywordDTO;
 import com.chunjae.nest.domain.paper.entity.Paper;
-import com.chunjae.nest.domain.paper.entity.PaperStatus;
-import com.chunjae.nest.domain.paper.service.PaperService;
-import com.chunjae.nest.domain.question.entity.Question;
 import com.chunjae.nest.domain.question.service.QuestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,14 +13,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.List;
-
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/ocr")
 public class QuestionController {
 
-    private final PaperService paperService;
     private final QuestionService questionService;
 
     @GetMapping("")
@@ -34,7 +28,7 @@ public class QuestionController {
 
         // 검색
         Pageable adjustedPageable = PageRequest.of(currentPage, pageSize);
-        Page<Paper> papers = paperService.searchResults(searchKeywordDTO, adjustedPageable);
+        Page<Paper> papers = questionService.searchOCR(searchKeywordDTO, adjustedPageable);
         model.addAttribute("papers", papers);
         model.addAttribute("page", papers);
 
@@ -56,9 +50,6 @@ public class QuestionController {
         String ocrPageLink = "/ocr?" + pageLink;
         model.addAttribute("ocrPageLink", ocrPageLink);
 
-        List<Question> questionList = questionService.searchResults();
-        model.addAttribute("questionList", questionList);
-
         return "pages/ocr/index";
     }
 
@@ -70,7 +61,7 @@ public class QuestionController {
 
         // 검색
         Pageable adjustedPageable = PageRequest.of(currentPage, pageSize);
-        Page<Paper> papers = paperService.searchResults(searchKeywordDTO, adjustedPageable);
+        Page<Paper> papers = questionService.searchOCRDone(searchKeywordDTO, adjustedPageable);
         model.addAttribute("papers", papers);
         model.addAttribute("page", papers);
 
@@ -91,10 +82,6 @@ public class QuestionController {
         pageLink += "page=";
         String ocrPageLink = "/ocr/done?" + pageLink;
         model.addAttribute("ocrPageLink", ocrPageLink);
-
-        List<Question> questionList = questionService.searchResults();
-        model.addAttribute("questionList", questionList);
-
 
         return "pages/ocr/done";
     }
