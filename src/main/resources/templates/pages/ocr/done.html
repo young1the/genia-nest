@@ -83,7 +83,7 @@
 								</div>
 								<div class="btn-wrap">
 									<button class="btn-green" type="submit">검색</button>
-									<button class="btn-gray" type="reset">초기화</button>
+									<button class="btn-gray" type="reset" id="reset">초기화</button>
 									<button class="btn-toggle"></button>
 								</div>
 							</div>
@@ -180,13 +180,7 @@
 								</thead>
 								<tbody>
 								<tr th:each="paper, iterStat : ${papers}">
-									<!--                        <td>-->
-									<!--                            <div class="check-wrap"><input type="checkbox" id="chk100_30" name="numChk">-->
-									<!--                                <label for="chk100_30"></label></div>-->
-									<!--                        </td>-->
-<!--									<td th:text="${#numbers.sequence(papers.number * papers.size + 1, (papers.number + 1) * papers.size)[iterStat.index]}" />-->
-<!--                	                <td th:text="${#numbers.sequence((papers.number + 1) * papers.size, papers.number * papers.size + 1)[iterStat.index]}" />-->
-									<td th:text="${paper.id}" />
+									<td th:text="${papers.totalElements - iterStat.index - ((papers.number) * papers.size)}"></td>
 									<td th:text="${paper.id}" style="display: none;" />
 									<td th:text="${paper.year}" />
 									<td th:text="${paper.category}" />
@@ -221,10 +215,112 @@
 
 			</div>
 		</div>
-
 	</div>
 	<script>
-	</script>
+	</script><script>
+	const areaSelect = document.getElementById('areaSelect');
+	const subjectSelect = document.getElementById('subjectSelect');
+
+	areaSelect.addEventListener('change', function () {
+		const selectArea = areaSelect.value;
+		const selectSubject = subjectSelect.value;
+		subjectSelect.innerHTML = ''; // 기존 내용 지우기
+
+		if (selectArea === '국어') {
+			addOption(subjectSelect, '전체');
+			addOption(subjectSelect, '화법과 작문');
+			addOption(subjectSelect, '언어와 매체');
+		} else if (selectArea === '수학') {
+			addOption(subjectSelect, '전체');
+			addOption(subjectSelect, '확률과 통계');
+			addOption(subjectSelect, '미적분');
+			addOption(subjectSelect, '기하');
+		} else if (selectArea === '영어') {
+			addOption(subjectSelect, '전체');
+			addOption(subjectSelect, '영어');
+		} else if (selectArea === '한국사') {
+			addOption(subjectSelect, '전체');
+			addOption(subjectSelect, '한국사');
+		} else if (selectArea === '사회탐구') {
+			addOption(subjectSelect, '전체');
+			addOption(subjectSelect, '생활과 윤리');
+			addOption(subjectSelect, '윤리와 사상');
+			addOption(subjectSelect, '한국지리');
+			addOption(subjectSelect, '세계지리');
+			addOption(subjectSelect, '동아시아사');
+			addOption(subjectSelect, '세계사');
+			addOption(subjectSelect, '경제');
+			addOption(subjectSelect, '정치와 법');
+		} else if (selectArea === '과학탐구') {
+			addOption(subjectSelect, '전체');
+			addOption(subjectSelect, '물리학I');
+			addOption(subjectSelect, '화학I');
+			addOption(subjectSelect, '생명과학I');
+			addOption(subjectSelect, '지구과학I');
+			addOption(subjectSelect, '물리학II');
+			addOption(subjectSelect, '화학II');
+			addOption(subjectSelect, '생명과학II');
+			addOption(subjectSelect, '지구과학II');
+		} else if (selectArea === '직업탐구') {
+			addOption(subjectSelect, '전체');
+			addOption(subjectSelect, '농업 기초 기술');
+			addOption(subjectSelect, '공업 일반');
+			addOption(subjectSelect, '상업 경제');
+			addOption(subjectSelect, '수산 해운 산업 기초');
+			addOption(subjectSelect, '인간 발달');
+			addOption(subjectSelect, '성공적인 직업생활');
+		} else if (selectArea === '제2외국어/한문') {
+			addOption(subjectSelect, '전체');
+			addOption(subjectSelect, '독일어I');
+			addOption(subjectSelect, '프랑스어I');
+			addOption(subjectSelect, '스페인어I');
+			addOption(subjectSelect, '중국어I');
+			addOption(subjectSelect, '일본어I');
+			addOption(subjectSelect, '러시아어I');
+			addOption(subjectSelect, '아랍어I');
+			addOption(subjectSelect, '베트남어I');
+			addOption(subjectSelect, '한문I');
+		}
+
+		const selectedData = { // 선택 값들 객체화 시키기
+			area : selectArea,
+			subject : selectSubject
+		};
+
+		fetch('/ocr/done', {
+			method : 'GET',
+		})
+		.then(response => response.text())
+		.then(html => {
+			//console.log(html);
+		})
+		.catch(error => {
+			console.log('에러 발생 : ', error);
+		});
+	});
+
+	function addOption(selectBox, optionText) { // 영역 - 과목 셀렉트 박스
+		const option = document.createElement('option');
+		option.text = optionText;
+		selectBox.add(option);
+	}
+
+	function updateTotalCount() { //  총 건수 세기
+		const totalCountElement = document.getElementById('totalCount');
+		if (totalCountElement) {
+			const totalCount = document.querySelectorAll('.left-area .select-box option').length;
+			totalCountElement.innerText = totalCount;
+		}
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateTotalCount();
+	});
+
+	document.getElementById("reset").addEventListener("click", function() {
+		window.location.href = "/ocr/done"; // 초기화
+	});
+</script>
 </body>
 
 </html>

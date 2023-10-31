@@ -23,7 +23,9 @@ public class PaperController {
     @GetMapping("")
     public String index(Model model, @ModelAttribute SearchKeywordDTO searchKeywordDTO, Pageable pageable) {
 
-        int pageSize = 10;
+        System.out.println(pageable.getPageSize());
+        // int totalItems  = pageable.getPageSize();
+        int totalItems = 10;
         int currentPage = pageable.getPageNumber();
 
         if (currentPage < 0) {
@@ -31,10 +33,10 @@ public class PaperController {
         }
 
         // 검색
-        Pageable adjustedPageable = PageRequest.of(currentPage, pageSize);
+        Pageable adjustedPageable = PageRequest.of(currentPage, totalItems );
         Page<Paper> papers = paperService.searchResults(searchKeywordDTO, adjustedPageable);
         model.addAttribute("papers", papers);
-        model.addAttribute("page", papers);
+        //model.addAttribute("page", papers);
 
         // 페이징
         String pageLink = "/paper?";

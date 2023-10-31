@@ -124,7 +124,7 @@
             <div class="table-wrap">
                 <div class="tab-top">
                     <div class="left-area">
-                        <span class="total">총 <em th:text="${papers.totalElements}">0</em>건</span>
+                        <span class="total">총 <em th:text="${papers.totalElements}" id="totalElements">0</em>건</span>
                         <div class="select-wrap">
                             <select class="select-box w140" id="pageSizeSelect">
                                 <option value="10">10개 보기</option>
@@ -155,12 +155,6 @@
                     </colgroup>
                     <thead>
                     <tr>
-<!--                        <th >-->
-<!--                            <div class="check-wrap">-->
-<!--                                <input type="checkbox" id="chk100_00" name="numChk" class="allCheck">-->
-<!--                                <label for="chk100_00"></label>-->
-<!--                            </div>-->
-<!--                        </th>-->
                         <th>NO</th>
                         <th>출제 년도</th>
                         <th>출제 타입</th>
@@ -175,13 +169,7 @@
                     </thead>
                     <tbody>
                     <tr th:each="paper, iterStat : ${papers}">
-<!--                        <td>-->
-<!--                            <div class="check-wrap"><input type="checkbox" id="chk100_30" name="numChk">-->
-<!--                                <label for="chk100_30"></label></div>-->
-<!--                        </td>-->
-                        <td th:text="${#numbers.sequence(papers.number * papers.size + 1, (papers.number + 1) * papers.size)[iterStat.index]}" />
-<!--                        <td th:text="${#numbers.sequence((papers.number + 1) * papers.size, papers.number * papers.size + 1)[iterStat.index]}" />-->
-<!--                        <td th:text="${paper.id}" />-->
+                        <td th:text="${papers.totalElements - iterStat.index - ((papers.number) * papers.size)}"></td>
                         <td th:text="${paper.id}" style="display: none;" />
                         <td th:text="${paper.year}" />
                         <td th:text="${paper.category}" />
@@ -203,23 +191,20 @@
             </div>
             <!-- 페이징 영역 -->
             <div class="paging-wrap">
-                <a href="javascript:;" class="first" th:href="@{${pageLink + 0}}"></a>
-                <a href="javascript:;" class="prev"  th:if="${page.number >= 0}" th:href="@{${pageLink + (page.number - 1)}}"></a>
-                <th:block th:each="pageNumber : ${#numbers.sequence(0, page.totalPages - 1)}">
-                    <a href="javascript:;" class="page" th:class="${page.number == pageNumber} ? active" th:href="@{${pageLink + pageNumber}}">
-                        <span class="page active" th:text="${pageNumber + 1}"></span>
+                <th:block>
+                    <a href="javascript:;" class="first" th:href="@{${pageLink + 0}}"></a>
+                    <a href="javascript:;" class="prev"  th:if="${papers.number >= 0}" th:href="@{${pageLink + (papers.number - 1)}}"></a>
+                </th:block>
+                <th:block th:each="pageNumber : ${#numbers.sequence(0, papers.totalPages - 1)}" th:if="${pageNumber >= 0}">
+                    <a href="javascript:;" class="page active" th:class="${papers.number == pageNumber} ? active" th:href="@{${pageLink + pageNumber}}">
+                        <span class="page" th:text="${pageNumber + 1}"></span>
                     </a>
                 </th:block>
-                <a href="javascript:;" class="next" th:if="${page.number <= page.totalPages - 1}" th:href="@{${pageLink + (page.number + 1)}}"></a>
-                <a href="javascript:;" class="last" th:href="@{${pageLink + (page.totalPages - 1)}}"></a>
+                <th:block th:if="${papers.number <= papers.totalPages}">
+                    <a href="javascript:;" class="next" th:href="@{${papers.number == papers.totalPages - 1 ? pageLink + papers.number : pageLink + (papers.number + 1)}}"></a>
+                    <a href="javascript:;" class="last" th:href="@{${pageLink + (papers.totalPages - 1)}}"></a>
+                </th:block>
             </div>
-<!--                <a href="javascript:;" class="first" th:if="${page.number != 0}" th:href="@{${pageLink + (page.number - 1)}}"></a>-->
-<!--                <a href="javascript:;" class="prev" th:if="${page.number == 0}"></a>-->
-<!--                <th:block th:each="pageNumber : ${#numbers.sequence(0, page.totalPages - 1)}">-->
-<!--                    <a href="javascript:;" class="page active" th:class="${page.number == pageNumber} ? active" th:href="@{${pageLink + pageNumber}}"><span class="page" th:text="${pageNumber + 1}"></span></a>-->
-<!--                </th:block>-->
-<!--                <a href="javascript:;" class="next" th:if="${page.number != page.totalPages - 1}" th:href="@{${pageLink + (page.number + 1)}}"></a>-->
-<!--                <a href="javascript:;" class="last" th:if="${page.number == page.totalPages - 1}"></a>-->
         </div>
     </div>
 
@@ -293,19 +278,17 @@
             area : selectArea,
             subject : selectSubject
         };
-        const jsonData = JSON.stringify(selectedData); // JSON으로 변환
 
-        fetch('api/paper', {
+        fetch('/paper', {
             method : 'GET',
         })
-            .then(response => response.json())
-            .then(data => {
-                // 서버에서 받은 결과 데이터 처리
-                console.log(data);
-            })
-            .catch(error => {
-                console.log('에러 발생 : ', error);
-            });
+        .then(response => response.text())
+        .then(html => {
+            //console.log(html);
+        })
+        .catch(error => {
+            console.log('에러 발생 : ', error);
+        });
     });
 
     function addOption(selectBox, optionText) { // 영역 - 과목 셀렉트 박스
@@ -330,6 +313,55 @@
         window.location.href = "/paper"; // 초기화
     });
 
+    // 보기 크기 선택 .. 10, 30, 50, 100
+    // function selectCount() {
+    //     const pageSizeSelect = document.getElementById('pageSizeSelect'); // 개수 선택
+    //     const selectedPageSize = parseInt(pageSizeSelect.value, 10);
+    //
+    //     console.log("선택한 보기 개수 : " + selectedPageSize);
+    //
+    //     const totalContent = document.getElementById('totalElements');
+    //     const totalElementsText = totalContent.textContent;
+    //     const totalElements = parseInt(totalElementsText, 10);
+    //     console.log("총 건수 : " + totalElements);
+    //
+    //     // 선택한 값을 서버로 전송
+    //     fetch('/paper?=' + selectedPageSize)
+    //         .then(response => {
+    //             if (response.ok) {
+    //                 return response.text();
+    //             } else {
+    //                 throw new Error('데이터를 가져오는데 실패했습니다.');
+    //             }
+    //         })
+    //         .catch(error => {
+    //             console.error('데이터 가져오기에 실패했습니다:', error);
+    //         });
+    // }
+
+    document.getElementById("pageSizeSelect").addEventListener("change", function() {
+        // 선택한 값을 가져오기
+        var selectedValue = document.getElementById("pageSizeSelect").value;
+
+        console.log(selectedValue);
+        // 선택한 값을 서버로 전송
+        fetch('/paper?pageSize=' + selectedValue, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            },
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    throw new Error('데이터를 가져오는데 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('데이터 가져오기에 실패했습니다:', error);
+            });
+    });
 </script>
 </body>
 </html>

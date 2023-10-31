@@ -30,7 +30,7 @@ public class QuestionController {
         Pageable adjustedPageable = PageRequest.of(currentPage, pageSize);
         Page<Paper> papers = questionService.searchOCR(searchKeywordDTO, adjustedPageable);
         model.addAttribute("papers", papers);
-        model.addAttribute("page", papers);
+        //model.addAttribute("page", papers);
 
         // 페이징
         String pageLink = "";
