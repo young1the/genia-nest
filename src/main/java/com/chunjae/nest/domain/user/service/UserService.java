@@ -102,6 +102,8 @@ public class UserService {
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
         user.setUserStatus(UserStatus.DELETE);
+        Role role = user.getRole();
+        role.setRoleStatus(RoleStatus.CANCELLED);//권한 삭제
         userRepository.save(user);
         log.info("user: {}", user.getUserStatus());
     }
@@ -120,14 +122,21 @@ public class UserService {
 //        return userList;
 
         if (searchOption.equals("userId")) {
-            return userRepository.findByUserIdContaining(searchKeyword);
+
+            return userRepository.findByUserIdContaining(searchKeyword)
+                    .stream()
+                    .filter(user -> user.getUserStatus() != UserStatus.DELETE && (user.getRole().getRoleStatus() != RoleStatus.CANCELLED || user.getRole().getRoleStatus() != RoleStatus.TERMINATED))
+                    .toList();
         }
             // 유저 레포지토리에서 userId가 searchKeyword로 받은 값을 가지고 있는 유저 가져오기
             // 가져와서 바로 리턴
         if (searchOption.equals("name")) {
             // 유저 레포지토리에서 name이 searchKeyword로 받은 값을 가지고 있는 유저 가져오기
             // 얘도
-            return userRepository.findByNameContaining(searchKeyword);
+            return userRepository.findByNameContaining(searchKeyword)
+                    .stream()
+                    .filter(user -> user.getUserStatus() != UserStatus.DELETE && (user.getRole().getRoleStatus() != RoleStatus.CANCELLED || user.getRole().getRoleStatus() != RoleStatus.TERMINATED))
+                    .toList();
         }
         return null;
 
