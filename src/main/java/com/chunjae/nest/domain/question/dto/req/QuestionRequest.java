@@ -6,7 +6,9 @@ import com.chunjae.nest.domain.question.entity.QuestionStatus;
 import com.chunjae.nest.domain.question.entity.QuestionType;
 import com.chunjae.nest.domain.user.entity.User;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 @Data
@@ -17,6 +19,7 @@ public class QuestionRequest {
     private QuestionType type;
     private Paper paper;
     private MultipartFile multipartFile;
+    private String numExpression;
 
     public Question createQuestion(User user) {
         return Question.builder()

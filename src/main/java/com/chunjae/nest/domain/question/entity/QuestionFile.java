@@ -25,4 +25,9 @@ public class QuestionFile extends BaseEntity {
     @Column(length = 255, nullable = false)
     private String url;
 
+    public void updateQuestionFile(String name, String url){
+        this.name = name;
+        this.url = url;
+    }
+
 }
