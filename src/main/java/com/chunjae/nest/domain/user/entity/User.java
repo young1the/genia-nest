@@ -8,12 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class User extends BaseEntity {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,6 +40,5 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     private List<PaperAssignment> paperAssignments = new ArrayList<>();
-
 
 }
