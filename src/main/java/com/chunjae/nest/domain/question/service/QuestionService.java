@@ -161,10 +161,10 @@ public class QuestionService {
     }
 
     @Transactional
-    public void deleteQuestion(Long id) {
+    public void deleteQuestion(Long id, int num) {
         Long userId = 1L;
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
-        Question question = questionRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
+        Question question = questionRepository.findByPaperIdAndNum(id, num).orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
         question.updateQuestionContent("");
         question.updateQuestionStatus(QuestionStatus.DELETED);
         QuestionFile questionFile = question.getQuestionFile();
