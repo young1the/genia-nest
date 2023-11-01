@@ -10,6 +10,9 @@ import com.chunjae.nest.domain.user.repository.RoleRepository;
 import com.chunjae.nest.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,8 +85,8 @@ public class UserService {
         }
     }
 
-    public List<User> getAllUsersOrderedByIdDesc() {
-        return userRepository.findAll(Sort.by(Sort.Order.desc("id")));
+    public Page<User> getAllUsersOrderedByIdDesc(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
     @Transactional
@@ -96,7 +99,6 @@ public class UserService {
             userRepository.save(user);
         }
     }
-
     @Transactional
     public void deleteUser(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
@@ -108,27 +110,20 @@ public class UserService {
         log.info("user: {}", user.getUserStatus());
     }
 
-    public List<User> searchUsers(String searchKeyword, String searchOption) {
+    public Page<User> searchUsers(String searchKeyword, String searchOption,Pageable pageable) {
 
-        if (searchOption.equals("userId")) {
-
-            return userRepository.findByUserIdContaining(searchKeyword)
-                    .stream()
-                    .filter(user -> user.getUserStatus() != UserStatus.DELETE && (user.getRole().getRoleStatus() != RoleStatus.CANCELLED || user.getRole().getRoleStatus() != RoleStatus.TERMINATED))
-                    .toList();
+        if (searchOption.equals("userId")||searchOption.equals("name")) {
+            return userRepository.findByUserIdOrNameContaining(searchKeyword, pageable);
         }
-            // 유저 레포지토리에서 userId가 searchKeyword로 받은 값을 가지고 있는 유저 가져오기
-        if (searchOption.equals("name")) {
-            // 유저 레포지토리에서 name이 searchKeyword로 받은 값을 가지고 있는 유저 가져오기
 
-            return userRepository.findByNameContaining(searchKeyword)
-                    .stream()
-                    .filter(user -> user.getUserStatus() != UserStatus.DELETE && (user.getRole().getRoleStatus() != RoleStatus.CANCELLED || user.getRole().getRoleStatus() != RoleStatus.TERMINATED))
-                    .toList();
-        }
         return null;
-
     }
+
+    // 페이징
+    public Page<User> userList(Pageable pageable) {
+        return userRepository.findAll(pageable);
+    }
+
 
 }
 

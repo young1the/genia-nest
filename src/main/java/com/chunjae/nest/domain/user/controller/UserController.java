@@ -10,6 +10,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -99,23 +103,19 @@ public class UserController {
     @GetMapping("/management")
     public String showAccountManagementPage(Model model,
                                             @RequestParam(required = false) String searchKeyword,
-                                            @RequestParam(required = false, defaultValue = "userId") String searchOption) {
+                                            @RequestParam(required = false, defaultValue = "userId") String searchOption,
+                                            @PageableDefault(page=0, size=10, sort="id", direction=Sort.Direction.DESC)Pageable pageable) {
 
-        List<User> users;
-
+        Page<User> users = null;
         if (searchKeyword != null && !searchKeyword.isEmpty()) {
-
-            users = userService.searchUsers(searchKeyword, searchOption);
+            users = userService.searchUsers(searchKeyword, searchOption, pageable);
         } else {
-
-            users = userService.getAllUsersOrderedByIdDesc()
-                    .stream().filter(user -> user.getUserStatus() != UserStatus.DELETE).toList();
+            System.out.println("안녕");
+            users = userService.getAllUsersOrderedByIdDesc(pageable);
         }
-
         model.addAttribute("users", users);
         return "pages/user/management";
     }
-
 
     @GetMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
@@ -156,4 +156,6 @@ public class UserController {
         }
         return "redirect:/user/password/modify?error=true";
     }
+
+
 }
