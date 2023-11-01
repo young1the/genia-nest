@@ -26,5 +26,7 @@ jobs:
         sudo docker build -t nest:${{github.sha}} .
 
     - name: Run Docker container
-      run: sudo docker run -d -p 80:8080 nest:${{github.sha}}
+      run: |
+        sudo docker stop ${{github.repository}} &&
+        sudo docker run -d --name ${{github.repository}} -p 80:8080 nest:${{github.sha}}
       
