@@ -25,12 +25,10 @@ public class QuestionApiController {
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadQuestionFile(QuestionRequest questionRequest) throws IOException {
-
         Optional<Question> optionalQuestion = questionRepository.findByPaperIdAndNum(questionRequest.getPaper().getId(), questionRequest.getNum());
         if (optionalQuestion.isPresent()) {
             return ResponseEntity.ok().body(questionService.updateQuestion(questionRequest));
         }
-
         return ResponseEntity.ok().body(questionService.uploadQuestionFile(questionRequest));
     }
 
