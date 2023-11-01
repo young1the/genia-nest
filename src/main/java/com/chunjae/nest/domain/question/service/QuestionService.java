@@ -57,6 +57,7 @@ public class QuestionService {
         String questionUrl = s3UploadService.uploadPaper(multipartFile);
         String questionFileName = s3UploadService.getFileName(questionUrl);
 
+
         if (!"failed".equals(questionUrl)) {
 
             String result = performOCR(numExpression, questionUrl);
@@ -101,10 +102,10 @@ public class QuestionService {
     }
 
     @Transactional
-    public String saveQuestion(Long id, String content) {
+    public String saveQuestion(Long id, int num, String content) {
         Long userId = 1L;
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
-        Question question = questionRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
+        Question question = questionRepository.findByPaperIdAndNum(id, num).orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
 
         if (!"".equals(content)) {
 
@@ -143,21 +144,25 @@ public class QuestionService {
     }
 
     @Transactional
-    public void updateQuestion(QuestionRequest questionRequest) throws IOException {
+    public String updateQuestion(QuestionRequest questionRequest) throws IOException {
         Long userId = 1L;
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
-        Question question = questionRepository.findById(questionRequest.getPaper().getId()).orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
+        Question question = questionRepository.findByPaperIdAndNum(questionRequest.getPaper().getId(), questionRequest.getNum()).orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
         QuestionFile questionFile = question.getQuestionFile();
+        String numExpression = questionRequest.getNumExpression();
         MultipartFile multipartFile = questionRequest.getMultipartFile();
 
         s3UploadService.deletePaper(questionFile.getUrl());
-        String url = s3UploadService.uploadPaper(multipartFile);
-        String fileName = s3UploadService.getFileName(url);
+        String questionUrl = s3UploadService.uploadPaper(multipartFile);
+        String fileName = s3UploadService.getFileName(questionUrl);
 
-        questionFile.updateQuestionFile(fileName, url);
-        question.updateQuestionContent("");
+        String result = performOCR(numExpression, questionUrl);
+        questionFile.updateQuestionFile(fileName, questionUrl);
+        question.updateQuestionContent(result);
+        question.updateType(questionRequest.getType());
         question.updateQuestionStatus(QuestionStatus.BEFORE);
 
+        return result;
     }
 
     @Transactional

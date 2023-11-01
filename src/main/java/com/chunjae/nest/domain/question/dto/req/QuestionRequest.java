@@ -5,10 +5,7 @@ import com.chunjae.nest.domain.question.entity.Question;
 import com.chunjae.nest.domain.question.entity.QuestionStatus;
 import com.chunjae.nest.domain.question.entity.QuestionType;
 import com.chunjae.nest.domain.user.entity.User;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @Data
@@ -29,5 +26,13 @@ public class QuestionRequest {
                 .user(user)
                 .questionStatus(QuestionStatus.BEFORE)
                 .build();
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SaveRequest{
+        private int num;
+        private String content;
     }
 }
