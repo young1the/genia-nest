@@ -21,8 +21,10 @@ jobs:
         sudo chmod +x ./clean-docker.sh && sudo bash ./clean-docker.sh
 
     - name: Build Docker image
-      run: sudo docker build -t myapp .
+      run: |
+        echo "nest:${{github.sha}} build" &&
+        sudo docker build -t nest:${{github.sha}} .
 
     - name: Run Docker container
-      run: sudo docker run -d -p 80:8080  myapp
+      run: sudo docker run -d -p 80:8080 nest:${{github.sha}}
       
