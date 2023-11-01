@@ -44,7 +44,11 @@ public class QuestionApiController {
     @GetMapping("/detail/{id}")
     public ResponseEntity<QuestionResponse> getQuestionDetail(@PathVariable(name = "id") Long id,
                                                               @RequestParam(name = "num") int num) {
-        return ResponseEntity.ok().body(questionService.getQuestionDetail(id, num));
+        QuestionResponse question = questionService.getQuestionDetail(id, num);
+        if (question == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok().body(question);
     }
 
     @PostMapping("/remove/{id}")
