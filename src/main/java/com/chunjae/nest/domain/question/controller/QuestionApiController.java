@@ -38,5 +38,12 @@ public class QuestionApiController {
         return ResponseEntity.ok().body(questionService.getQuestionDetail(id, num));
     }
 
+    @PostMapping("/remove/{id}")
+    public ResponseEntity<String> deleteQuestion(@PathVariable(name = "id") Long id,
+                                                 @RequestParam(name = "num") int num) {
+
+        questionService.deleteQuestion(id, num);
+        return ResponseEntity.ok().build();
+    }
 
 }
