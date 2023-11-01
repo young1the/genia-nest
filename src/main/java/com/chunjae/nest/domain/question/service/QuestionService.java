@@ -133,13 +133,16 @@ public class QuestionService {
     @Transactional(readOnly = true)
     public QuestionResponse getQuestionDetail(Long id, int num) {
         return questionRepository.findByPaperIdAndNum(id, num)
-                .map(questionData -> QuestionResponse.builder()
-                        .id(questionData.getId())
-                        .num(questionData.getNum())
-                        .type(questionData.getType())
-                        .content(questionData.getContent())
-                        .url(questionData.getQuestionFile().getUrl())
-                        .build())
+                .map(questionData -> {
+                    if (questionData.getQuestionStatus() == QuestionStatus.DELETED) return null;
+                    return QuestionResponse.builder()
+                            .id(questionData.getId())
+                            .num(questionData.getNum())
+                            .type(questionData.getType())
+                            .content(questionData.getContent())
+                            .url(questionData.getQuestionFile().getUrl())
+                            .build();
+                })
                 .orElse(null);
     }
 
