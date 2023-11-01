@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -179,18 +180,35 @@ public class PaperService {
         return "failed";
     }
 
+    @Transactional
     public String assignTaskPaper(PaperAssignmentRequest paperAssignmentRequest) {
 
         User user = userRepository.findById(paperAssignmentRequest.getUserId()).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
         Paper paper = paperRepository.findById(paperAssignmentRequest.getPaperId()).orElseThrow(() -> new IllegalArgumentException("시험지가 없습니다."));
-
+        Optional<PaperAssignment> assignmentUser = paperAssignmentRepository.findByUserAndPaper(user, paper);
+        if (assignmentUser.isPresent()) {
+            PaperAssignment paperAssignment = assignmentUser.get();
+            paperAssignment.updatePaperAssignmentStatus(PaperAssignmentStatus.TO_DO);
+            return "ok";
+        }
         PaperAssignment paperAssignment = PaperAssignment.builder()
+
                 .user(user)
                 .paper(paper)
                 .paperAssignmentStatus(PaperAssignmentStatus.TO_DO)
                 .build();
         paperAssignmentRepository.save(paperAssignment);
 
+        return "ok";
+    }
+
+    @Transactional
+    public String unassignTaskPaper(PaperAssignmentRequest paperAssignmentRequest) {
+
+        User user = userRepository.findById(paperAssignmentRequest.getUserId()).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
+        Paper paper = paperRepository.findById(paperAssignmentRequest.getPaperId()).orElseThrow(() -> new IllegalArgumentException("시험지가 없습니다."));
+        PaperAssignment paperAssignment = paperAssignmentRepository.findByUserAndPaper(user, paper).orElseThrow(() -> new IllegalArgumentException("지정된 작업자가 없습니다."));
+        paperAssignment.updatePaperAssignmentStatus(PaperAssignmentStatus.CANCELLED);
         return "ok";
     }
 
@@ -208,4 +226,6 @@ public class PaperService {
     public Page<Paper> searchResults(SearchKeywordDTO searchKeywordDTO, Pageable pageable) {
         return paperRepository.searchByWhere(searchKeywordDTO, pageable);
     }
+
+
 }

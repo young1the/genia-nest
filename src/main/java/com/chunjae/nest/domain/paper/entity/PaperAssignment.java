@@ -29,4 +29,7 @@ public class PaperAssignment extends BaseEntity {
     @Column(length = 10, nullable = false)
     private PaperAssignmentStatus paperAssignmentStatus;
 
+    public void updatePaperAssignmentStatus(PaperAssignmentStatus paperAssignmentStatus) {
+        this.paperAssignmentStatus = paperAssignmentStatus;
+    }
 }
