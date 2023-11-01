@@ -6,7 +6,7 @@
                     <a href="javascript:;"><img th:src="@{/images/logo.svg}" alt="천재교육"></a>
                 </div>
                 <div class="btn-wrap">
-                    <button><a href="javascript:;" class="user" th:text="${#ctx.session.user.userId}"></a></button>
+                    <button><a href="/user/password/modify" class="user" th:text="${#ctx.session.user.userId}"></a></button>
                     <button><a href="/user/logout" class="btn-login">로그아웃</a></button>
                     <button><a href="javascript:;" class="user" th:text="${#ctx.session.user.role.role}"></a></button>
 

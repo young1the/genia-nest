@@ -132,25 +132,28 @@ public class UserController {
     }
 
     @PostMapping("/password/modify")
-    public String modifyPassword(
-            @RequestParam("password") String newPassword,
-            HttpSession session
+    public String modPassword(
+            @RequestParam("newPassword1") String newPassword1,
+            @RequestParam("newPassword2") String newPassword2,
+            HttpSession session,
+            RedirectAttributes attributes
     ) {
         User user = (User) session.getAttribute("user");
-
+        System.out.println(newPassword1 + ":"+ newPassword2);
         if (user != null) {
             try {
-
-                userService.modPassword(user, newPassword);
-
-                session.invalidate();
-
-                return "redirect:/user/login";
+                if (newPassword1.equals(newPassword2)) {
+                    userService.modPassword(user, newPassword1);
+                    attributes.addFlashAttribute("message", "비밀번호가 성공적으로 수정되었습니다.");
+                    System.out.println("비밀번호 바꾸기 성공");
+                    session.invalidate();
+                    return "redirect:/user/login";
+                }
             } catch (Exception e) {
                 System.out.println("비밀번호 바꾸기 실패");
-                return "redirect:/user/password/modify";
+                return "redirect:/user/password/modify?error=true";
             }
         }
-        return "redirect:/user/password/modify";
+        return "redirect:/user/password/modify?error=true";
     }
 }

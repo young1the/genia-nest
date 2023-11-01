@@ -71,11 +71,11 @@ public class UserService {
         return null;
     }
 
-    public void modPassword(User user, String newPassword) {
+    public void modPassword(User user, String newPassword1) {
 
         if (user != null) {
-            System.out.println("비밀번호 : " + newPassword);
-            String encoded = EncodePasswordUtils.passwordEncoder().encode(newPassword);
+            System.out.println("비밀번호 : " + newPassword1);
+            String encoded = EncodePasswordUtils.passwordEncoder().encode(newPassword1);
             user.setPassword(encoded);
             user.setUserStatus(UserStatus.ACTIVE);
             userRepository.save(user);
