@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @Builder
 @ToString
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
 @Entity
 public class Paper extends BaseEntity {
@@ -76,9 +76,11 @@ public class Paper extends BaseEntity {
         this.subject = paperRequest.getSubject();
     }
 
-
-    public void setPaperStatusToDelete() {
-        this.paperStatus = PaperStatus.DELETED;
+    public void updatePaperStatus(PaperStatus paperStatus) {
+        this.paperStatus = paperStatus;
     }
 
+    public void setOcrCount(int ocrCount) {
+        this.ocrCount = ocrCount;
+    }
 }

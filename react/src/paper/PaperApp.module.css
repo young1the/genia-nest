@@ -30,3 +30,8 @@
 .pdf {
     flex: 5 1 0;
 }
+
+.buttonContainer {
+    display: flex;
+    gap: 16px;
+}

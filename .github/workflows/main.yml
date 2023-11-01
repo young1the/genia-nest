@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
   build:
@@ -19,21 +16,9 @@ jobs:
     - name: Add Application.Properties
       run: echo "${{ secrets.PROPERTIES }}" > ./src/main/resources/application.properties
       
-    - name: Stop Docker containers
+    - name: Clean Docker
       run: |
-        ids=$(docker ps -a -q)
-        for id in $ids
-        do
-          echo "Stopping and removing container: $id"
-          sudo docker stop $id
-          sudo docker rm $id
-        done
-      continue-on-error: true
-
-    - name: Remove Docker image
-      run: sudo docker rmi myapp
-      continue-on-error: true
-
+        sudo chmod +x ./clean-docker.sh && sudo bash ./clean-docker.sh
 
     - name: Build Docker image
       run: sudo docker build -t myapp .

@@ -4,6 +4,7 @@ import com.chunjae.nest.domain.paper.dto.SearchKeywordDTO;
 import com.chunjae.nest.domain.paper.entity.Paper;
 import com.chunjae.nest.domain.paper.entity.PaperStatus;
 import com.chunjae.nest.domain.paper.entity.QPaper;
+import com.chunjae.nest.domain.user.dto.AssignmentSearchReqDTO;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -14,6 +15,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Repository
@@ -22,6 +27,56 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
     QPaper paper = QPaper.paper;
+
+    private BooleanExpression dateAfter(String date) {
+        if (date == null || date.isEmpty()) return null;
+        LocalDate localDate = LocalDate.parse(date);
+        LocalTime localTime = LocalTime.of(0, 0, 0);
+        LocalDateTime localDateTime = LocalDateTime.of(localDate, localTime);
+        return paper.createdAt.after(localDateTime);
+    }
+
+    private BooleanExpression dateBefore(String date) {
+        if (date == null || date.isEmpty()) return null;
+        LocalDate localDate = LocalDate.parse(date).plusDays(1);
+        LocalTime localTime = LocalTime.of(0, 0, 0);
+        LocalDateTime localDateTime = LocalDateTime.of(localDate, localTime);
+        return paper.createdAt.before(localDateTime);
+    }
+
+    private BooleanExpression nameLike(String name) {
+        if (name == null || name.isEmpty()) return null;
+        return paper.user.name.like("%" + name + "%");
+    }
+
+    private BooleanExpression userIdLike(String id) {
+        if (id == null || id.isEmpty()) return null;
+        return paper.user.userId.like("%" + id + "%");
+    }
+
+    private BooleanExpression searchByOption(AssignmentSearchReqDTO searchKeywordDTO) {
+        String keyword = searchKeywordDTO.getSearchKeyword();
+        String option = searchKeywordDTO.getSearchOption();
+        if (keyword == null || option == null) return null;
+        if (option.equals("name")) {
+            return nameLike(keyword);
+        }
+        if (option.equals("userId")) {
+            return userIdLike(keyword);
+        }
+        return null;
+    }
+
+    public Page<Paper> searchByWhere(AssignmentSearchReqDTO searchKeywordDTO, Pageable pageable) {
+        JPAQuery<Paper> query = queryFactory.selectFrom(paper);
+        query = query.where(searchByOption(searchKeywordDTO), dateAfter(searchKeywordDTO.getStartDate()), dateBefore(searchKeywordDTO.getEndDate()));
+        Long count = queryFactory.selectFrom(paper).select(paper.count()).where(searchByOption(searchKeywordDTO), dateAfter(searchKeywordDTO.getStartDate()), dateBefore(searchKeywordDTO.getEndDate())).fetchOne();
+        List<Paper> results = query
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+        return new PageImpl<>(results, pageable, count);
+    }
 
     public Page<Paper> searchByWhere(SearchKeywordDTO searchKeywordDTO, Pageable pageable) {
         JPAQuery<Paper> query = queryFactory
@@ -99,10 +154,10 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
             BooleanExpression userSearch = paper.user.name.like("%" + searchKeyword + "%");
             BooleanExpression nameSearch = paper.name.like("%" + searchKeyword + "%");
             return userSearch.or(nameSearch);
-        } else if ("user_id".equals(searchOption) && searchKeyword != null && !searchKeyword.isEmpty()){
+        } else if ("user_id".equals(searchOption) && searchKeyword != null && !searchKeyword.isEmpty()) {
             BooleanExpression userSearch = Expressions.booleanTemplate("lower({0}) like lower({1})", paper.user.name, "%" + searchKeyword + "%");
             return userSearch;
-        } else if ("name".equals(searchOption) && searchKeyword != null && !searchKeyword.isEmpty()){
+        } else if ("name".equals(searchOption) && searchKeyword != null && !searchKeyword.isEmpty()) {
             BooleanExpression nameSearch = Expressions.booleanTemplate("lower({0}) like lower({1})", paper.name, "%" + searchKeyword + "%");
             return nameSearch;
         } else {
@@ -139,7 +194,7 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
 //        System.out.println("레파지토리 부분 - 받은 paperStatus 값 : " + paperStatus);
         BooleanExpression result = paper.paperStatus.ne(PaperStatus.valueOf("DELETED"));
 
-        if ("전체".equals(paperStatus)){
+        if ("전체".equals(paperStatus)) {
             return result;
         } else if ("완료".equals(paperStatus)) {
             return paper.paperStatus.eq(PaperStatus.valueOf("DONE"));

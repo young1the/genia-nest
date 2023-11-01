@@ -33,7 +33,7 @@ const PaperFileSelect = ({infoSectionProps}) => {
                 </label>
             </div>
             <p className={styles.caption}>
-                * 한번에 하나의 파일을 업로드 할 수 있습니다.
+                * 한번에 여러개의 파일을 업로드 할 수 있습니다.
                 <br/>
                 업로드 가능 확장자 : PDF
             </p>

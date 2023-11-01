@@ -1,10 +1,8 @@
 package com.chunjae.nest.common.excel;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.SpreadsheetVersion;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import java.io.IOException;
@@ -46,8 +44,16 @@ public class ExcelFile<T> {
         Row row = sheet.createRow(currentRowIndex++);
         int columnIndex = COLUMN_START_INDEX;
         for (String headerName : renderResource.getHeaderNames()) {
+            CellStyle cellStyle = workbook.createCellStyle();
+            cellStyle.setBorderTop(BorderStyle.THIN); //테두리 위쪽
+            cellStyle.setBorderBottom(BorderStyle.THIN); //테두리 아래쪽
+            cellStyle.setBorderLeft(BorderStyle.THIN); //테두리 왼쪽
+            cellStyle.setBorderRight(BorderStyle.THIN); //테두리 오른쪽
+            cellStyle.setFillForegroundColor(IndexedColors.BRIGHT_GREEN.getIndex());
+            cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);	//채우기 적용
             Cell cell = row.createCell(columnIndex++);
             cell.setCellValue(headerName);
+            cell.setCellStyle(cellStyle);
         }
     }
 

@@ -20,7 +20,9 @@ import org.springframework.data.domain.Pageable;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -80,7 +82,6 @@ public class PaperService {
     @Transactional(readOnly = true)
     public PaperResponse getPaperDetail(Long id) {
         Paper paper = paperRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("시험지가 없습니다."));
-
         return PaperResponse.builder()
                 .year(paper.getYear())
                 .month(paper.getMonth())
@@ -106,6 +107,10 @@ public class PaperService {
         paper.paperToUpdate(paperRequest);
         MultipartFile multipartFile = paperRequest.getMultipartFile();
         if (paper.getOcrCount() != 0 && (paper.getPaperStatus() == PaperStatus.IN_PROGRESS || paper.getPaperStatus() == PaperStatus.TO_DO)) {
+            paperRepository.save(paper);
+            return "ok";
+        }
+        if (multipartFile == null) {
             paperRepository.save(paper);
             return "ok";
         }
@@ -144,7 +149,6 @@ public class PaperService {
                 paperLogRepository.save(paperLog);
                 return "ok";
             }
-
             return "failed";
         } catch (Exception e) {
             return "failed";

@@ -135,8 +135,8 @@
                         </div>
                     </div>
                     <div class="btn-wrap">
-                        <a class="btn-gray w120" href="javascript:;">엑셀 다운로드</a>
-                        <a class="btn-green w100" href="/paper/upload">시험지 업로드</a>
+                        <a class="btn-gray w120" id="excelDownload" download href="/paper/download">엑셀 다운로드</a>
+                        <a class="btn-green w100" href="/paper/upload" target="_blank">시험지 업로드</a>
                     </div>
                 </div>
                 <table class="tbl-list">
@@ -177,9 +177,9 @@
                         <td th:text="${paper.grade}" />
                         <td th:text="${paper.area}" />
                         <td th:text="${paper.subject}" />
-                        <td th:text="${paper.name}" class="tit"><a href="javascript:;" /></td>
-                        <td th:text="${paper.user.name}" />
-                        <td th:text="${#temporals.format(paper.createdAt, 'yyyy-MM-dd')}"></td>
+                        <td class="tit"><a th:href="@{/paper/upload(id=${paper.id})}" target="_blank" th:text="${paper.name}"/></td>
+                        <td th:text="${paper.user.name}">홍길동</td>
+                        <td th:text="${#temporals.format(paper.getCreatedAt(), 'yyyy-MM-dd')}">YYYY.MM.DD</td>
                     </tr>
                     </tbody>
                 </table>
@@ -312,6 +312,13 @@
     document.getElementById("reset").addEventListener("click", function() {
         window.location.href = "/paper"; // 초기화
     });
+    const setDownloadLink = () => {
+        const downloadElem = document.getElementById("excelDownload")
+        let url = new URL(window.location.href);
+        url.pathname="/paper/download";
+        downloadElem.href = url.toString();
+    }
+    setDownloadLink();
 
 </script>
 </body>

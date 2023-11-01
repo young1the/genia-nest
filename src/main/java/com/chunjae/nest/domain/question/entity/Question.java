@@ -4,16 +4,11 @@ import com.chunjae.nest.common.BaseEntity;
 import com.chunjae.nest.domain.paper.entity.Paper;
 import com.chunjae.nest.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
+import lombok.*;
 
 
 @Getter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -34,13 +29,25 @@ public class Question extends BaseEntity {
     @Column(nullable = false)
     private int num;
 
-    @Column(columnDefinition = "LONGTEXT", nullable = false)
+    @Column(columnDefinition = "LONGTEXT")
     private String content;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 10, nullable = false)
     private QuestionType type;
 
-    @OneToMany(mappedBy = "question")
-    private List<QuestionFile> questionFiles = new ArrayList<>();
+    @Enumerated(EnumType.STRING)
+    @Column(length = 10, nullable = false)
+    private QuestionStatus questionStatus;
+
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "question")
+    private QuestionFile questionFile;
+
+    public void updateQuestionContent(String content) {
+        this.content = content;
+    }
+
+    public void updateQuestionStatus(QuestionStatus questionStatus) {
+        this.questionStatus = questionStatus;
+    }
 }

@@ -1,13 +1,14 @@
-import { useState, useEffect, useRef } from "react";
+import {useState, useEffect, useRef, forwardRef} from "react";
 import styles from "../styles/PDFCanvas.module.css";
 
-const PDFCanvas = ({ pdfPage }) => {
-  const canvasRef = useRef();
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    renderCanvas();
-    return cleanCanvas;
-  }, [pdfPage]);
+const PDFCanvas = forwardRef(({pdfPage}, ref) => {
+    const localRef = useRef();
+    const canvasRef = ref || localRef;
+    const [loading, setLoading] = useState(true);
+    useEffect(() => {
+        renderCanvas();
+        return cleanCanvas;
+    }, [pdfPage]);
 
   const renderCanvas = async () => {
     const canvas = canvasRef.current;
@@ -35,6 +36,6 @@ const PDFCanvas = ({ pdfPage }) => {
       {loading ? <div className={styles.loaderWrapper}>로딩중</div> : null}
     </div>
   );
-};
+})
 
 export default PDFCanvas;

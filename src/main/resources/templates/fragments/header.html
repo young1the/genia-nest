@@ -7,21 +7,21 @@
                 </div>
                 <div class="btn-wrap">
                     <button><a href="javascript:;" class="user" th:text="${#ctx.session.userId}"></a></button>
-                    <button><a href="javascirpt:;" class="btn-login">로그아웃</a></button>
+                    <button><a href="/user/logout" class="btn-login">로그아웃</a></button>
                 </div>
             </div>
             <div>
                 <ul class="nav">
+<!--                    <li>-->
+<!--                        <a href="/">HOME</a>-->
+<!--                        <ul class="depth2">-->
+<!--                            <li>-->
+<!--                                <a href="/">공지사항</a>-->
+<!--                            </li>-->
+<!--                        </ul>-->
+<!--                    </li>-->
                     <li>
-                        <a href="/">HOME</a>
-                        <ul class="depth2">
-                            <li>
-                                <a href="/">공지사항</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="/paper">수능/모의 관리</a>
+                        <a href="/paper" class="location">수능/모의 관리</a>
                         <ul class="depth2">
                             <li>
                                 <a href="/paper">수능/모의 관리</a>
@@ -32,7 +32,7 @@
                         </ul>
                     </li>
                     <li>
-                        <a href="/ocr">OCR 변환</a>
+                        <a href="/ocr" class="location">OCR 변환</a>
                         <ul class="depth2">
                             <li>
                                 <a href="/ocr">OCR 변환 관리</a>
@@ -43,10 +43,13 @@
                         </ul>
                     </li>
                     <li>
-                        <a href="/user/management">시스템 관리</a>
+                        <a href="/user/management" class="location">시스템 관리</a>
                         <ul class="depth2">
                             <li>
                                 <a href="/user/management">계정 관리</a>
+                            </li>
+                            <li>
+                                <a href="/user/management/assignment">작업 현황 관리</a>
                             </li>
                         </ul>
                     </li>
@@ -56,12 +59,11 @@
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            const nav = document.querySelector(".nav");
-            const aTags = nav.getElementsByTagName("a");
+            const locations = document.getElementsByClassName("location");
             const currentPath = window.location.href;
-            for (const aTag of aTags) {
-                if (currentPath === aTag.href) {
-                    aTag.parentElement.classList.add("active");
+            for (const location of locations) {
+                if (currentPath.indexOf(location.href) >= 0) {
+                    location.parentElement.classList.add("active");
                     break ;
                 }
             }

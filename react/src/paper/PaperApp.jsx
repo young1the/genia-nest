@@ -4,10 +4,19 @@ import H1 from "./components/common/H1.jsx";
 import InfoSection from "./components/input/info/InfoSection.jsx";
 import PDFSection from "./components/input/pdf/PDFSection.jsx";
 import usePDF from "../pdf/hooks/usePDF.js";
-import {useRef} from "react";
+import {useEffect, useRef } from "react";
 
-function PaperApp() {
-    const inputRefs = useRef();
+function PaperApp({idParam}) {
+    const inputRefs = useRef({
+        area: {},
+        category: {},
+        grade: {},
+        month: {},
+        name: {},
+        subject: {},
+        totalCount: {},
+        year: {},
+    });
     const {
         addPDF,
         deletePDFFile,
@@ -17,13 +26,27 @@ function PaperApp() {
         pages,
         generatePDFFile,
         pdfBlob,
-    } = usePDF();
-
+    } = usePDF()
+    useEffect(() => {
+        getInitialValue();
+    }, []);
+    const getInitialValue = async () => {
+        if (idParam) {
+            const response = await fetch(`/api/paper/detail/${idParam}`);
+            const result = await response.json();
+            if (result.url) {
+                await addPDF({name: result.name, url: result.url});
+            }
+            Object.entries(result).forEach(([name, value]) => {
+                inputRefs.current[name] = {value};
+            })
+        }
+    }
     const paperFileSubmitHandler = async () => {
-        if (!pdfBlob) return ;
         const formData = new FormData();
         let fileName;
-        for (const [name, elem] of Object.entries(inputRefs)) {
+        for (const [name, elem] of Object.entries(inputRefs.current)) {
+            console.log(`${name} : ${elem.value}`)
             if (elem?.value) {
                 formData.append(name, elem.value);
                 if (name === "name") {
@@ -31,13 +54,17 @@ function PaperApp() {
                 }
             }
         }
+        const generated = await generatePDFFile();
+        const pdfBlob = new Blob([generated], {type: "application/pdf"});
         formData.append("multipartFile", pdfBlob, fileName);
-        const response = await fetch(`/api/paper/upload`, {
+        const requestURL = !idParam ? `/api/paper/upload` : `/api/paper/modify/${idParam}`;
+        const response = await fetch(requestURL, {
             method: "POST",
             body: formData,
         })
-        if (response.ok) alert("ok");
-        else alert("not ok");
+        if (response.ok) {
+            window.close();
+        } else alert("저장 실패");
     }
 
     const infoSectionProps = {addPDF, deletePDFFile, files, inputRefs};
@@ -47,11 +74,28 @@ function PaperApp() {
         pdfFileUrl: pdfBlob,
         paperFileSubmitHandler,
     }
+
+    const deleteHandler = async () => {
+        const doDelete = confirm("정말 삭제하시겠습니까?");
+        if (!doDelete) return;
+        const response = await fetch(`/api/paper/remove/${idParam}`, {
+            method: "POST",
+        });
+        if (response.ok) {
+            window.close();
+        }
+    }
+
     return (
         <main className={styles.wrapper}>
             <header className={styles.header}>
                 <H1>시험지 업로드 페이지</H1>
-                <Button color="gray" onClick={()=>{window.close()}}>닫기</Button>
+                <div className={styles.buttonContainer}>
+                    {idParam ? <Button color="red" onClick={deleteHandler}>삭제</Button> : null}
+                    <Button color="gray" onClick={() => {
+                        window.close()
+                    }}>닫기</Button>
+                </div>
             </header>
             <div className={styles.inputContainer}>
                 <section className={styles.info}><InfoSection infoSectionProps={infoSectionProps}/></section>
