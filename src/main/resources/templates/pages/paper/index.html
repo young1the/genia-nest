@@ -179,7 +179,7 @@
 <!--                            <div class="check-wrap"><input type="checkbox" id="chk100_30" name="numChk">-->
 <!--                                <label for="chk100_30"></label></div>-->
 <!--                        </td>-->
-                        <td th:text="${#numbers.sequence(papers.number * papers.size + 1, (papers.number + 1) * papers.size)[iterStat.index]}" />
+                        <td th:text="${papers.getSize() - iterStat.index}" />
 <!--                        <td th:text="${#numbers.sequence((papers.number + 1) * papers.size, papers.number * papers.size + 1)[iterStat.index]}" />-->
 <!--                        <td th:text="${paper.id}" />-->
                         <td th:text="${paper.id}" style="display: none;" />
