@@ -55,7 +55,7 @@
                             </div>
                             <div class="select-wrap">
                                 <select class="select-box" id="subjectSelect" name="subject">
-                                    <option th:value="${searchKeywordDTO.subject}" th:selected="${searchKeywordDTO.subject}">과목</option>
+                                    <option th:value="전체" th:selected="${searchKeywordDTO.subject}">과목</option>
                                 </select>
                             </div>
                             <div class="select-wrap">
@@ -124,14 +124,19 @@
             <div class="table-wrap">
                 <div class="tab-top">
                     <div class="left-area">
-                        <span class="total">총 <em th:text="${papers.totalElements}" id="totalElements">0</em>건</span>
+                        <span class="total">총 <em th:text="${papers.totalElements}">0</em>건</span>
                         <div class="select-wrap">
-                            <select class="select-box w140" id="pageSizeSelect">
-                                <option value="10">10개 보기</option>
-                                <option value="30">30개 보기</option>
-                                <option value="50">50개 보기</option>
-                                <option value="100">100개 보기</option>
+                            <select class="select-box w140" id="pageSizeSelect" th:name="size" onchange="selectOnChangeHandler(this)">
+                                <option th:each="option : ${sizes}" th:value="${option}"
+                                        th:text="${option}+'개 보기'"
+                                        th:selected="${option} == ${papers.pageable.getPageSize()}"></option>
                             </select>
+<!--                            <select class="select-box w140" id="pageSizeSelect">-->
+<!--                                <option value="10">10개 보기</option>-->
+<!--                                <option value="30">30개 보기</option>-->
+<!--                                <option value="50">50개 보기</option>-->
+<!--                                <option value="100">100개 보기</option>-->
+<!--                            </select>-->
                         </div>
                     </div>
                     <div class="btn-wrap">
@@ -196,8 +201,10 @@
                     <a href="javascript:;" class="prev"  th:if="${papers.number >= 0}" th:href="@{${pageLink + (papers.number - 1)}}"></a>
                 </th:block>
                 <th:block th:each="pageNumber : ${#numbers.sequence(0, papers.totalPages - 1)}" th:if="${pageNumber >= 0}">
-                    <a href="javascript:;" class="page active" th:class="${papers.number == pageNumber} ? active" th:href="@{${pageLink + pageNumber}}">
-                        <span class="page" th:text="${pageNumber + 1}"></span>
+                    <a href="javascript:;" class="page"
+                       th:classappend="${papers.number == pageNumber} ? 'active' : ''"
+                       th:href="@{${pageLink + pageNumber}}">
+                        <span th:text="${pageNumber + 1}"></span>
                     </a>
                 </th:block>
                 <th:block th:if="${papers.number <= papers.totalPages}">
@@ -210,8 +217,74 @@
 
 </div>
 <script>
-    const areaSelect = document.getElementById('areaSelect');
-    const subjectSelect = document.getElementById('subjectSelect');
+
+    function areaSelectHandler () {
+        const areaSelect = document.getElementById('areaSelect');
+        const subjectSelect = document.getElementById('subjectSelect');
+        const searchParam = new URLSearchParams(new URL(window.location.href).search);
+        const areaParam = searchParam.get("area");
+            if (areaParam) {
+                areaSelect.value = areaParam;
+            }
+        const selectArea = areaSelect.value;
+        const subjectParam = searchParam.get("subject");
+            if (selectArea === '국어') {
+                addOption(subjectSelect, '전체', subjectParam);
+                addOption(subjectSelect, '화법과 작문', subjectParam);
+                addOption(subjectSelect, '언어와 매체', subjectParam);
+            } else if (selectArea === '수학') {
+                addOption(subjectSelect, '전체', subjectParam);
+                addOption(subjectSelect, '확률과 통계', subjectParam);
+                addOption(subjectSelect, '미적분', subjectParam);
+                addOption(subjectSelect, '기하', subjectParam);
+            } else if (selectArea === '영어') {
+                addOption(subjectSelect, '전체', subjectParam);
+                addOption(subjectSelect, '영어', subjectParam);
+            } else if (selectArea === '한국사') {
+                addOption(subjectSelect, '전체', subjectParam);
+                addOption(subjectSelect, '한국사', subjectParam);
+            } else if (selectArea === '사회탐구') {
+                addOption(subjectSelect, '전체', subjectParam);
+                addOption(subjectSelect, '생활과 윤리', subjectParam);
+                addOption(subjectSelect, '윤리와 사상', subjectParam);
+                addOption(subjectSelect, '한국지리', subjectParam);
+                addOption(subjectSelect, '세계지리', subjectParam);
+                addOption(subjectSelect, '동아시아사', subjectParam);
+                addOption(subjectSelect, '세계사', subjectParam);
+                addOption(subjectSelect, '경제', subjectParam);
+                addOption(subjectSelect, '정치와 법', subjectParam);
+            } else if (selectArea === '과학탐구') {
+                addOption(subjectSelect, '전체', subjectParam);
+                addOption(subjectSelect, '물리학I', subjectParam);
+                addOption(subjectSelect, '화학I', subjectParam);
+                addOption(subjectSelect, '생명과학I', subjectParam);
+                addOption(subjectSelect, '지구과학I', subjectParam);
+                addOption(subjectSelect, '물리학II', subjectParam);
+                addOption(subjectSelect, '화학II', subjectParam);
+                addOption(subjectSelect, '생명과학II', subjectParam);
+                addOption(subjectSelect, '지구과학II', subjectParam);
+            } else if (selectArea === '직업탐구') {
+                addOption(subjectSelect, '전체', subjectParam);
+                addOption(subjectSelect, '농업 기초 기술', subjectParam);
+                addOption(subjectSelect, '공업 일반', subjectParam);
+                addOption(subjectSelect, '상업 경제', subjectParam);
+                addOption(subjectSelect, '수산 해운 산업 기초', subjectParam);
+                addOption(subjectSelect, '인간 발달', subjectParam);
+                addOption(subjectSelect, '성공적인 직업생활', subjectParam);
+            } else if (selectArea === '제2외국어/한문') {
+                addOption(subjectSelect, '전체', subjectParam);
+                addOption(subjectSelect, '독일어I', subjectParam);
+                addOption(subjectSelect, '프랑스어I', subjectParam);
+                addOption(subjectSelect, '스페인어I', subjectParam);
+                addOption(subjectSelect, '중국어I', subjectParam);
+                addOption(subjectSelect, '일본어I', subjectParam);
+                addOption(subjectSelect, '러시아어I', subjectParam);
+                addOption(subjectSelect, '아랍어I', subjectParam);
+                addOption(subjectSelect, '베트남어I', subjectParam);
+                addOption(subjectSelect, '한문I', subjectParam);
+        }
+    }
+    document.addEventListener("DOMContentLoaded", areaSelectHandler)
 
     areaSelect.addEventListener('change', function () {
        const selectArea = areaSelect.value;
@@ -274,51 +347,101 @@
             addOption(subjectSelect, '한문I');
         }
 
-        const selectedData = { // 선택 값들 객체화 시키기
-            area : selectArea,
-            subject : selectSubject
-        };
-
-        fetch('/paper', {
-            method : 'GET',
-        })
-        .then(response => response.text())
-        .then(html => {
-            //console.log(html);
-        })
-        .catch(error => {
-            console.log('에러 발생 : ', error);
-        });
+        // const selectedData = { // 선택 값들 객체화 시키기
+        //     area : selectArea,
+        //     subject : selectSubject
+        // };
+        //
+        // fetch('/paper', {
+        //     method : 'GET',
+        // })
+        // .then(response => response.text())
+        // .then(html => {
+        //     //console.log(html);
+        // })
+        // .catch(error => {
+        //     console.log('에러 발생 : ', error);
+        // });
     });
 
-    function addOption(selectBox, optionText) { // 영역 - 과목 셀렉트 박스
+    function addOption(selectBox, optionText, subjectParam) { // 영역 - 과목 셀렉트 박스
         const option = document.createElement('option');
         option.text = optionText;
+        if (subjectParam && optionText === subjectParam) {
+            option.selected = true;
+        }
         selectBox.add(option);
     }
 
-    function updateTotalCount() { //  총 건수 세기
-        const totalCountElement = document.getElementById('totalCount');
-        if (totalCountElement) {
-            const totalCount = document.querySelectorAll('.left-area .select-box option').length;
-            totalCountElement.innerText = totalCount;
-        }
-    }
+    // url 파라미터 기억하기
+    // const searchParams = new URLSearchParams(location.search);
+    // for (const param of searchParams) {
+    //     console.log(param);
+    // }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        updateTotalCount();
+    // document.addEventListener("DOMContentLoaded", function () {
+    //     const searchParams = new URLSearchParams(location.search);
+    //     for (const param of searchParams) {
+    //         console.log(param);
+    //     }
+    //
+    //     // selectbox 요소 가져오기
+    //     const yearSelect = document.getElementById("year");
+    //     const monthSelect = document.getElementById("month");
+    //     const areaSelect = document.getElementById("area");
+    //     const subjectSelect = document.getElementById("subject");
+    //     const optionSelect = document.getElementById("searchOption");
+    //     const keywordSelect = document.getElementById("searchKeyword");
+    //     const categorySelect = document.getElementById("category");
+    //     const statusSelect = document.getElementById("paperStatus");
+    //     const gradeSelect = document.getElementById("grade");
+    //
+    //     // URL에서 각 파라미터 값을 가져옵니다.
+    //     const yearParam = searchParams.get("year");
+    //     const monthParam = searchParams.get("month");
+    //     const areaParam = searchParams.get("area");
+    //     const subjectParam = searchParams.get("subject");
+    //     const optionParam = searchParams.get("searchOption");
+    //     const keywordParam = searchParams.get("searchKeyword");
+    //     const categoryParam = searchParams.get("category");
+    //     const statusParam = searchParams.get("paperStatus");
+    //     const gradeParam = searchParams.get("grade");
+    //
+    //     // selectbox에서 해당 값을 선택하도록 설정합니다.
+    //     if (yearParam) { yearSelect.value = yearParam; }
+    //     if (monthParam) { monthSelect.value = monthParam; }
+    //     if (areaParam) { areaSelect.value = areaParam; }
+    //     if (subjectParam) { subjectSelect.value = subjectParam; }
+    //     if (optionParam) { optionSelect.value = optionParam; }
+    //     if (keywordParam) { keywordSelect.value = keywordParam; }
+    //     if (categoryParam) { categorySelect.value = categoryParam; }
+    //     if (statusParam) { statusSelect.value = statusParam; }
+    //     if (gradeParam) { gradeSelect.value = gradeParam; }
+    //
+    // });
+
+    document.getElementById("reset").addEventListener("click", function() { // 초기화
+        window.location.href = "/paper";
     });
 
-    document.getElementById("reset").addEventListener("click", function() {
-        window.location.href = "/paper"; // 초기화
-    });
-    const setDownloadLink = () => {
+    const setDownloadLink = () => { // 엑셀 다운로드
         const downloadElem = document.getElementById("excelDownload")
         let url = new URL(window.location.href);
         url.pathname="/paper/download";
         downloadElem.href = url.toString();
     }
     setDownloadLink();
+
+    const selectOnChangeHandler = (elem) => { // 10개, 30개, 50개.. 선택하기
+        const selectedOption = elem.value;
+        console.log(elem.value);
+        const url = new URL(window.location.href);
+        const params = new URLSearchParams(url.search);
+        params.set("size", selectedOption);
+        //params.set("page", 0);
+        url.search = params.toString();
+        location.href = url.href;
+    }
 
 </script>
 </body>

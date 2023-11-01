@@ -124,11 +124,10 @@
 								<div class="left-area">
 									<span class="total">총<em th:text="${papers.totalElements}">0</em>건</span>
 									<div class="select-wrap">
-										<select class="select-box w140" id="pageSizeSelect">
-											<option value="10">10개 보기</option>
-											<option value="30">30개 보기</option>
-											<option value="50">50개 보기</option>
-											<option value="100">100개 보기</option>
+										<select class="select-box w140" id="pageSizeSelect" th:name="size" onchange="selectOnChangeHandler(this)">
+											<option th:each="option : ${sizes}" th:value="${option}"
+													th:text="${option}+'개 보기'"
+													th:selected="${option} == ${papers.pageable.getPageSize()}"></option>
 										</select>
 									</div>
 								</div>
@@ -192,7 +191,7 @@
 										<td th:text="${paper.totalCount}" />
 										<td th:text="${paper.user.name}" />
 										<td th:text="${#temporals.format(paper.createdAt, 'yyyy-MM-dd')}"></td>
-										<td th:text="${paper.paperStatus.displayValue}" />
+										<td th:text="${paper.paperStatus.displayValue}" /> <!--확인용(최종 머지 시 삭제)-->
 									</tr>
 								</tbody>
 							</table>
@@ -204,20 +203,16 @@
 								<a href="javascript:;" class="prev"  th:if="${papers.number >= 0}" th:href="@{${ocrPageLink + (papers.number - 1)}}"></a>
 							</th:block>
 							<th:block th:each="pageNumber : ${#numbers.sequence(0, papers.totalPages - 1)}" th:if="${pageNumber >= 0}">
-								<a href="javascript:;" class="page active" th:class="${papers.number == pageNumber} ? active" th:href="@{${ocrPageLink + pageNumber}}">
-									<span class="page" th:text="${pageNumber + 1}"></span>
+								<a href="javascript:;" class="page"
+								   th:classappend="${papers.number == pageNumber} ? 'active' : ''"
+								   th:href="@{${ocrPageLink + pageNumber}}">
+									<span th:text="${pageNumber + 1}"></span>
 								</a>
 							</th:block>
 							<th:block th:if="${papers.number <= papers.totalPages}">
 								<a href="javascript:;" class="next" th:href="@{${papers.number == papers.totalPages - 1 ? ocrPageLink + papers.number : ocrPageLink + (papers.number + 1)}}"></a>
 								<a href="javascript:;" class="last" th:href="@{${ocrPageLink + (papers.totalPages - 1)}}"></a>
 							</th:block>
-
-							<!-- <th:block th:if="${papers.number >= 0}">-->
-<!--								<a href="javascript:;" class="next" th:if="${papers.number <= papers.totalPages}" th:href="@{${ocrPageLink + (papers.number + 1)}}"></a>-->
-<!--								<a href="javascript:;" class="last" th:href="@{${ocrPageLink + (papers.totalPages - 1)}}"></a>-->
-<!--							</th:block>-->
-
 						</div>
 					</div>
 				</div>
@@ -327,6 +322,17 @@
 	document.getElementById("reset").addEventListener("click", function() {
 		window.location.href = "/ocr"; // 초기화
 	});
+
+	const selectOnChangeHandler = (elem) => { // 10개, 30개, 50개.. 선택하기
+		const selectedOption = elem.value;
+		console.log(elem.value);
+		const url = new URL(window.location.href);
+		const params = new URLSearchParams(url.search);
+		params.set("size", selectedOption);
+		//params.set("page", 0);
+		url.search = params.toString();
+		location.href = url.href;
+	}
 </script>
 </body>
 
