@@ -20,7 +20,9 @@ import org.springframework.data.domain.Pageable;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -192,5 +194,4 @@ public class PaperService {
     public Page<Paper> searchResults(SearchKeywordDTO searchKeywordDTO, Pageable pageable) {
       return paperRepository.searchByWhere(searchKeywordDTO, pageable);
     }
-
 }

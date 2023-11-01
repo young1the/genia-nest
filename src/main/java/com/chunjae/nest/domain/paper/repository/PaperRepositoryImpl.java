@@ -199,8 +199,9 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
         } else if ("완료".equals(paperStatus)) {
             return paper.paperStatus.eq(PaperStatus.valueOf("DONE"));
         } else if ("진행중".equals(paperStatus)) {
-            return paper.paperStatus.eq(PaperStatus.valueOf("TO_DO"))
-                    .or(paper.paperStatus.eq(PaperStatus.valueOf("IN_PROGRESS")));
+            return paper.paperStatus.eq(PaperStatus.valueOf("IN_PROGRESS"));
+        } else if ("진행 전".equals(paperStatus)) {
+            return paper.paperStatus.eq(PaperStatus.valueOf("TO_DO"));
         } else {
             // 두 값 모두 넘어오지 않았을 경우
             return result;

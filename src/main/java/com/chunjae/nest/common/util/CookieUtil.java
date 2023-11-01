@@ -34,7 +34,6 @@ public class CookieUtil {
         }
     }
 
-    //findCookie 메서드 정의!
     public Optional<Cookie> findCookie(HttpServletRequest request, String cookieName) {
         Cookie[] cookies = request.getCookies();
 

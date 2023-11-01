@@ -1,8 +1,8 @@
 package com.chunjae.nest.domain.user.controller;
 
 import com.chunjae.nest.common.util.CookieUtil;
-import com.chunjae.nest.domain.user.dto.CreateUserReqDTO;
 import com.chunjae.nest.domain.user.entity.User;
+import com.chunjae.nest.domain.user.entity.UserStatus;
 import com.chunjae.nest.domain.user.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,13 +10,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,8 +40,6 @@ public class UserController {
         userIdCookie.ifPresent(cookie -> model.addAttribute(USER_ID_COOKIE_NAME, cookie.getValue()));
         return "pages/user/login";
     }
-
-
 
     @PostMapping("/login")
     public String login(
@@ -69,8 +68,22 @@ public class UserController {
                     cookieUtil.deleteCookie(request, response);
                 }
 
-                // 로그인에 성공한 후, 원하는 페이지로 리다이렉트
-                return "redirect:/";
+                // 로그인에 성공한 후, 원하는 페이지로 리다이렉트 하기전에
+                // userStatus 확인해서 NEW_USER면
+                // 비밀번호 변경 페이지로 보내기
+                // 아니면 원하는 페이지로 리다이렉트
+
+                UserStatus userStatus = userService.getCurrentUserStatus(userId);
+                System.out.println("------컨트롤러--------");
+                System.out.println(userStatus);
+                if (userStatus == UserStatus.NEW_USER) {
+
+                    return "redirect:/user/password/modify";
+                } else {
+
+                    return "redirect:/";
+                }
+
             } else {
                 // 로그인 실패 시 오류 메시지 추가
                 attributes.addFlashAttribute("message", "아이디 혹은 비밀번호가 일치하지 않습니다!");
@@ -84,36 +97,61 @@ public class UserController {
         }
     }
 
-
     @GetMapping("/management")
-    public String showAccountManagementPage(Model model) {
-        List<User> users = userService.getAllUsers();
+    public String showAccountManagementPage(Model model,
+                                            @RequestParam(required = false) String searchKeyword,
+                                            @RequestParam(required = false, defaultValue = "userId") String searchOption) {
+
+        List<User> users;
+
+        if (searchKeyword != null && !searchKeyword.isEmpty()) {
+
+            users = userService.searchUsers(searchKeyword, searchOption);
+        } else {
+
+            users = userService.getAllUsersOrderedByIdDesc()
+                    .stream().filter(user -> user.getUserStatus() != UserStatus.DELETE).toList();
+        }
+
         model.addAttribute("users", users);
         return "pages/user/management";
     }
 
-    @PostMapping("/add")
-    @ResponseBody
-    public ResponseEntity<Void> createUser(@RequestBody CreateUserReqDTO userDTO) {
-        log.info("userDTO: {}", userDTO);
-
-        try {
-            userService.createUser(userDTO);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            log.error("Create user error: " + e.getMessage(), e);
-            return ResponseEntity.badRequest().build();
-        }
-    }
 
     @GetMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 
         session.invalidate();
-        deleteCookie(request,response);
+        deleteCookie(request, response);
 
         return "redirect:/user/login";
     }
 
+    @GetMapping("/password/modify")
+    public String modPassword() {
+        return "pages/user/modPassword";
+    }
 
+    @PostMapping("/password/modify")
+    public String modifyPassword(
+            @RequestParam("password") String newPassword,
+            HttpSession session
+    ) {
+        String userId = (String) session.getAttribute("userId");
+
+        if (userId != null) {
+            try {
+
+                userService.modPassword(userId, newPassword);
+
+                session.invalidate();
+
+                return "redirect:/user/login";
+            } catch (Exception e) {
+                System.out.println();
+                return "redirect:/user/password/modify";
+            }
+        }
+        return "redirect:/user/password/modify";
+    }
 }
