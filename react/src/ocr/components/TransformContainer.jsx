@@ -1,9 +1,9 @@
-import { useRef, useState } from "react";
+import {useEffect, useRef, useState} from "react";
 import styles from "../OCRApp.module.css";
 import html2canvas from "html2canvas";
 import LoaderIcon from "react-loader-icon"
 
-const TransformContainer = ({ cropData, totalCount, idParam , handleCropData }) => {
+const TransformContainer = ({ cropData, totalCount, idParam, clearCropData }) => {
   const [questionNum, setQuestionNum] = useState(1);
   const [questionType, setQuestionType] = useState(""); // 재밌는 일
   const [questionContent, setQuestionContent] = useState("");
@@ -23,15 +23,13 @@ const TransformContainer = ({ cropData, totalCount, idParam , handleCropData }) 
     setQuestionContent(result.content);
     setQuestionType(result.type);
     setQuestionImage(result.url);
-    console.log(result);
-    console.log("result type : " + result.type);
+    // console.log(result);
+    // console.log("result type : " + result.type);
   }
+  useEffect(() => {
+    getQuestionInfo();
+  }, [questionNum]);
 
-  const handleOnKeyPress = e => {
-    if (e.key === 'Enter') {
-      getQuestionInfo(); // Enter 입력이 되면 클릭 이벤트 실행
-    }
-  };
   const handleQuestionType = (e) => {
     setQuestionType(e.target.value);
   };
@@ -78,6 +76,30 @@ const TransformContainer = ({ cropData, totalCount, idParam , handleCropData }) 
     }
   };
 
+  const questionDone = () => {
+    if(questionContent){
+      const body={
+        id: "",
+        content: questionContent,
+      }
+      const stringifyBody = JSON.stringify(body);
+      const questionUpload = () => fetch(`/api/question/upload`, {
+        method: "POST",
+        body: stringifyBody,
+      })
+    }else{
+      const body={
+        id: idParam,
+        num: questionNum,
+      }
+      const stringifyBody = JSON.stringify(body);
+      const questionRemove = () => fetch(`api/question/remove/`, {
+        method: "POST",
+        body: stringifyBody,
+      })
+    }
+  }
+
   return (
     <div className={styles.viewBox}>
       <div className={styles.viewTop}>
@@ -94,9 +116,9 @@ const TransformContainer = ({ cropData, totalCount, idParam , handleCropData }) 
           <button
             className={styles.icon}
             onClick={() => {
-              if (questionNum === 1) {
-                setQuestionNum(1);
+              if (questionNum <= 1) {
                 console.log("첫번째 문제");
+                setQuestionNum(1);
               } else setQuestionNum((questionNum) => questionNum - 1);
             }}
           >
@@ -106,15 +128,16 @@ const TransformContainer = ({ cropData, totalCount, idParam , handleCropData }) 
             type="text"
             value={questionNum}
             onChange={(e) => {
-              setQuestionNum(parseInt(e.target.value));}}
-              onKeyPress={handleOnKeyPress}
+              const value = e.target.value;
+              if (isNaN(+value)) return ;
+              setQuestionNum(e.target.value);}}
           />
           /
-          <input type="text" defaultValue={totalCount} />
+          <input type="text" readOnly={true} defaultValue={totalCount} />
           <button
             className={styles.icon}
             onClick={() => {
-              if (questionNum === totalCount) {
+              if (questionNum >= totalCount) {
                 setQuestionNum(totalCount);
                 console.log(totalCount + "번이 마지막 문제입니다.");
               } else setQuestionNum((questionNum) => questionNum + 1);
@@ -139,7 +162,7 @@ const TransformContainer = ({ cropData, totalCount, idParam , handleCropData }) 
               <button
                 className={styles.geniaButton + " " + styles.geniaButtonGray}
                 onClick={() => {
-                  // handleCropData()
+                  clearCropData();
                   setQuestionContent("");
                 }}
               >
@@ -175,6 +198,7 @@ const TransformContainer = ({ cropData, totalCount, idParam , handleCropData }) 
                   name="term"
                   value="MULTIPLE"
                   onChange={handleQuestionType}
+                  checked={questionType === "MULTIPLE"}
                 />
                 <label htmlFor="term01_01">객관식</label>
                 <input
@@ -183,6 +207,8 @@ const TransformContainer = ({ cropData, totalCount, idParam , handleCropData }) 
                   name="term"
                   value="SHORT_ANSWER"
                   onChange={handleQuestionType}
+                  checked={questionType === "SHORT_ANSWER"}
+
                 />
                 <label htmlFor="term01_02">단답형</label>
                 <input
@@ -191,6 +217,7 @@ const TransformContainer = ({ cropData, totalCount, idParam , handleCropData }) 
                   name="term"
                   value="ESSAY"
                   onChange={handleQuestionType}
+                  checked={questionType === "ESSAY"}
                 />
                 <label htmlFor="term01_02">서술형</label>
               </div>
@@ -236,7 +263,7 @@ const TransformContainer = ({ cropData, totalCount, idParam , handleCropData }) 
               <textarea
                 className={`${styles.box} ${styles.geniaTextarea}`}
                 style={{}}
-                // value={questionContent}
+                value={questionContent}
                 onChange={(e) => {
                   setQuestionContent(e.target.value);
                 }}
@@ -253,7 +280,9 @@ const TransformContainer = ({ cropData, totalCount, idParam , handleCropData }) 
               <button
                 className={styles.geniaButton + " " + styles.geniaButtonGreen}
                 onClick={() => {
-                  {questionType ? console.log("ok"): alert("변환 조건을 선택해주세요.")}
+                  {questionType ?
+                      questionDone()
+                      :alert("변환 조건을 선택해주세요.")}
                 }}
               >
                 저장

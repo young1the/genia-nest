@@ -17,6 +17,10 @@ function OCRApp({ initialData, idParam }) {
     }
   };
 
+  const clearCropData = () => {
+    setCropData([]);
+  }
+
   return (
     <>
       <div className={styles.fullPop}>
@@ -38,9 +42,9 @@ function OCRApp({ initialData, idParam }) {
                   />
                   <TransformContainer
                     cropData={cropData}
+                    clearCropData={clearCropData}
                     totalCount={initialData.totalCount}
                     idParam={idParam}
-                    handleCropData={setCropData}
                   />
                 </div>
               </div>

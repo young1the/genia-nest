@@ -37,12 +37,6 @@ const CropperContainer = ({ getCropData, cropperRef, canvasRef, pdfURL }) => {
       <div className={styles.viewBottom}>
         <div className={styles.imgCutWrap}>
           <div className={styles.typeBoxWrap}>
-            <div className={styles.radioWrap}>
-              <input type="radio" id="type01_01" name="que-type" />
-              <label htmlFor="type01_01">문제</label>
-              <input type="radio" id="type01_02" name="que-type" />
-              <label htmlFor="type01_02">정답/해설</label>
-            </div>
             <div className={styles.pageWrap}>
               {pages.length > 0 ? (
                 <span>

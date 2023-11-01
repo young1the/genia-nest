@@ -12,8 +12,8 @@ const OCRHeader = ({ name, totalCount }) => {
         </span>
       </div>
       <div className={styles.btnWrap}>
-        <button className={`${styles.geniaButton} ${styles.geniaButtonLine}`}>
-          목록
+        <button className={`${styles.geniaButton} ${styles.geniaButtonLine}`} onClick={()=>{window.close()}}>
+          닫기
         </button>
       </div>
     </div>
