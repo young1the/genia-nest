@@ -3,12 +3,10 @@ package com.chunjae.nest.domain.paper.entity;
 import com.chunjae.nest.common.BaseEntity;
 import com.chunjae.nest.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
+@Builder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
