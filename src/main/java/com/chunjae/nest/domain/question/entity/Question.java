@@ -47,6 +47,10 @@ public class Question extends BaseEntity {
         this.content = content;
     }
 
+    public void updateType(QuestionType type){
+        this.type = type;
+    }
+
     public void updateQuestionStatus(QuestionStatus questionStatus) {
         this.questionStatus = questionStatus;
     }

@@ -15,7 +15,7 @@ const OCRAppEntry = ({idParam}) => {
     }
   };
 
-  return initialData ? <OCRApp initialData={initialData} /> : <p>로딩중</p>;
+  return initialData ? <OCRApp initialData={initialData} idParam={idParam} /> : <p>로딩중</p>;
 };
 
 export default OCRAppEntry;

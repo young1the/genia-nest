@@ -10,6 +10,9 @@ import com.chunjae.nest.domain.user.repository.RoleRepository;
 import com.chunjae.nest.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,11 +56,13 @@ public class UserService {
     public User login(String userId, String password) {
         // 회원 정보 & 비밀번호 조회
         User user = userRepository.findByUserId(userId);
-
-        if (user == null || !EncodePasswordUtils.passwordEncoder().matches(password, user.getPassword())) {
+        if (user == null) return null;
+        if (!EncodePasswordUtils.passwordEncoder().matches(password, user.getPassword())) {
             return null;
         }
-
+        if (user.getRole().getRoleStatus() == RoleStatus.CANCELLED || user.getRole().getRoleStatus() == RoleStatus.TERMINATED) {
+            return null;
+        }
         return user;
     }
 
@@ -69,21 +74,19 @@ public class UserService {
         return null;
     }
 
-    public void modPassword(String userId, String newPassword) {
-
-        User user = userRepository.findByUserId(userId);
+    public void modPassword(User user, String newPassword1) {
 
         if (user != null) {
-            System.out.println("비밀번호 : " + newPassword);
-            String encoded = EncodePasswordUtils.passwordEncoder().encode(newPassword);
+            System.out.println("비밀번호 : " + newPassword1);
+            String encoded = EncodePasswordUtils.passwordEncoder().encode(newPassword1);
             user.setPassword(encoded);
             user.setUserStatus(UserStatus.ACTIVE);
             userRepository.save(user);
         }
     }
 
-    public List<User> getAllUsersOrderedByIdDesc() {
-        return userRepository.findAll(Sort.by(Sort.Order.desc("id")));
+    public Page<User> getAllUsersOrderedByIdDesc(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
     @Transactional
@@ -96,42 +99,31 @@ public class UserService {
             userRepository.save(user);
         }
     }
-
     @Transactional
     public void deleteUser(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
         user.setUserStatus(UserStatus.DELETE);
+        Role role = user.getRole();
+        role.setRoleStatus(RoleStatus.CANCELLED);//권한 삭제
         userRepository.save(user);
         log.info("user: {}", user.getUserStatus());
     }
 
-    public List<User> searchUsers(String searchKeyword, String searchOption) {
-//        List<User> userList = new ArrayList<>();
-//
-//        for (User user : getAllUsersOrderedByIdDesc()) {
-//            if (user.getUserStatus() != UserStatus.DELETE) {
-//                if (("userId".equals(searchOption) && user.getUserId().contains(searchKeyword)) ||
-//                        ("name".equals(searchOption) && user.getName().contains(searchKeyword))) {
-//                    userList.add(user);
-//                }
-//            }
-//        }
-//        return userList;
+    public Page<User> searchUsers(String searchKeyword, String searchOption,Pageable pageable) {
 
-        if (searchOption.equals("userId")) {
-            return userRepository.findByUserIdContaining(searchKeyword);
+        if (searchOption.equals("userId")||searchOption.equals("name")) {
+            return userRepository.findByUserIdOrNameContaining(searchKeyword, pageable);
         }
-            // 유저 레포지토리에서 userId가 searchKeyword로 받은 값을 가지고 있는 유저 가져오기
-            // 가져와서 바로 리턴
-        if (searchOption.equals("name")) {
-            // 유저 레포지토리에서 name이 searchKeyword로 받은 값을 가지고 있는 유저 가져오기
-            // 얘도
-            return userRepository.findByNameContaining(searchKeyword);
-        }
+
         return null;
-
     }
+
+    // 페이징
+    public Page<User> userList(Pageable pageable) {
+        return userRepository.findAll(pageable);
+    }
+
 
 }
 

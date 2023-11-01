@@ -13,7 +13,7 @@ const PDFCanvas = forwardRef(({pdfPage}, ref) => {
   const renderCanvas = async () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const viewport = pdfPage.getViewport({ scale: 1 });
+    const viewport = pdfPage.getViewport({ scale: 3 });
     canvas.width = viewport.width;
     canvas.height = viewport.height;
     const context = canvas?.getContext("2d");
