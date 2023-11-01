@@ -76,29 +76,25 @@ const TransformContainer = ({ cropData, totalCount, idParam, clearCropData }) =>
     }
   };
 
-  const questionDone = () => {
-    if(questionContent){
-      const body={
-        id: "",
-        content: questionContent,
-      }
-      const stringifyBody = JSON.stringify(body);
-      const questionUpload = () => fetch(`/api/question/upload`, {
-        method: "POST",
-        body: stringifyBody,
-      })
-    }else{
-      const body={
-        id: idParam,
-        num: questionNum,
-      }
-      const stringifyBody = JSON.stringify(body);
-      const questionRemove = () => fetch(`api/question/remove/`, {
-        method: "POST",
-        body: stringifyBody,
-      })
-    }
+  const uploadBody={
+    id: "",
+    content: questionContent,
   }
+  const stringyUploadBody = JSON.stringify(uploadBody)
+  const questionUpload = () => fetch(`/api/question/upload`, {
+    method: "POST",
+    body: stringyUploadBody,
+  })
+
+  const removeBody = {
+    id: idParam,
+    num: questionNum,
+  }
+  const stringyRemoveBody = JSON.stringify(removeBody)
+  const questionRemove = () => fetch(`api/question/remove/`, {
+    method: "POST",
+    body: stringyRemoveBody,
+  })
 
   return (
     <div className={styles.viewBox}>
@@ -140,7 +136,7 @@ const TransformContainer = ({ cropData, totalCount, idParam, clearCropData }) =>
               if (questionNum >= totalCount) {
                 setQuestionNum(totalCount);
                 console.log(totalCount + "번이 마지막 문제입니다.");
-              } else setQuestionNum((questionNum) => questionNum + 1);
+              } else setQuestionNum((questionNum) => +questionNum + 1);
             }}
           >
             chevron_right
@@ -163,6 +159,7 @@ const TransformContainer = ({ cropData, totalCount, idParam, clearCropData }) =>
                 className={styles.geniaButton + " " + styles.geniaButtonGray}
                 onClick={() => {
                   clearCropData();
+                  setQuestionImage()
                   setQuestionContent("");
                 }}
               >
@@ -281,7 +278,9 @@ const TransformContainer = ({ cropData, totalCount, idParam, clearCropData }) =>
                 className={styles.geniaButton + " " + styles.geniaButtonGreen}
                 onClick={() => {
                   {questionType ?
-                      questionDone()
+                      questionContent ?
+                          questionUpload():
+                          questionRemove()
                       :alert("변환 조건을 선택해주세요.")}
                 }}
               >

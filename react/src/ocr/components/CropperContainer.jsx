@@ -100,20 +100,21 @@ const CropperContainer = ({ getCropData, cropperRef, canvasRef, pdfURL }) => {
             </div>
           </div>
           <div className={styles.imgBox}>
-            <div className="pdf-area">
+            <div className="pdf-area" style={{padding: "16px"}}>
               {pages.length > 0 ? (
                 iscaptureStart ? (
                   <Cropper
                     ref={cropperRef}
-                    zoomTo={0.5}
+
                     initialAspectRatio={1}
                     src={canvasRef.current?.toDataURL()}
+                    dragMode={"move"}
                     viewMode={1}
                     minCropBoxHeight={10}
                     minCropBoxWidth={10}
                     background={false}
                     responsive={true}
-                    autoCropArea={1}
+                    autoCropArea={0.5}
                     checkOrientation={false}
                     guides={true}
                     autoCrop={true}
