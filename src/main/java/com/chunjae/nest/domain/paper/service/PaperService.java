@@ -165,13 +165,14 @@ public class PaperService {
 
         if (0 == paper.getOcrCount()) {
             s3UploadService.deletePaper(url);
-            paper.setPaperStatusToDelete();
+            paper.setPaperStatus(PaperStatus.DELETED);
             paperRepository.save(paper);
             paperFileRepository.delete(paper.getPaperFile());
             PaperLog paperLog = PaperLog.builder()
                     .userId(paper.getUser().getUserId())
                     .paperName(paper.getName())
                     .paperUrl("")
+                    .paperStatus(PaperStatus.DELETED)
                     .build();
             paperLogRepository.save(paperLog);
             return "ok";
