@@ -55,7 +55,7 @@
                             </div>
                             <div class="select-wrap">
                                 <select class="select-box" id="subjectSelect" name="subject">
-                                    <option th:value="전체" th:selected="${searchKeywordDTO.subject}">과목</option>
+                                    <option th:value="${searchKeywordDTO.subject}" th:selected="${searchKeywordDTO.subject}">과목</option>
                                 </select>
                             </div>
                             <div class="select-wrap">
@@ -313,55 +313,6 @@
         window.location.href = "/paper"; // 초기화
     });
 
-    // 보기 크기 선택 .. 10, 30, 50, 100
-    // function selectCount() {
-    //     const pageSizeSelect = document.getElementById('pageSizeSelect'); // 개수 선택
-    //     const selectedPageSize = parseInt(pageSizeSelect.value, 10);
-    //
-    //     console.log("선택한 보기 개수 : " + selectedPageSize);
-    //
-    //     const totalContent = document.getElementById('totalElements');
-    //     const totalElementsText = totalContent.textContent;
-    //     const totalElements = parseInt(totalElementsText, 10);
-    //     console.log("총 건수 : " + totalElements);
-    //
-    //     // 선택한 값을 서버로 전송
-    //     fetch('/paper?=' + selectedPageSize)
-    //         .then(response => {
-    //             if (response.ok) {
-    //                 return response.text();
-    //             } else {
-    //                 throw new Error('데이터를 가져오는데 실패했습니다.');
-    //             }
-    //         })
-    //         .catch(error => {
-    //             console.error('데이터 가져오기에 실패했습니다:', error);
-    //         });
-    // }
-
-    document.getElementById("pageSizeSelect").addEventListener("change", function() {
-        // 선택한 값을 가져오기
-        var selectedValue = document.getElementById("pageSizeSelect").value;
-
-        console.log(selectedValue);
-        // 선택한 값을 서버로 전송
-        fetch('/paper?pageSize=' + selectedValue, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-            },
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.text();
-                } else {
-                    throw new Error('데이터를 가져오는데 실패했습니다.');
-                }
-            })
-            .catch(error => {
-                console.error('데이터 가져오기에 실패했습니다:', error);
-            });
-    });
 </script>
 </body>
 </html>

@@ -23,20 +23,12 @@ public class PaperController {
     @GetMapping("")
     public String index(Model model, @ModelAttribute SearchKeywordDTO searchKeywordDTO, Pageable pageable) {
 
-        System.out.println(pageable.getPageSize());
-        // int totalItems  = pageable.getPageSize();
-        int totalItems = 10;
-        int currentPage = pageable.getPageNumber();
-
-        if (currentPage < 0) {
-            currentPage = 0; // 페이지 번호가 음수이면 0으로 설정
-        }
-
+        int pageSize = 10;
+        int currentPage = Math.max(0, pageable.getPageNumber()); // 음수 페이지 번호 방지
         // 검색
-        Pageable adjustedPageable = PageRequest.of(currentPage, totalItems );
+        Pageable adjustedPageable = PageRequest.of(currentPage, pageSize);
         Page<Paper> papers = paperService.searchResults(searchKeywordDTO, adjustedPageable);
         model.addAttribute("papers", papers);
-        //model.addAttribute("page", papers);
 
         // 페이징
         String pageLink = "/paper?";
