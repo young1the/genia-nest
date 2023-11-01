@@ -1,12 +1,11 @@
 package com.chunjae.nest.domain.paper.service;
 
 import com.chunjae.nest.domain.paper.dto.SearchKeywordDTO;
+import com.chunjae.nest.domain.paper.dto.req.PaperAssignmentRequest;
 import com.chunjae.nest.domain.paper.dto.req.PaperRequest;
 import com.chunjae.nest.domain.paper.dto.res.PaperResponse;
-import com.chunjae.nest.domain.paper.entity.Paper;
-import com.chunjae.nest.domain.paper.entity.PaperFile;
-import com.chunjae.nest.domain.paper.entity.PaperLog;
-import com.chunjae.nest.domain.paper.entity.PaperStatus;
+import com.chunjae.nest.domain.paper.entity.*;
+import com.chunjae.nest.domain.paper.repository.PaperAssignmentRepository;
 import com.chunjae.nest.domain.paper.repository.PaperFileRepository;
 import com.chunjae.nest.domain.paper.repository.PaperLogRepository;
 import com.chunjae.nest.domain.paper.repository.PaperRepository;
@@ -30,6 +29,7 @@ public class PaperService {
 
     private final S3UploadService s3UploadService;
     private final PaperRepository paperRepository;
+    private final PaperAssignmentRepository paperAssignmentRepository;
     private final PaperFileRepository paperFileRepository;
     private final PaperLogRepository paperLogRepository;
     private final UserRepository userRepository;
@@ -177,6 +177,21 @@ public class PaperService {
             return "ok";
         }
         return "failed";
+    }
+
+    public String assignTaskPaper(PaperAssignmentRequest paperAssignmentRequest) {
+
+        User user = userRepository.findById(paperAssignmentRequest.getUserId()).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
+        Paper paper = paperRepository.findById(paperAssignmentRequest.getPaperId()).orElseThrow(() -> new IllegalArgumentException("시험지가 없습니다."));
+
+        PaperAssignment paperAssignment = PaperAssignment.builder()
+                .user(user)
+                .paper(paper)
+                .paperAssignmentStatus(PaperAssignmentStatus.TO_DO)
+                .build();
+        paperAssignmentRepository.save(paperAssignment);
+
+        return "ok";
     }
 
     public void validateUserAndPaper(User user, Paper paper) {
