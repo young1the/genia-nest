@@ -31,8 +31,10 @@ public class UserAssignmentController {
     @GetMapping("")
     public String index(Model model, @ModelAttribute AssignmentSearchReqDTO assignmentSearchReqDTO, @PageableDefault(size=10, sort="id", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<AssignmentDTO> assignments = userAssignmentService.searchResults(assignmentSearchReqDTO, pageable);
+        int[] sizes = {10,30,100};
         model.addAttribute("assignments", assignments);
         model.addAttribute("params", assignmentSearchReqDTO);
+        model.addAttribute("sizes", sizes);
         return "pages/assignment/index";
 
     }

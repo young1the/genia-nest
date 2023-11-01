@@ -23,30 +23,28 @@ public class UserAssignmentService {
         if (papers == null) {
             return null;
         }
-        List<AssignmentDTO> assignments = papers.stream().map(ele -> {
-                    String manager = null;
-                    List<PaperAssignment> paperAssignments = ele.getPaperAssignments();
-                    if (paperAssignments != null && !paperAssignments.isEmpty()) {
-                        manager = paperAssignments.get(0).getUser().getName();
-                    }
-                    return AssignmentDTO
-                            .builder()
-                            .id(ele.getId())
-                            .year(ele.getYear())
-                            .category(ele.getCategory())
-                            .month(ele.getMonth())
-                            .grade(ele.getGrade())
-                            .area(ele.getArea())
-                            .subject(ele.getSubject())
-                            .name(ele.getName())
-                            .ocrCount(ele.getOcrCount())
-                            .uploader(ele.getUser().getName())
-                            .totalCount(ele.getTotalCount())
-                            .manager(manager)
-                            .createdAt(ele.getCreatedAt())
-                            .build();
-                }
-        ).toList();
-        return new PageImpl<>(assignments, pageable, assignments.size());
+        return papers.map(ele -> {
+            String manager = null;
+            List<PaperAssignment> paperAssignments = ele.getPaperAssignments();
+            if (paperAssignments != null && !paperAssignments.isEmpty()) {
+                manager = paperAssignments.get(0).getUser().getName();
+            }
+            return AssignmentDTO
+                    .builder()
+                    .id(ele.getId())
+                    .year(ele.getYear())
+                    .category(ele.getCategory())
+                    .month(ele.getMonth())
+                    .grade(ele.getGrade())
+                    .area(ele.getArea())
+                    .subject(ele.getSubject())
+                    .name(ele.getName())
+                    .ocrCount(ele.getOcrCount())
+                    .uploader(ele.getUser().getName())
+                    .totalCount(ele.getTotalCount())
+                    .manager(manager)
+                    .createdAt(ele.getCreatedAt())
+                    .build();
+        });
     }
 }

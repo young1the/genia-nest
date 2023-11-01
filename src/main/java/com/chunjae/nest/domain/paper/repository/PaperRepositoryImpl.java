@@ -62,7 +62,6 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
             return nameLike(keyword);
         }
         if (option.equals("userId")) {
-            System.out.println("yes");
             return userIdLike(keyword);
         }
         return null;
@@ -70,17 +69,13 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
 
     public Page<Paper> searchByWhere(AssignmentSearchReqDTO searchKeywordDTO, Pageable pageable) {
         JPAQuery<Paper> query = queryFactory.selectFrom(paper);
-        System.out.println(searchKeywordDTO);
-        if (searchKeywordDTO != null) {
-            query = query.where(searchByOption(searchKeywordDTO), dateAfter(searchKeywordDTO.getStartDate()), dateBefore(searchKeywordDTO.getEndDate()));
-        }
-
+        query = query.where(searchByOption(searchKeywordDTO), dateAfter(searchKeywordDTO.getStartDate()), dateBefore(searchKeywordDTO.getEndDate()));
+        Long count = queryFactory.selectFrom(paper).select(paper.count()).where(searchByOption(searchKeywordDTO), dateAfter(searchKeywordDTO.getStartDate()), dateBefore(searchKeywordDTO.getEndDate())).fetchOne();
         List<Paper> results = query
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
-
-        return new PageImpl<>(results, pageable, 100);
+        return new PageImpl<>(results, pageable, count);
     }
 
     public Page<Paper> searchByWhere(SearchKeywordDTO searchKeywordDTO, Pageable pageable) {
