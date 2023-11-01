@@ -176,7 +176,7 @@ public class QuestionService {
         question.updateQuestionContent("");
         question.updateQuestionStatus(QuestionStatus.DELETED);
         QuestionFile questionFile = question.getQuestionFile();
-        questionFile.updateQuestionFile("", "");
+        questionFile.updateQuestionFile(questionFile.getName(), "");
         s3UploadService.deletePaper(questionFile.getUrl());
         QuestionLog questionLog = QuestionLog.builder()
                 .userId(user.getUserId())

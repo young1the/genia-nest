@@ -6,11 +6,12 @@ import LoaderIcon from "react-loader-icon"
 const TransformContainer = ({ cropData, totalCount, idParam, clearCropData }) => {
   const [questionNum, setQuestionNum] = useState(1);
   const [questionType, setQuestionType] = useState(""); // 재밌는 일
-  const [questionContent, setQuestionContent] = useState("");
+  const [questionContent, setQuestionContent] = useState(null);
   const [questionImage, setQuestionImage] = useState();
   const [isLatex, setIsLatex] = useState("N");
   const [isLoading, setIsLoading] = useState(false);
   const divRef = useRef(null);
+  const [isChanged, setIsChanged] = useState(false);
 
   const getQuestionInfo = async () => {
     const getInfo = await fetch(`/api/question/detail/${idParam}?num=${questionNum}`, {
@@ -19,6 +20,13 @@ const TransformContainer = ({ cropData, totalCount, idParam, clearCropData }) =>
       },
       method: "GET",
     });
+    if (getInfo.status === 404) {
+      setQuestionContent(null);
+      setQuestionType("");
+      setQuestionImage("");
+      clearCropData();
+      return ;
+    }
     const result = await getInfo.json();
     setQuestionContent(result.content);
     setQuestionType(result.type);
@@ -76,25 +84,25 @@ const TransformContainer = ({ cropData, totalCount, idParam, clearCropData }) =>
     }
   };
 
-  const uploadBody={
-    id: "",
-    content: questionContent,
+  const questionUpload = async () =>{
+    const uploadBody={
+      num: questionNum,
+      content: questionContent,
+    }
+    const stringyUploadBody = JSON.stringify(uploadBody);
+    await fetch(`/api/question/save/${idParam}`, {
+      method: "POST",
+      headers: {
+        "Content-Type" : "application/json",
+      },      body: stringyUploadBody,
+    });
   }
-  const stringyUploadBody = JSON.stringify(uploadBody)
-  const questionUpload = () => fetch(`/api/question/upload`, {
-    method: "POST",
-    body: stringyUploadBody,
-  })
 
-  const removeBody = {
-    id: idParam,
-    num: questionNum,
+  const questionRemove = async () =>{
+    await fetch(`/api/question/remove/${idParam}?num=${questionNum}`, {
+      method: "POST",
+    })
   }
-  const stringyRemoveBody = JSON.stringify(removeBody)
-  const questionRemove = () => fetch(`api/question/remove/`, {
-    method: "POST",
-    body: stringyRemoveBody,
-  })
 
   return (
     <div className={styles.viewBox}>
@@ -256,12 +264,13 @@ const TransformContainer = ({ cropData, totalCount, idParam, clearCropData }) =>
             <div className={styles.boxTop}>
               <div className={styles.tit}>OCR 인식 결과</div>
             </div>
-            {questionContent ? (
+            {questionContent != null ? (
               <textarea
                 className={`${styles.box} ${styles.geniaTextarea}`}
                 style={{}}
                 value={questionContent}
                 onChange={(e) => {
+                  setIsChanged(true);
                   setQuestionContent(e.target.value);
                 }}
               >{questionContent}</textarea>
@@ -277,11 +286,18 @@ const TransformContainer = ({ cropData, totalCount, idParam, clearCropData }) =>
               <button
                 className={styles.geniaButton + " " + styles.geniaButtonGreen}
                 onClick={() => {
-                  {questionType ?
-                      questionContent ?
-                          questionUpload():
-                          questionRemove()
-                      :alert("변환 조건을 선택해주세요.")}
+                  console.log(isChanged);
+                  if(!questionType) {
+                    alert("문제 유형을 선택해주세요");
+                    return;
+                  }
+                  if(!questionContent || questionContent.trim() === ""){
+                    questionRemove();
+                    setQuestionNum((questionNum) => +questionNum + 1);
+                    return;
+                  }
+                  questionUpload();
+                  setQuestionNum((questionNum) => +questionNum + 1);
                 }}
               >
                 저장
