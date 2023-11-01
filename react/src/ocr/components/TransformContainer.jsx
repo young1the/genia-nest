@@ -1,100 +1,100 @@
-import { useRef, useState } from "react";
+import {useEffect, useRef, useState} from "react";
 import styles from "../OCRApp.module.css";
+import html2canvas from "html2canvas";
+import LoaderIcon from "react-loader-icon"
 
-const TransformContainer = ({ cropData, totalCount }) => {
+const TransformContainer = ({ cropData, totalCount, idParam, clearCropData }) => {
   const [questionNum, setQuestionNum] = useState(1);
-  const [questionType, setQuestionType] = useState(); // 재밌는 일
+  const [questionType, setQuestionType] = useState(""); // 재밌는 일
   const [questionContent, setQuestionContent] = useState("");
+  const [questionImage, setQuestionImage] = useState();
   const [isLatex, setIsLatex] = useState("N");
   const [isLoading, setIsLoading] = useState(false);
   const divRef = useRef(null);
 
-  const transformOCR = async () => {
-    const src =
-      "https://genia-fs1-nest-s3.s3.ap-northeast-2.amazonaws.com/math.png";
-    const formats = ["text", "html"];
-    const data_options = {
-      include_asciimath: true,
-      include_latex: true,
-    };
-    const body = {
-      src,
-      formats,
-      data_options,
-    };
-    const stringifiedBody = JSON.stringify(body);
-    setIsLoading(true);
-    const response = await fetch("/api/ocr/math", {
+  const getQuestionInfo = async () => {
+    const getInfo = await fetch(`/api/question/detail/${idParam}?num=${questionNum}`, {
       headers: {
-        "Content-Type": "application/json; charset=utf-8",
+        "Content-Type" : "application/json",
       },
-      method: "POST",
-      body: stringifiedBody,
+      method: "GET",
     });
-    const result = await response.json();
-    setIsLoading(false);
-    setQuestionContent(result.text);
-    console.log(result);
-  };
-
-  const transformtextOCR = async () => {
-    setIsLoading(true);
-    const src =
-      "https://genia-fs1-nest-s3.s3.ap-northeast-2.amazonaws.com/text.png";
-    const body = { src };
-    const stringifiedRequest = JSON.stringify(body);
-    const textresponse = await fetch("/api/ocr/text", {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-      body: stringifiedRequest,
-    });
-    const textresult = await textresponse.json();
-    setIsLoading(false);
-    setQuestionContent(textresult.text);
-    console.log(questionContent);
-  };
+    const result = await getInfo.json();
+    setQuestionContent(result.content);
+    setQuestionType(result.type);
+    setQuestionImage(result.url);
+    // console.log(result);
+    // console.log("result type : " + result.type);
+  }
+  useEffect(() => {
+    getQuestionInfo();
+  }, [questionNum]);
 
   const handleQuestionType = (e) => {
     setQuestionType(e.target.value);
   };
   const handleUseLatex = (e) => {
-    setUseLatex(e.target.value);
+    setIsLatex(e.target.value);
   };
 
-  const handleDownload = async () => {
-    //이미지 업로드 버튼 클릭시 실행됨! 500error! 뭔지 모르겠음! 내일 하겠음!
+  const ocrRequest = async () => {
     if (!divRef.current) return;
     const formData = new FormData();
-    var blobData;
     try {
       const div = divRef.current;
       const canvas = await html2canvas(div, { scale: 2 });
-      blobData = await new Promise((resolve, reject) => {
+      const blobData = await new Promise((resolve, reject) => {
         canvas.toBlob((blob) => {
           if (!blob) reject();
           resolve(blob);
         });
       });
       console.log(blobData);
+      formData.append("num", questionNum.toString());
+      formData.append("type", questionType);
+      formData.append("paper", idParam);
+      formData.append("multipartFile", blobData, `${questionNum.toString()}.png`);
+      formData.append("numExpression", isLatex)
+      for (const [a, b] of formData.entries()) {
+        console.log("=======");
+        console.log(a);
+        console.log(b);
+        console.log("=======");
+      }
+      const response = await fetch(`/api/question/upload`, {
+        method: "POST",
+        body: formData,
+      });
+      if (response.ok) {
+        const data = await response.text()
+        setQuestionContent(data)
+      }
+      else alert("not ok");
+
     } catch (error) {
       console.error("Error converting div to image:", error);
     }
-    formData.set("num", questionNum.toString());
-    formData.set("type", questionType);
-    formData.set("paper");
-    formData.set("multipartFile", blobData);
-    const response = await fetch(`/api/question/upload`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-      body: formData,
-    });
-    if (response.ok) alert("ok");
-    else alert("not ok");
   };
+
+  const uploadBody={
+    id: "",
+    content: questionContent,
+  }
+  const stringyUploadBody = JSON.stringify(uploadBody)
+  const questionUpload = () => fetch(`/api/question/upload`, {
+    method: "POST",
+    body: stringyUploadBody,
+  })
+
+  const removeBody = {
+    id: idParam,
+    num: questionNum,
+  }
+  const stringyRemoveBody = JSON.stringify(removeBody)
+  const questionRemove = () => fetch(`api/question/remove/`, {
+    method: "POST",
+    body: stringyRemoveBody,
+  })
 
   return (
     <div className={styles.viewBox}>
@@ -112,9 +112,9 @@ const TransformContainer = ({ cropData, totalCount }) => {
           <button
             className={styles.icon}
             onClick={() => {
-              if (questionNum === 1) {
-                setQuestionNum(1);
+              if (questionNum <= 1) {
                 console.log("첫번째 문제");
+                setQuestionNum(1);
               } else setQuestionNum((questionNum) => questionNum - 1);
             }}
           >
@@ -124,18 +124,19 @@ const TransformContainer = ({ cropData, totalCount }) => {
             type="text"
             value={questionNum}
             onChange={(e) => {
-              setQuestionNum(parseInt(e.target.value));
-            }}
+              const value = e.target.value;
+              if (isNaN(+value)) return ;
+              setQuestionNum(e.target.value);}}
           />
           /
-          <input type="text" defaultValue={totalCount} />
+          <input type="text" readOnly={true} defaultValue={totalCount} />
           <button
             className={styles.icon}
             onClick={() => {
-              if (questionNum === totalCount) {
+              if (questionNum >= totalCount) {
                 setQuestionNum(totalCount);
                 console.log(totalCount + "번이 마지막 문제입니다.");
-              } else setQuestionNum((questionNum) => questionNum + 1);
+              } else setQuestionNum((questionNum) => +questionNum + 1);
             }}
           >
             chevron_right
@@ -157,8 +158,9 @@ const TransformContainer = ({ cropData, totalCount }) => {
               <button
                 className={styles.geniaButton + " " + styles.geniaButtonGray}
                 onClick={() => {
-                  setCropData([]);
-                  setQuestionContent();
+                  clearCropData();
+                  setQuestionImage()
+                  setQuestionContent("");
                 }}
               >
                 초기화
@@ -174,21 +176,16 @@ const TransformContainer = ({ cropData, totalCount }) => {
                     alt="cropped"
                   />
                 ))
-              ) : (
-                <p className={styles.emptyTxt}>문제 텍스트를 캡쳐 해주세요.</p>
-              )}
+              ) :
+              questionImage ?
+                  <img
+                      style={{ width: "100%" }}
+                      src={questionImage}
+                      alt="Question image"
+                  /> :
+                  <p className={styles.emptyTxt}>문제 텍스트를 캡쳐 해주세요.</p>
+              }
             </div>
-            {cropData.length > 0 ? (
-              <button onClick={handleDownload}>이미지 업로드</button>
-            ) : (
-              <button
-                onClick={() => {
-                  alert("문제 텍스트를 캡쳐 해주세요");
-                }}
-              >
-                이미지 업로드
-              </button>
-            )}
             <div className={styles.boxTop}>
               <div className={styles.tit}>변환조건</div>
               <div className={styles.radioWrap}>
@@ -198,6 +195,7 @@ const TransformContainer = ({ cropData, totalCount }) => {
                   name="term"
                   value="MULTIPLE"
                   onChange={handleQuestionType}
+                  checked={questionType === "MULTIPLE"}
                 />
                 <label htmlFor="term01_01">객관식</label>
                 <input
@@ -206,6 +204,8 @@ const TransformContainer = ({ cropData, totalCount }) => {
                   name="term"
                   value="SHORT_ANSWER"
                   onChange={handleQuestionType}
+                  checked={questionType === "SHORT_ANSWER"}
+
                 />
                 <label htmlFor="term01_02">단답형</label>
                 <input
@@ -214,6 +214,7 @@ const TransformContainer = ({ cropData, totalCount }) => {
                   name="term"
                   value="ESSAY"
                   onChange={handleQuestionType}
+                  checked={questionType === "ESSAY"}
                 />
                 <label htmlFor="term01_02">서술형</label>
               </div>
@@ -241,10 +242,8 @@ const TransformContainer = ({ cropData, totalCount }) => {
                 <button
                   className={styles.geniaButton + " " + styles.geniaButtonGreen}
                   onClick={() => {
-                    console.log(questionNum, questionType, isLatex);
-                    {
-                      isLatex === "N" ? transformtextOCR() : transformOCR();
-                    }
+                    // console.log(questionNum, questionType, isLatex);
+                    ocrRequest();
                   }}
                 >
                   OCR 변환하기
@@ -265,7 +264,7 @@ const TransformContainer = ({ cropData, totalCount }) => {
                 onChange={(e) => {
                   setQuestionContent(e.target.value);
                 }}
-              ></textarea>
+              >{questionContent}</textarea>
             ) : (
               <div className={styles.box}>
                 <p className={styles.emptyTxt}>
@@ -277,8 +276,15 @@ const TransformContainer = ({ cropData, totalCount }) => {
             <div className={styles.btnWrap}>
               <button
                 className={styles.geniaButton + " " + styles.geniaButtonGreen}
+                onClick={() => {
+                  {questionType ?
+                      questionContent ?
+                          questionUpload():
+                          questionRemove()
+                      :alert("변환 조건을 선택해주세요.")}
+                }}
               >
-                다음
+                저장
               </button>
             </div>
           </div>

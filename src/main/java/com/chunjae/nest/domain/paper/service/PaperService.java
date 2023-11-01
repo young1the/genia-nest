@@ -48,7 +48,7 @@ public class PaperService {
 
             log.info(" url: {}, fileName: {}", url, fileName);
 
-            if (!"failed".equals(url)) {
+            if (!url.equals("failed")) {
                 Paper paper = paperRequest.createPaper(user);
                 PaperFile paperFile = PaperFile.builder()
                         .name(fileName)
@@ -121,12 +121,17 @@ public class PaperService {
                 String fileName = s3UploadService.getFileName(url);
                 log.info("url:{}, fileName:{}", url, fileName);
 
-                if (!"failed".equals(url)) {
+                if (!url.equals("failed")) {
                     paperFile.updatePaperFile(fileName, url);
-
+                    PaperLog paperLog = PaperLog.builder()
+                            .userId(user.getUserId())
+                            .paperUrl(url)
+                            .paperName(paperRequest.getName())
+                            .build();
 
                     paperFileRepository.save(paperFile);
                     paperRepository.save(paper);
+                    paperLogRepository.save(paperLog);
 
                     return "ok";
                 }
@@ -135,6 +140,12 @@ public class PaperService {
                 s3UploadService.deletePaper(paper.getPaperFile().getUrl());
                 paperFile.updatePaperFile("", "");
                 paperFileRepository.save(paperFile);
+                PaperLog paperLog = PaperLog.builder()
+                        .userId(user.getUserId())
+                        .paperUrl("")
+                        .paperName(paperRequest.getName())
+                        .build();
+                paperLogRepository.save(paperLog);
                 return "ok";
             }
             return "failed";
@@ -153,7 +164,7 @@ public class PaperService {
 
         if (0 == paper.getOcrCount()) {
             s3UploadService.deletePaper(url);
-            paper.updatePaperStatus(PaperStatus.DELETED);
+            paper.setPaperStatus(PaperStatus.DELETED);
             paperRepository.save(paper);
             paperFileRepository.delete(paper.getPaperFile());
             PaperLog paperLog = PaperLog.builder()
