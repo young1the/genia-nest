@@ -4,7 +4,7 @@ import OCRHeader from "./components/OCRHeader";
 import CropperContainer from "./components/CropperContainer";
 import TransformContainer from "./components/TransformContainer";
 
-function OCRApp({ initialData }) {
+function OCRApp({ initialData, idParam }) {
   const [cropData, setCropData] = useState([]);
   const cropperRef = useRef();
   const canvasRef = useRef();
@@ -16,6 +16,10 @@ function OCRApp({ initialData }) {
       setCropData((prev) => [...prev, croppedDataURL]);
     }
   };
+
+  const clearCropData = () => {
+    setCropData([]);
+  }
 
   return (
     <>
@@ -38,7 +42,9 @@ function OCRApp({ initialData }) {
                   />
                   <TransformContainer
                     cropData={cropData}
+                    clearCropData={clearCropData}
                     totalCount={initialData.totalCount}
+                    idParam={idParam}
                   />
                 </div>
               </div>

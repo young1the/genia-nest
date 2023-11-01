@@ -10,19 +10,17 @@ import com.chunjae.nest.domain.paper.entity.PaperStatus;
 import com.chunjae.nest.domain.paper.repository.PaperFileRepository;
 import com.chunjae.nest.domain.paper.repository.PaperLogRepository;
 import com.chunjae.nest.domain.paper.repository.PaperRepository;
-import org.springframework.data.domain.Page;
 import com.chunjae.nest.domain.user.entity.User;
 import com.chunjae.nest.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -61,6 +59,7 @@ public class PaperService {
                         .userId(user.getUserId())
                         .paperUrl(url)
                         .paperName(paperRequest.getName())
+                        .paperStatus(PaperStatus.TO_DO)
                         .build();
 
                 paperRepository.save(paper);
@@ -180,7 +179,6 @@ public class PaperService {
         return "failed";
     }
 
-
     public void validateUserAndPaper(User user, Paper paper) {
         if (!Objects.equals(user.getId(), paper.getUser().getId())) {
             throw new IllegalArgumentException("유저와 시험지의 작성자가 일치하지 않습니다.");
@@ -193,6 +191,6 @@ public class PaperService {
     }
 
     public Page<Paper> searchResults(SearchKeywordDTO searchKeywordDTO, Pageable pageable) {
-      return paperRepository.searchByWhere(searchKeywordDTO, pageable);
+        return paperRepository.searchByWhere(searchKeywordDTO, pageable);
     }
 }

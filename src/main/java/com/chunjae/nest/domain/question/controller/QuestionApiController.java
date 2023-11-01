@@ -5,12 +5,14 @@ import com.chunjae.nest.domain.question.dto.req.QuestionRequest;
 import com.chunjae.nest.domain.question.dto.res.QuestionResponse;
 import com.chunjae.nest.domain.question.service.QuestionService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
 @RestController
+@Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/question")
 public class QuestionApiController {
@@ -19,10 +21,7 @@ public class QuestionApiController {
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadQuestionFile(QuestionRequest questionRequest) throws IOException {
-        if ("ok".equals(questionService.uploadQuestionFile(questionRequest))) {
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok().body(questionService.uploadQuestionFile(questionRequest));
     }
 
     @PostMapping("/save/{id}")
@@ -37,6 +36,14 @@ public class QuestionApiController {
     public ResponseEntity<QuestionResponse> getQuestionDetail(@PathVariable(name = "id") Long id,
                                                               @RequestParam(name = "num") int num) {
         return ResponseEntity.ok().body(questionService.getQuestionDetail(id, num));
+    }
+
+    @PostMapping("/remove/{id}")
+    public ResponseEntity<String> deleteQuestion(@PathVariable(name = "id") Long id,
+                                                 @RequestParam(name = "num") int num) {
+
+        questionService.deleteQuestion(id, num);
+        return ResponseEntity.ok().build();
     }
 
 }
