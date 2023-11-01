@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/html">
+<head>
+    <title>작업 현황 관리</title>
+    <th:block th:replace="~{fragments/include:: include}"/>
+</head>
+<body>
+<div id="wrap">
+    <th:block th:replace="~{fragments/header:: header}"/>
+    <div class="container">
+        <div class="inner">
+            <div class="index-tit">시스템 관리 > 작업 현황 관리</div>
+            <h1 class="page-tit">작업 현황 관리</h1>
+            <div class="search-box-wrap">
+                <form action="/user/management/assignment" method="GET">
+                    <div class="search-box">
+                        <div class="box">
+                            <span>검색 조건</span>
+                            <div class="select-wrap">
+                                <input type="date" id="startDate" name="startDate" style="width: 140px;">
+                                ~
+                                <input type="date" id="endDate" name="endDate" style="width: 140px;">
+                            </div>
+                            <div class="select-wrap">
+                                <select class="select-box" id="condition" name="searchOption">
+                                    <option value="userId">아이디</option>
+                                    <option value="name">이름</option>
+                                </select>
+                            </div>
+                            <input type="text" placeholder="검색어" class="search-form" id="keyword" name="searchKeyword">
+                        </div>
+                        <div class="btn-wrap">
+                            <button class="btn-green" type="submit">검색</button>
+                            <button class="btn-gray" type="reset">초기화</button>
+                        </div>
+                    </div>
+                </form>
+            </div> <!--search-box-wrap end-->
+            <div class="table-wrap">
+                <div class="tab-top">
+                    <div class="left-area">
+                        <span class="total">총 <em th:text="${assignments.getTotalElements()}">0</em>건</span>
+                        <!--th:text="${papers.totalElements}"-->
+                        <div class="select-wrap">
+                            <select class="select-box w140" id="pageSizeSelect" th:name="size" onchange="selectOnChangeHandler(this)">
+                                <option th:each="option : ${sizes}" th:value="${option}"
+                                        th:text="${option}+'개보기'"
+                                        th:selected="${option} == ${assignments.pageable.getPageSize()}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="btn-wrap">
+                        <a class="btn-gray w120" id="excelDownload" download href="/paper/download">엑셀 다운로드</a>
+                    </div>
+                </div>
+                <table class="tbl-list">
+                    <caption></caption>
+                    <colgroup>
+                        <!--                        <col style="width: 3%;">-->
+                        <col style="width: 4%;">
+                        <col style="width: 6%;">
+                        <col style="width: 6%;">
+                        <col style="width: 6%;">
+                        <col style="width: 4%;">
+                        <col style="width: 8%;">
+                        <col style="width: 8%;">
+                        <col style="width: 20%;">
+                        <col style="width: 6%;">
+                        <col style="width: 8%;">
+                        <col style="width: 6%;">
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <!--                        <th >-->
+                        <!--                            <div class="check-wrap">-->
+                        <!--                                <input type="checkbox" id="chk100_00" name="numChk" class="allCheck">-->
+                        <!--                                <label for="chk100_00"></label>-->
+                        <!--                            </div>-->
+                        <!--                        </th>-->
+                        <th>NO</th>
+                        <th>출제 년도</th>
+                        <th>월</th>
+                        <th>시험 종류</th>
+                        <th>학년</th>
+                        <th>영역</th>
+                        <th>과목</th>
+                        <th>시험지 명</th>
+                        <th>등록자</th>
+                        <th>등록일</th>
+                        <th>담당자</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="assignment, iterStat : ${assignments}">
+                        <td th:text="${assignments.totalElements - iterStat.index - (assignments.number * assignments.pageable.getPageSize()) }"/>
+                        <td th:text="${assignment.id}" style="display: none;"/>
+                        <td th:text="${assignment.year}"/>
+                        <td th:text="${assignment.month}"/>
+                        <td th:text="${assignment.category}"/>
+                        <td th:text="${assignment.grade}"/>
+                        <td th:text="${assignment.area}"/>
+                        <td th:text="${assignment.subject}"/>
+                        <td th:text="${assignment.name}"/>
+                        <td th:text="${assignment.uploader}"/>
+                        <td th:text="${#temporals.format(assignment.createdAt, 'yyyy-MM-dd')}">YYYY.MM.DD</td>
+                        <td th:if="${assignment.manager}" th:text="${assignment.manager}">
+                        </td>
+                        <td th:unless="${assignment.manager}">
+                            <select style="width: 100%">
+                                <option value="">null</option>
+                            </select>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="paging-wrap"
+                 th:with="
+            pageNumber = ${assignments.pageable.pageNumber},
+            pageSize = ${assignments.pageable.pageSize},
+            totalPages = ${assignments.totalPages},
+            startPage = ${T(java.lang.Math).floor(pageNumber / pageSize) * pageSize},
+            tempEndPage = ${startPage + pageSize},
+            endPage = (${tempEndPage < totalPages ? tempEndPage : totalPages})"
+            >
+                <th:block th:if="${assignments.getTotalElements() > 0}">
+                <a href="javascript:;" class="first"
+                   th:href="@{/user/management/assignment(page=0, size=${selectedSize} ,startDate=${params.startDate}, endDate=${params.endDate}, searchOption=${params.searchOption}, searchKeyword=${params.searchKeyword})}"></a>
+                <th:block th:each="num : ${#numbers.sequence(startPage, endPage - 1)}">
+                    <a href="javascript:;" class="page"
+                       th:classappend="${pageNumber==num} ? 'active':''"
+                       th:href="@{/user/management/assignment(page=${num}, size=${selectedSize} ,startDate=${params.startDate}, endDate=${params.endDate}, searchOption=${params.searchOption}, searchKeyword=${params.searchKeyword})}">
+                        <span th:text="${num + 1}">1</span>
+                    </a>
+                </th:block>
+                <a href="javascript:;" class="last"
+                   th:href="@{/user/management/assignment(page=${assignments.getTotalPages() - 1}, size=${selectedSize} ,startDate=${params.startDate}, endDate=${params.endDate}, searchOption=${params.searchOption}, searchKeyword=${params.searchKeyword})}"></a>
+                </a>
+                </th:block>
+                <th:block th:if="${assignments.getTotalElements() <= 0}">
+                    <p>검색 결과가 없습니다.</p>
+                </th:block>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+    const selectOnChangeHandler = (elem) => {
+        const selectedOption = elem.value;
+        console.log(elem.value);
+        const url = new URL(window.location.href);
+        const params = new URLSearchParams(url.search);
+        params.set("size", selectedOption);
+        params.set("page", 0);
+        url.search = params.toString();
+        location.href = url.href;
+    }
+
+    const setDownloadLink = () => {
+        const downloadElem = document.getElementById("excelDownload")
+        let url = new URL(window.location.href);
+        url.pathname = "/paper/download";
+        downloadElem.href = url.toString();
+    }
+    setDownloadLink();
+</script>
+</body>
+</html>
