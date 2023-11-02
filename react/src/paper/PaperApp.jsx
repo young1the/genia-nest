@@ -4,7 +4,7 @@ import H1 from "./components/common/H1.jsx";
 import InfoSection from "./components/input/info/InfoSection.jsx";
 import PDFSection from "./components/input/pdf/PDFSection.jsx";
 import usePDF from "../pdf/hooks/usePDF.js";
-import {useEffect, useRef } from "react";
+import {useEffect, useRef} from "react";
 
 function PaperApp({idParam}) {
     const inputRefs = useRef({
@@ -93,7 +93,13 @@ function PaperApp({idParam}) {
                 <div className={styles.buttonContainer}>
                     {idParam ? <Button color="red" onClick={deleteHandler}>삭제</Button> : null}
                     <Button color="gray" onClick={() => {
-                        window.close()
+                        console.log(window);
+                        if (window.opener) {
+                            window.opener.location.reload();
+                            window.close();
+                        } else {
+                            window.history.back();
+                        }
                     }}>닫기</Button>
                 </div>
             </header>
