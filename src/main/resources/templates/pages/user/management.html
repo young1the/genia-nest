@@ -159,14 +159,14 @@
                     <div class="paging-wrap">
                         <th:block th:if="${users.getTotalElements() > 0}">
                         <a href="javascript:;" class="first" th:href="@{/user/management(page=0)}"></a>
-                        <a href="javascript:;" class="prev" th:if="${users.number > 0}" th:href="@{/user/management(page=${users.number - 1})}"></a>
+                        <a href="javascript:;" class="prev" th:if="${users.number >= 0}" th:href="@{/user/management(page=${users.number - 1})}"></a>
                         <th:block th:each="pageNumber : ${#numbers.sequence(0, users.totalPages - 1)}">
-                            <a href="javascript:;" class="page" th:class="${users.number == pageNumber} ? active" th:href="@{/user/management(page=${pageNumber})}">
-                                <span class="page active" th:text="${pageNumber + 1}"></span>
+                            <a href="javascript:;" class="page" th:classappend="${users.number == pageNumber} ? 'active' : ''" th:href="@{/user/management(page=${pageNumber})}">
+                                <span th:text="${pageNumber + 1}"></span>
                             </a>
                         </th:block>
 
-                        <a href="javascript:;" class="next" th:if="${users.number < users.totalPages - 1}" th:href="@{/user/management(page=${users.number + 1})}"></a>
+                        <a href="javascript:;" class="next" th:if="${users.number <= users.totalPages - 1}" th:href="@{/user/management(page=${users.number + 1})}"></a>
                         <a href="javascript:;" class="last" th:href="@{/user/management(page=${users.totalPages - 1})}"></a>
                         </th:block>
                         <th:block th:if="${users.getTotalElements() <= 0}">
