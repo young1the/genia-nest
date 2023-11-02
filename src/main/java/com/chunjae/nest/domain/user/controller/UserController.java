@@ -154,7 +154,7 @@ public class UserController {
                 return "redirect:/user/password/modify?error=true";
             }
         }
-        return "redirect:/user/password/modify?error=true";
+        return "redirect:/user/login";
     }
 
 
