@@ -32,7 +32,7 @@ public class PaperFilter implements Filter {
         HttpSession session = req.getSession();
         User user = (User) session.getAttribute("user"); // 유저 정보
 
-        if (user.getRole().getRole().equals("문제담당자")) {
+        if (user.getRole().getRole().equals("문제 담당자")) {
             res.sendRedirect("/ocr");
             return;
 }
