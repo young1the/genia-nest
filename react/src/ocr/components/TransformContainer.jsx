@@ -69,6 +69,7 @@ const TransformContainer = ({ cropData, totalCount, idParam, clearCropData }) =>
         console.log(b);
         console.log("=======");
       }
+      setIsLoading(true);
       const response = await fetch(`/api/question/upload`, {
         method: "POST",
         body: formData,
@@ -76,9 +77,10 @@ const TransformContainer = ({ cropData, totalCount, idParam, clearCropData }) =>
       if (response.ok) {
         const data = await response.text()
         setQuestionContent(data)
+        setIsLoading(false);
+        console.log(data);
       }
-      else alert("not ok");
-
+      else alert("문제 이미지와 변환조건, 수식유무를 확인해주세요");
     } catch (error) {
       console.error("Error converting div to image:", error);
     }
@@ -162,7 +164,8 @@ const TransformContainer = ({ cropData, totalCount, idParam, clearCropData }) =>
       <div className={styles.viewBottom}>
         <div className={styles.queChgWrap}>
           <div className={styles.boxWrap}>
-            <div>
+            <div className={styles.typeBoxWrap}
+                 style={{display: "flex", justifyContent: "end"}}>
               <button
                 className={styles.geniaButton + " " + styles.geniaButtonGray}
                 onClick={() => {
@@ -195,74 +198,81 @@ const TransformContainer = ({ cropData, totalCount, idParam, clearCropData }) =>
               }
             </div>
             <div className={styles.boxTop}>
-              <div className={styles.tit}>변환조건</div>
-              <div className={styles.radioWrap}>
-                <input
-                  type="radio"
-                  id="term01_01"
-                  name="term"
-                  value="MULTIPLE"
-                  onChange={handleQuestionType}
-                  checked={questionType === "MULTIPLE"}
-                />
-                <label htmlFor="term01_01">객관식</label>
-                <input
-                  type="radio"
-                  id="term01_02"
-                  name="term"
-                  value="SHORT_ANSWER"
-                  onChange={handleQuestionType}
-                  checked={questionType === "SHORT_ANSWER"}
+              <div style={{display: "flex", margin: "10px 0"}}>
+                <div className={styles.tit}>변환조건</div>
+                <div className={styles.radioWrap}>
+                  <input
+                    type="radio"
+                    id="term01_01"
+                    name="term"
+                    value="MULTIPLE"
+                    onChange={handleQuestionType}
+                    checked={questionType === "MULTIPLE"}
+                  />
+                  <label htmlFor="term01_01">객관식</label>
+                  <input
+                    type="radio"
+                    id="term01_02"
+                    name="term"
+                    value="SHORT_ANSWER"
+                    onChange={handleQuestionType}
+                    checked={questionType === "SHORT_ANSWER"}
 
-                />
-                <label htmlFor="term01_02">단답형</label>
-                <input
-                  type="radio"
-                  id="term01_03"
-                  name="term"
-                  value="ESSAY"
-                  onChange={handleQuestionType}
-                  checked={questionType === "ESSAY"}
-                />
-                <label htmlFor="term01_02">서술형</label>
+                  />
+                  <label htmlFor="term01_02">단답형</label>
+                  <input
+                    type="radio"
+                    id="term01_03"
+                    name="term"
+                    value="ESSAY"
+                    onChange={handleQuestionType}
+                    checked={questionType === "ESSAY"}
+                  />
+                  <label htmlFor="term01_02">서술형</label>
+                </div>
               </div>
-              <div className={styles.tit}>수식유무</div>
-              <div className={styles.radioWrap}>
-                <input
-                  type="radio"
-                  id="chg_type01_01"
-                  name="type"
-                  defaultChecked
-                  onChange={handleUseLatex}
-                  value="N"
-                />
-                <label htmlFor="chg_type01_01">없음</label>
-                <input
-                  type="radio"
-                  id="chg_type01_02"
-                  name="type"
-                  onChange={handleUseLatex}
-                  value="Y"
-                />
-                <label htmlFor="chg_type01_02">있음</label>
-              </div>
-              <div className={styles.btnWrap}>
+              <div
+                  className={styles.btnWrap}
+                  style={{float: "right"}}>
                 <button
-                  className={styles.geniaButton + " " + styles.geniaButtonGreen}
-                  onClick={() => {
-                    // console.log(questionNum, questionType, isLatex);
-                    ocrRequest();
-                  }}
+                    className={styles.geniaButton + " " + styles.geniaButtonGreen}
+                    onClick={() => {
+                      !questionType ? alert("문제 유형을 선택해주세요.") :
+                          cropData.length > 0 || questionImage ?
+                              ocrRequest() : alert("문제 이미지를 캡쳐해주세요.")
+                    }}
                 >
                   OCR 변환하기
                 </button>
+              </div>
+              <div style={{display: "flex", margin: "10px 0"}}>
+                <div className={styles.tit}>수식유무</div>
+                <div className={styles.radioWrap}>
+                  <input
+                    type="radio"
+                    id="chg_type01_01"
+                    name="type"
+                    defaultChecked
+                    onChange={handleUseLatex}
+                    value="N"
+                  />
+                  <label htmlFor="chg_type01_01">없음</label>
+                  <input
+                    type="radio"
+                    id="chg_type01_02"
+                    name="type"
+                    onChange={handleUseLatex}
+                    value="Y"
+                  />
+                  <label htmlFor="chg_type01_02">있음</label>
+                </div>
               </div>
             </div>
           </div>
 
           <div className={`${styles.boxWrap} ${styles.resultBox}`}>
             <div className={styles.boxTop}>
-              <div className={styles.tit}>OCR 인식 결과</div>
+              <div className={styles.geniaTitle}>OCR 인식 결과</div>
             </div>
             {questionContent != null ? (
               <textarea
@@ -293,11 +303,19 @@ const TransformContainer = ({ cropData, totalCount, idParam, clearCropData }) =>
                   }
                   if(!questionContent || questionContent.trim() === ""){
                     questionRemove();
-                    setQuestionNum((questionNum) => +questionNum + 1);
+                    if(questionNum === totalCount){
+                      alert("마지막 문제 입니다.");
+                    }else{
+                      setQuestionNum((questionNum) => +questionNum + 1);
+                    }
                     return;
                   }
                   questionUpload();
-                  setQuestionNum((questionNum) => +questionNum + 1);
+                  if(questionNum === totalCount){
+                    alert("마지막 문제 입니다.");
+                  }else{
+                    setQuestionNum((questionNum) => +questionNum + 1);
+                  }
                 }}
               >
                 저장
