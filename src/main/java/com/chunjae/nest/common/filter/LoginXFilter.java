@@ -30,9 +30,6 @@ public class LoginXFilter implements Filter {
         HttpServletResponse res = (HttpServletResponse) response;
         String requestURI = req.getRequestURI();
         HttpSession session = req.getSession();
-        System.out.println("============");
-        System.out.println(requestURI);
-        System.out.println("-----------");
         User user = (User) session.getAttribute("user"); // 유저 정보
         if (user == null) {
             res.sendRedirect("/user/login");

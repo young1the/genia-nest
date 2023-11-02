@@ -31,11 +31,14 @@ public class PaperFilter implements Filter {
         //String requestURI = req.getRequestURI();
         HttpSession session = req.getSession();
         User user = (User) session.getAttribute("user"); // 유저 정보
-
+        if (user == null) {
+            res.sendRedirect("/user/login");
+            return ;
+        }
         if (user.getRole().getRole().equals("문제담당자")) {
             res.sendRedirect("/ocr");
             return;
-}
+        }
         chain.doFilter(request, response);
     }
 
