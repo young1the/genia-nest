@@ -17,6 +17,9 @@ const CropperContainer = ({ getCropData, cropperRef, canvasRef, pdfURL }) => {
   useEffect(() => {
     getPDF();
   }, []);
+  useEffect(()=>{
+    // 다시 받아오기
+  },[currentPage])
 
   return (
     <div className={styles.viewBox}>
@@ -34,12 +37,6 @@ const CropperContainer = ({ getCropData, cropperRef, canvasRef, pdfURL }) => {
       <div className={styles.viewBottom}>
         <div className={styles.imgCutWrap}>
           <div className={styles.typeBoxWrap}>
-            <div className={styles.radioWrap}>
-              <input type="radio" id="type01_01" name="que-type" />
-              <label htmlFor="type01_01">문제</label>
-              <input type="radio" id="type01_02" name="que-type" />
-              <label htmlFor="type01_02">정답/해설</label>
-            </div>
             <div className={styles.pageWrap}>
               {pages.length > 0 ? (
                 <span>
@@ -103,20 +100,21 @@ const CropperContainer = ({ getCropData, cropperRef, canvasRef, pdfURL }) => {
             </div>
           </div>
           <div className={styles.imgBox}>
-            <div className="pdf-area">
+            <div className="pdf-area" style={{padding: "16px"}}>
               {pages.length > 0 ? (
                 iscaptureStart ? (
                   <Cropper
                     ref={cropperRef}
-                    zoomTo={0.5}
+
                     initialAspectRatio={1}
                     src={canvasRef.current?.toDataURL()}
+                    dragMode={"move"}
                     viewMode={1}
                     minCropBoxHeight={10}
                     minCropBoxWidth={10}
                     background={false}
                     responsive={true}
-                    autoCropArea={1}
+                    autoCropArea={0.5}
                     checkOrientation={false}
                     guides={true}
                     autoCrop={true}

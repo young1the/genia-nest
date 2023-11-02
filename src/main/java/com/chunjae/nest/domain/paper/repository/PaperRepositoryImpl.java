@@ -103,7 +103,6 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
     }
 
     private BooleanExpression yearEq(String year) {
-       // System.out.println("레파지토리 부분 - 받은 year 값 : " + year);
         if ("년도".equals(year)) {
             return null;
         } else if ("2023".equals(year)) {
