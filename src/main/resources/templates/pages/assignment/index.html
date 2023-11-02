@@ -107,9 +107,9 @@
                         <td th:if="${assignment.manager}" th:text="${assignment.manager}">
                         </td>
                         <td th:unless="${assignment.manager}">
-                            <select style="width: 100%">
-                                <option value="">null</option>
-                            </select>
+                            <div class="btn-wrap">
+                            <button class="btn-green" th:onclick="|openManagerList(${assignment.id})|">지정하기</button>
+                            </div>
                         </td>
                     </tr>
                     </tbody>
@@ -127,6 +127,7 @@
                 <th:block th:if="${assignments.getTotalElements() > 0}">
                     <a href="javascript:;" class="first"
                        th:href="@{/user/management/assignment(page=0, size=${selectedSize} ,startDate=${params.startDate}, endDate=${params.endDate}, searchOption=${params.searchOption}, searchKeyword=${params.searchKeyword})}"></a>
+                    <a href="javascript:;" class="prev" th:href="@{/user/management/assignment(page=${assignments.previousOrFirstPageable().getPageNumber()}, size=${selectedSize} ,startDate=${params.startDate}, endDate=${params.endDate}, searchOption=${params.searchOption}, searchKeyword=${params.searchKeyword})}"></a>
                     <th:block th:each="num : ${#numbers.sequence(startPage, endPage - 1)}">
                         <a href="javascript:;" class="page"
                            th:classappend="${pageNumber==num} ? 'active':''"
@@ -134,6 +135,7 @@
                             <span th:text="${num + 1}">1</span>
                         </a>
                     </th:block>
+                    <a href="javascript:;" class="next" th:href="@{/user/management/assignment(page=${assignments.nextOrLastPageable().getPageNumber()}, size=${selectedSize} ,startDate=${params.startDate}, endDate=${params.endDate}, searchOption=${params.searchOption}, searchKeyword=${params.searchKeyword})}"></a>
                     <a href="javascript:;" class="last"
                        th:href="@{/user/management/assignment(page=${assignments.getTotalPages() - 1}, size=${selectedSize} ,startDate=${params.startDate}, endDate=${params.endDate}, searchOption=${params.searchOption}, searchKeyword=${params.searchKeyword})}"></a>
                     </a>
@@ -144,9 +146,14 @@
             </div>
         </div>
     </div>
-
+    <button onclick="openManagerList()">왕버튼</button>
+    <div id="pInput">자식한테 받은거</div>
 </div>
 <script>
+    const openManagerList = (pageId) => {
+        window.open(`/user/management/assignment/managers?id=${pageId}`, '_blank', "width:500px, height:300px");
+    }
+
     const selectOnChangeHandler = (elem) => {
         const selectedOption = elem.value;
         console.log(elem.value);
@@ -159,7 +166,7 @@
     }
 
     const setDownloadLink = () => {
-        const downloadElem = document.getElementById("excelDownload")
+        const downloadElem = document.getElementById("excelDownload");
         let url = new URL(window.location.href);
         url.pathname = "/user/management/assignment/download";
         downloadElem.href = url.toString();

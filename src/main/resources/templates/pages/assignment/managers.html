@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/html">
+<!DOCTYPE html>
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    tr:hover {
+        background-color: #ddd;
+    }
+
+    input[type="checkbox"] {
+        transform: scale(1.5); /* Increase the checkbox size */
+    }
+
+    select, input {
+        width: 100%;
+        padding: 5px;
+    }
+
+    input[type="text"] {
+        width: 360px;
+        border-radius: 4px;
+        height: 32px;
+        padding-left: 10px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+    }
+
+    .select-box {
+        display: flex;
+        align-items: center;
+        width: 92px;
+        height: 32px;
+        color: #333;
+        font-size: 14px;
+        font-weight: 500;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+        border-radius: 4px;
+    }
+
+    .search-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #fff;
+        padding: 16px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        width: 100%;
+        box-sizing: border-box;
+        gap: 24px;
+    }
+
+    .search-btn {
+        color: white;
+        background: green;
+        padding: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 14px;
+        font-weight: 500;
+        box-sizing: border-box;
+        min-width: 60px;
+        height: 32px;
+        border-radius: 4px;
+        cursor: pointer;
+        border: none;
+    }
+
+    .container {
+        display: flex;
+        gap: 16px;
+    }
+
+</style>
+<body>
+<form action="/user/management/assignment/managers" method="get">
+    <div class="search-container">
+        <div class="container">
+            <select class="select-box" name="searchOption">
+                <option value="userId">아이디</option>
+                <option value="name">이름</option>
+            </select>
+            <input type="text" name="searchKeyword" placeholder="검색어 입력">
+        </div>
+        <div class="container">
+            <button class="search-btn">검색</button>
+            <button class="search-btn">초기화</button>
+        </div>
+    </div>
+</form>
+
+<table>
+    <thead>
+    <tr>
+        <th>NO</th>
+        <th>아이디</th>
+        <th>이름</th>
+        <th>부서</th>
+        <th>기간</th>
+        <th></th> <!-- 체크박스 -->
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="manager, iterStat: ${managers}">
+        <td th:text="${iterStat.index}"/>
+        <td th:text="${manager.userId}"/>
+        <td th:text="${manager.name}"/>
+        <td th:text="${manager.part}"/>
+        <td th:text="${manager.startDate} + '~' + ${manager.endDate}"/>
+        <td>
+            <button class="search-btn" th:onclick="|submitHandler(${manager.id})|">적용</button>
+        </td>
+    </tr>
+    <!-- 다른 행들 추가 -->
+    </tbody>
+</table>
+</body>
+<script>
+    const submitHandler = async (managerId) => {
+        const url = new URL(window.location.href);
+        const searchParam = new URLSearchParams(url.search);
+        const pageId = searchParam.get("id");
+
+    }
+</script>
+</html>
