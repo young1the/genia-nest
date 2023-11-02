@@ -1,12 +1,12 @@
 package com.chunjae.nest.domain.paper.controller;
 
+import com.chunjae.nest.domain.paper.dto.req.PaperAssignmentRequest;
 import com.chunjae.nest.domain.paper.dto.req.PaperRequest;
 import com.chunjae.nest.domain.paper.dto.res.PaperResponse;
 import com.chunjae.nest.domain.paper.service.PaperService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -52,4 +52,11 @@ public class PaperApiController {
         return ResponseEntity.badRequest().build();
     }
 
+    @PostMapping("/assign")
+    public ResponseEntity<String> assignTaskPaper(@RequestBody PaperAssignmentRequest paperAssignmentRequest) {
+
+        paperService.assignTaskPaper(paperAssignmentRequest);
+
+        return ResponseEntity.ok().build();
+    }
 }
