@@ -4,7 +4,7 @@ import H1 from "./components/common/H1.jsx";
 import InfoSection from "./components/input/info/InfoSection.jsx";
 import PDFSection from "./components/input/pdf/PDFSection.jsx";
 import usePDF from "../pdf/hooks/usePDF.js";
-import {useEffect, useRef } from "react";
+import {useEffect, useRef, useState} from "react";
 
 function PaperApp({idParam}) {
     const inputRefs = useRef({
@@ -30,6 +30,7 @@ function PaperApp({idParam}) {
     useEffect(() => {
         getInitialValue();
     }, []);
+    const [_,setData] = useState(false);
     const getInitialValue = async () => {
         if (idParam) {
             const response = await fetch(`/api/paper/detail/${idParam}`);
@@ -38,8 +39,10 @@ function PaperApp({idParam}) {
                 await addPDF({name: result.name, url: result.url});
             }
             Object.entries(result).forEach(([name, value]) => {
+                console.log(`${name} : ${value}`);
                 inputRefs.current[name] = {value};
             })
+            setData(prev=>!prev);
         }
     }
     const paperFileSubmitHandler = async () => {
@@ -55,8 +58,10 @@ function PaperApp({idParam}) {
             }
         }
         const generated = await generatePDFFile();
-        const pdfBlob = new Blob([generated], {type: "application/pdf"});
-        formData.append("multipartFile", pdfBlob, fileName);
+        if (generated) {
+            const pdfBlob = new Blob([generated], {type: "application/pdf"});
+            formData.append("multipartFile", pdfBlob, fileName);
+        }
         const requestURL = !idParam ? `/api/paper/upload` : `/api/paper/modify/${idParam}`;
         const response = await fetch(requestURL, {
             method: "POST",

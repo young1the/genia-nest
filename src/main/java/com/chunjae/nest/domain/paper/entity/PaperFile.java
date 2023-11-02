@@ -14,7 +14,7 @@ public class PaperFile extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, length = 255, nullable = false)
+    @Column(length = 255, nullable = false)
     private String name;
 
     @Column(length = 255, nullable = false)

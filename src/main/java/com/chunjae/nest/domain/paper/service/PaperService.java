@@ -43,13 +43,31 @@ public class PaperService {
         Long id = 1L;
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
         MultipartFile multipartFile = paperRequest.getMultipartFile();
+        if (multipartFile == null) {
+            Paper paper = paperRequest.createPaper(user);
+            PaperFile paperFile = PaperFile.builder()
+                    .name("")
+                    .url("")
+                    .paper(paper)
+                    .build();
+            PaperLog paperLog = PaperLog.builder()
+                    .userId(user.getUserId())
+                    .paperUrl("")
+                    .paperName(paperRequest.getName())
+                    .paperStatus(PaperStatus.TO_DO)
+                    .build();
+            paperRepository.save(paper);
+            paperFileRepository.save(paperFile);
+            paperLogRepository.save(paperLog);
+            return "ok";
+        }
         if (isAllowedFileType(multipartFile)) {
             String url = s3UploadService.uploadPaper(multipartFile);
             String fileName = s3UploadService.getFileName(url);
 
             log.info(" url: {}, fileName: {}", url, fileName);
 
-            if (!url.equals("failed")) {
+            if (!"failed".equals(url)) {
                 Paper paper = paperRequest.createPaper(user);
                 PaperFile paperFile = PaperFile.builder()
                         .name(fileName)
@@ -102,55 +120,36 @@ public class PaperService {
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
         Paper paper = paperRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("시험지가 없습니다."));
         validateUserAndPaper(user, paper);
-
+        String originUrl = paper.getPaperFile().getUrl();
         PaperFile paperFile = paper.getPaperFile();
         paper.paperToUpdate(paperRequest);
         MultipartFile multipartFile = paperRequest.getMultipartFile();
+
         if (paper.getOcrCount() != 0 && (paper.getPaperStatus() == PaperStatus.IN_PROGRESS || paper.getPaperStatus() == PaperStatus.TO_DO)) {
-            paperRepository.save(paper);
             return "ok";
         }
         if (multipartFile == null) {
-            paperRepository.save(paper);
+            paperFile.updatePaperFile("", "");
+            s3UploadService.deletePaper(originUrl);
             return "ok";
         }
+
+        String url = s3UploadService.uploadPaper(multipartFile);
+        String fileName = s3UploadService.getFileName(url);
         try {
 
             if (isAllowedFileType(multipartFile) && !multipartFile.isEmpty()) {
-                s3UploadService.deletePaper(paper.getPaperFile().getUrl());
-                String url = s3UploadService.uploadPaper(multipartFile);
-                String fileName = s3UploadService.getFileName(url);
                 log.info("url:{}, fileName:{}", url, fileName);
 
-                if (!url.equals("failed")) {
+                if (!"failed".equals(url)) {
                     paperFile.updatePaperFile(fileName, url);
-                    PaperLog paperLog = PaperLog.builder()
-                            .userId(user.getUserId())
-                            .paperUrl(url)
-                            .paperName(paperRequest.getName())
-                            .build();
-
-                    paperFileRepository.save(paperFile);
-                    paperRepository.save(paper);
-                    paperLogRepository.save(paperLog);
-
+                    s3UploadService.deletePaper(originUrl);
                     return "ok";
                 }
-            } else if (multipartFile.isEmpty()) {
-                paperRepository.save(paper);
-                s3UploadService.deletePaper(paper.getPaperFile().getUrl());
-                paperFile.updatePaperFile("", "");
-                paperFileRepository.save(paperFile);
-                PaperLog paperLog = PaperLog.builder()
-                        .userId(user.getUserId())
-                        .paperUrl("")
-                        .paperName(paperRequest.getName())
-                        .build();
-                paperLogRepository.save(paperLog);
-                return "ok";
             }
             return "failed";
         } catch (Exception e) {
+            s3UploadService.deletePaper(url);
             return "failed";
         }
     }
@@ -192,7 +191,6 @@ public class PaperService {
             return "ok";
         }
         PaperAssignment paperAssignment = PaperAssignment.builder()
-
                 .user(user)
                 .paper(paper)
                 .paperAssignmentStatus(PaperAssignmentStatus.TO_DO)
