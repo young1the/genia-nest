@@ -93,7 +93,6 @@ function PaperApp({idParam}) {
                 <div className={styles.buttonContainer}>
                     {idParam ? <Button color="red" onClick={deleteHandler}>삭제</Button> : null}
                     <Button color="gray" onClick={() => {
-                        console.log(window);
                         if (window.opener) {
                             window.opener.location.reload();
                             window.close();

@@ -118,7 +118,7 @@
     </thead>
     <tbody>
     <tr th:each="manager, iterStat: ${managers}">
-        <td th:text="${iterStat.index}"/>
+        <td th:text="${managers.getTotalElements() - iterStat.index}"/>
         <td th:text="${manager.userId}"/>
         <td th:text="${manager.name}"/>
         <td th:text="${manager.part}"/>
@@ -132,11 +132,30 @@
 </table>
 </body>
 <script>
-    const submitHandler = async (managerId) => {
+    const submitHandler = async (userId) => {
         const url = new URL(window.location.href);
         const searchParam = new URLSearchParams(url.search);
-        const pageId = searchParam.get("id");
-
+        const paperId = searchParam.get("id");
+        if (paperId == null) {
+            window.close();
+            return ;
+        }
+        const body = {userId, paperId};
+        const jsonBody = JSON.stringify(body);
+        const response = await fetch("/api/paper/assign", {
+            method: "post",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: jsonBody,
+        })
+        if (response.ok) {
+            window?.opener?.location?.reload();
+            window.close();
+        }
+        else {
+            alert("할당에 실패했습니다.");
+        }
     }
 </script>
 </html>
