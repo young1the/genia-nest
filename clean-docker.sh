@@ -13,5 +13,5 @@ if [ -n "$images" ]; then
 else
   echo "No images to remove."
 fi
-sudo docker system prune --volumes --force
+sudo docker system prune --all --volumes --force
 echo "...Clean Docker Done..."
