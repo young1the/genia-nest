@@ -13,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 
 @Repository
@@ -74,7 +73,6 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
     }
 
     private BooleanExpression yearEq(String year) {
-
         if ("년도".equals(year)) {
             return null;
         } else if ("2023".equals(year)) {
@@ -114,7 +112,6 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
     }
 
     private BooleanExpression keyWordEq(String searchOption, String searchKeyword) {
-
         if ("전체".equals(searchOption) || (searchKeyword != null && searchKeyword.isEmpty())) {
             BooleanExpression userSearch = paper.user.name.like("%" + searchKeyword + "%");
             BooleanExpression nameSearch = paper.name.like("%" + searchKeyword + "%");
@@ -132,13 +129,11 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
     }
 
     private BooleanExpression categoryEq(String category) {
-        System.out.println("레파지토리 부분 - 받은 category 값 : " + category);
         BooleanExpression categoryCondition = (category != null) ? paper.category.eq(category) : null;
         return categoryCondition;
     }
 
     private BooleanExpression gradeEq(String grade) {
-
         if ("전체".equals(grade)) {
             return null;
         } else if ("1".equals(grade)) {
