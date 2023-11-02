@@ -6,6 +6,8 @@ import com.chunjae.nest.domain.paper.dto.SearchKeywordDTO;
 import com.chunjae.nest.domain.paper.entity.Paper;
 import com.chunjae.nest.domain.user.dto.AssignmentDTO;
 import com.chunjae.nest.domain.user.dto.AssignmentSearchReqDTO;
+import com.chunjae.nest.domain.user.dto.ManagerDTO;
+import com.chunjae.nest.domain.user.dto.ManagerSearchDTO;
 import com.chunjae.nest.domain.user.service.UserAssignmentService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +46,17 @@ public class UserAssignmentController {
         model.addAttribute("sizes", sizes);
         return "pages/assignment/index";
 
+    }
+
+    @GetMapping("/managers")
+    public String managers(Model model, @ModelAttribute ManagerSearchDTO searchDTO, @PageableDefault(size=10, sort="id", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<ManagerDTO> managers = userAssignmentService.searchQuestionManagers(searchDTO, pageable);
+        if (managers != null) {
+            managers.stream().forEach(ele-> System.out.println(ele.getName()));
+        }
+        model.addAttribute("managers", managers);
+        model.addAttribute("params", searchDTO);
+        return "pages/assignment/managers";
     }
 
     @GetMapping("/download")
