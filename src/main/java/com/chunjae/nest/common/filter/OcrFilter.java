@@ -31,7 +31,7 @@ public class OcrFilter implements Filter {
         //String requestURI = req.getRequestURI();
         HttpSession session = req.getSession();
         User user = (User) session.getAttribute("user"); // 유저 정보
-                if (user.getRole().getRole().equals("수집담당자")) {
+                if (user.getRole().getRole().equals("수집 담당자")) {
                     res.sendRedirect("/paper");
                     return ;
                 }
