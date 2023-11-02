@@ -132,7 +132,7 @@
 									</div>
 								</div>
 								<div class="btn-wrap">
-									<a class="btn-green w120" href="javascript:;">엑셀 다운로드</a>
+									<a class="btn-gray w120" id="excelDownload" download href="/ocr/download">엑셀 다운로드</a>
 								</div>
 							</div>
 							<table class="tbl-list">
@@ -327,6 +327,14 @@
 	document.getElementById("reset").addEventListener("click", function() {
 		window.location.href = "/ocr"; // 초기화
 	});
+
+	const setDownloadLink = () => { // 엑셀 다운로드
+		const downloadElem = document.getElementById("excelDownload")
+		let url = new URL(window.location.href);
+		url.pathname="/ocr/download";
+		downloadElem.href = url.toString();
+	}
+	setDownloadLink();
 
 	const selectOnChangeHandler = (elem) => { // 10개, 30개, 50개.. 선택하기
 		const selectedOption = elem.value;

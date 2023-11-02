@@ -132,7 +132,7 @@
 									</div>
 								</div>
 								<div class="btn-wrap">
-									<a class="btn-gray w120" href="javascript:;">엑셀 다운로드</a>
+									<a class="btn-gray w120" id="excelDownload" download href="/ocr/done/download">엑셀 다운로드</a>
 								</div>
 							</div>
 							<table class="tbl-list">
@@ -322,6 +322,14 @@
 	document.addEventListener('DOMContentLoaded', function() {
 		updateTotalCount();
 	});
+
+	const setDownloadLink = () => { // 엑셀 다운로드
+		const downloadElem = document.getElementById("excelDownload")
+		let url = new URL(window.location.href);
+		url.pathname="/ocr/done/download";
+		downloadElem.href = url.toString();
+	}
+	setDownloadLink();
 
 	document.getElementById("reset").addEventListener("click", function() {
 		window.location.href = "/ocr/done"; // 초기화
