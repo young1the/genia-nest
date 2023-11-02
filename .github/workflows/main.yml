@@ -23,7 +23,7 @@ jobs:
     - name: Build Docker image
       run: |
         echo "nest:${{github.sha}} build" &&
-        sudo docker build -t nest:${{github.sha}} .
+        sudo docker buildx build --no-cache -t nest:${{github.sha}} .
 
     - name: Run Docker container
       run: |
