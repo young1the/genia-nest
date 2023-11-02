@@ -3,6 +3,7 @@ package com.chunjae.nest.domain.paper.controller;
 import com.chunjae.nest.domain.paper.dto.req.PaperAssignmentRequest;
 import com.chunjae.nest.domain.paper.dto.req.PaperRequest;
 import com.chunjae.nest.domain.paper.dto.res.PaperResponse;
+import com.chunjae.nest.domain.paper.entity.PaperAssignment;
 import com.chunjae.nest.domain.paper.service.PaperService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -56,6 +57,14 @@ public class PaperApiController {
     public ResponseEntity<String> assignTaskPaper(@RequestBody PaperAssignmentRequest paperAssignmentRequest) {
 
         paperService.assignTaskPaper(paperAssignmentRequest);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/unassign")
+    public ResponseEntity<String> unassignTaskPaper(@RequestBody PaperAssignmentRequest paperAssignmentRequest){
+
+        paperService.unassignTaskPaper(paperAssignmentRequest);
 
         return ResponseEntity.ok().build();
     }
