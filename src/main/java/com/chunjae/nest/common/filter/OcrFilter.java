@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.Order;
+
 import java.io.IOException;
 
 @WebFilter(value = {"/ocr/*", "/user/management/*"})
@@ -31,16 +32,20 @@ public class OcrFilter implements Filter {
         //String requestURI = req.getRequestURI();
         HttpSession session = req.getSession();
         User user = (User) session.getAttribute("user"); // 유저 정보
-                if (user.getRole().getRole().equals("수집 담당자")) {
-                    res.sendRedirect("/paper");
-                    return ;
-                }
+        if (user == null) {
+            res.sendRedirect("/user/login");
+            return ;
+        }
+        if (user.getRole().getRole().equals("수집담당자")) {
+            res.sendRedirect("/paper");
+            return;
+        }
         chain.doFilter(request, response);
     }
 
-        @Override
-        public void destroy () {
-            Filter.super.destroy();
-        }
-
+    @Override
+    public void destroy() {
+        Filter.super.destroy();
     }
+
+}
