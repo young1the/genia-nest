@@ -138,7 +138,6 @@
 							<table class="tbl-list">
 								<caption></caption>
 								<colgroup>
-									<!--                        <col style="width: 3%;">-->
 									<col style="width: 4%;">
 									<col style="width: 6%;">
 									<col style="width: 6%;">
@@ -155,12 +154,6 @@
 								</colgroup>
 								<thead>
 									<tr>
-<!--										<th>-->
-<!--											<div class="check-wrap">-->
-<!--												<input type="checkbox" id="chk100_00" name="numChk" class="allCheck">-->
-<!--												<label for="chk100_00"></label>-->
-<!--											</div>-->
-<!--										</th>-->
 										<th>NO</th>
 										<th>출제 년도</th>
 										<th>출제 타입</th>
@@ -193,11 +186,14 @@
 									<td th:text="${#temporals.format(paper.createdAt, 'yyyy-MM-dd')}"></td>
 									<td th:text="${paper.paperStatus.displayValue}" />  <!--확인용(최종 머지 시 삭제)-->
 								</tr>
+								<tr th:if="${papers.isEmpty()}" >
+									<td colspan="13">검색 결과가 없습니다.</td>
+								</tr>
+								</tbody>
 								</tbody>
 							</table>
 						</div>
 						<!-- 페이징 영역 -->
-
 						<div class="paging-wrap">
 							<th:block>
 								<a href="javascript:;" class="first" th:href="@{${ocrPageLink + 0}}"></a>
@@ -217,18 +213,36 @@
 						</div>
 					</div>
 				</div>
-
 			</div>
 		</div>
 	</div>
-	<script>
-	</script><script>
-	const areaSelect = document.getElementById('areaSelect');
-	const subjectSelect = document.getElementById('subjectSelect');
+<script>
+	function areaSelectHandler() {
+		const areaSelect = document.getElementById('areaSelect');
+		const subjectSelect = document.getElementById('subjectSelect');
+		const searchParam = new URLSearchParams(new URL(window.location.href).search);
+		const selectArea = areaSelect.value;
+		const subjectParam = searchParam.get("subject");
+
+		const subjectOptions = {
+			'국어': ['전체', '화법과 작문', '언어와 매체'],
+			'수학': ['전체', '확률과 통계', '미적분', '기하'],
+			'영어': ['전체', '영어'],
+			'한국사': ['전체', '한국사'],
+			'사회탐구': ['전체', '생활과 윤리', '윤리와 사상', '한국지리', '세계지리', '동아시아사', '세계사', '경제', '정치와 법'],
+			'과학탐구': ['전체', '물리학I', '화학I', '생명과학I', '지구과학I', '물리학II', '화학II', '생명과학II', '지구과학II'],
+			'직업탐구': ['전체', '농업 기초 기술', '공업 일반', '상업 경제', '수산 해운 산업 기초', '인간 발달', '성공적인 직업생활'],
+			'제2외국어/한문': ['전체', '독일어I', '프랑스어I', '스페인어I', '중국어I', '일본어I', '러시아어I', '아랍어I', '베트남어I', '한문I']
+		};
+
+		const optionsToAdd = subjectOptions[selectArea] || [];
+		optionsToAdd.forEach(option => addOption(subjectSelect, option, subjectParam));
+	}
+
+	document.addEventListener("DOMContentLoaded", areaSelectHandler);
 
 	areaSelect.addEventListener('change', function () {
 		const selectArea = areaSelect.value;
-		const selectSubject = subjectSelect.value;
 		subjectSelect.innerHTML = ''; // 기존 내용 지우기
 
 		if (selectArea === '국어') {
@@ -286,27 +300,14 @@
 			addOption(subjectSelect, '베트남어I');
 			addOption(subjectSelect, '한문I');
 		}
-
-		const selectedData = { // 선택 값들 객체화 시키기
-			area : selectArea,
-			subject : selectSubject
-		};
-
-		fetch('/ocr/done', {
-			method : 'GET',
-		})
-		.then(response => response.text())
-		.then(html => {
-			//console.log(html);
-		})
-		.catch(error => {
-			console.log('에러 발생 : ', error);
-		});
 	});
 
-	function addOption(selectBox, optionText) { // 영역 - 과목 셀렉트 박스
+	function addOption(selectBox, optionText, subjectParam) { // 영역 - 과목 셀렉트 박스
 		const option = document.createElement('option');
 		option.text = optionText;
+		if (subjectParam && optionText === subjectParam) {
+			option.selected = true;
+		}
 		selectBox.add(option);
 	}
 
@@ -332,7 +333,6 @@
 		const url = new URL(window.location.href);
 		const params = new URLSearchParams(url.search);
 		params.set("size", selectedOption);
-		//params.set("page", 0);
 		url.search = params.toString();
 		location.href = url.href;
 	}

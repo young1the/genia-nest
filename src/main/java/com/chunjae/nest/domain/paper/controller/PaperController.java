@@ -37,10 +37,6 @@ public class PaperController implements Serializable {
                         @PageableDefault(size=10, sort="id", direction = Sort.Direction.DESC) Pageable pageable) {
 
         int[] sizes = {10, 30, 50, 100};
-        System.out.println("Received search data: " + searchKeywordDTO);
-
-        // 데이터를 세션에 저장
-        session.setAttribute("storedParam", searchKeywordDTO);
 
         // 검색
         Page<Paper> papers = paperService.searchResults(searchKeywordDTO, pageable);
@@ -111,5 +107,4 @@ public class PaperController implements Serializable {
             System.out.println(e.getMessage());
         }
     }
-
 }
