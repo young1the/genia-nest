@@ -237,8 +237,8 @@ const TransformContainer = ({ cropData, totalCount, idParam, clearCropData }) =>
                 <button
                     className={styles.geniaButton + " " + styles.geniaButtonGreen}
                     onClick={() => {
-                      !questionType ? alert("문제 유형을 선택해주세요.") :
-                          cropData.length > 0 || questionImage ?
+                      cropData.length > 0 || questionImage ?
+                          !questionType ? alert("문제 유형을 선택해주세요.") :
                               ocrRequest() : alert("문제 이미지를 캡쳐해주세요.")
                     }}
                 >
