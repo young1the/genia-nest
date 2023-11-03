@@ -67,7 +67,10 @@ function PaperApp({idParam}) {
                 window.opener.location.reload();
             }
             window.close();
-        } else alert("저장 실패");
+        } else {
+            alert("저장 실패");
+            location.reload();
+        }
     }
 
     const infoSectionProps = {addPDF, deletePDFFile, files, inputRefs};
@@ -89,6 +92,9 @@ function PaperApp({idParam}) {
                 window.opener.location.reload();
             }
             window.close();
+        } else {
+            alert("저장 실패");
+            location.reload();
         }
     }
 
