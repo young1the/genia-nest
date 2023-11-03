@@ -148,6 +148,8 @@ public class UserController {
                     System.out.println("비밀번호 바꾸기 성공");
                     session.invalidate();
                     return "redirect:/user/login";
+                } else {
+                    return "redirect:/user/password/modify?error=true";
                 }
             } catch (Exception e) {
                 System.out.println("비밀번호 바꾸기 실패");
