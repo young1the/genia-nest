@@ -41,6 +41,17 @@
         document.getElementById("startDate").value = formatDate(now);
         document.getElementById("endDate").value = formatDate(nextYear);
     });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchParam = new URLSearchParams(new URL(window.location.href).search);
+        const selectOption = searchParam.get("searchOption");
+        const keywordParam = searchParam.get("searchKeyword");
+        if (selectOption) {
+            document.getElementById("searchOption").value = selectOption;
+            document.getElementById("searchKeyword").value = keywordParam;
+        }
+    });
+
 </script>
 
 <div id="wrap">
@@ -54,8 +65,8 @@
             <div class="search-box-wrap">
                 <form class="search-box" action="/user/management" method="get">
                     <div class="box">
-                        <select name="searchOption" style="width: 90px">
-                            <option value="userId" selected="selected">아이디</option>
+                        <select name="searchOption" id="searchOption" style="width: 90px">
+                            <option value="userId" selected>아이디</option>
                             <option value="name">이름</option>
                         </select>
                         <input name="searchKeyword" type="text" placeholder="검색어" class="search-form"
@@ -96,9 +107,9 @@
                             <td>
                                 <div class="select-wrap">
                                     <select class="select-box w140" id="role" name="role">
-                                        <option value="총괄 관리자">총괄 관리자</option>
-                                        <option value="수집 담당자">수집 담당자</option>
-                                        <option value="문제 담당자">문제 담당자</option>
+                                        <option value="총괄관리자">총괄관리자</option>
+                                        <option value="수집담당자">수집담당자</option>
+                                        <option value="문제담당자">문제담당자</option>
                                     </select>
                                 </div>
                             </td>
@@ -148,14 +159,14 @@
                     <div class="paging-wrap">
                         <th:block th:if="${users.getTotalElements() > 0}">
                         <a href="javascript:;" class="first" th:href="@{/user/management(page=0)}"></a>
-                        <a href="javascript:;" class="prev" th:if="${users.number > 0}" th:href="@{/user/management(page=${users.number - 1})}"></a>
+                        <a href="javascript:;" class="prev" th:if="${users.number >= 0}" th:href="@{/user/management(page=${users.number - 1})}"></a>
                         <th:block th:each="pageNumber : ${#numbers.sequence(0, users.totalPages - 1)}">
-                            <a href="javascript:;" class="page" th:class="${users.number == pageNumber} ? active" th:href="@{/user/management(page=${pageNumber})}">
-                                <span class="page active" th:text="${pageNumber + 1}"></span>
+                            <a href="javascript:;" class="page" th:classappend="${users.number == pageNumber} ? 'active' : ''" th:href="@{/user/management(page=${pageNumber})}">
+                                <span th:text="${pageNumber + 1}"></span>
                             </a>
                         </th:block>
 
-                        <a href="javascript:;" class="next" th:if="${users.number < users.totalPages - 1}" th:href="@{/user/management(page=${users.number + 1})}"></a>
+                        <a href="javascript:;" class="next" th:if="${users.number <= users.totalPages - 1}" th:href="@{/user/management(page=${users.number + 1})}"></a>
                         <a href="javascript:;" class="last" th:href="@{/user/management(page=${users.totalPages - 1})}"></a>
                         </th:block>
                         <th:block th:if="${users.getTotalElements() <= 0}">

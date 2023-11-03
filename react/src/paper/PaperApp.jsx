@@ -68,6 +68,9 @@ function PaperApp({idParam}) {
             body: formData,
         })
         if (response.ok) {
+            if (window.opener) {
+                window.opener.location.reload();
+            }
             window.close();
         } else alert("저장 실패");
     }
@@ -87,6 +90,9 @@ function PaperApp({idParam}) {
             method: "POST",
         });
         if (response.ok) {
+            if (window.opener) {
+                window.opener.location.reload();
+            }
             window.close();
         }
     }
@@ -98,7 +104,10 @@ function PaperApp({idParam}) {
                 <div className={styles.buttonContainer}>
                     {idParam ? <Button color="red" onClick={deleteHandler}>삭제</Button> : null}
                     <Button color="gray" onClick={() => {
-                        window.close()
+                        if (window.opener) {
+                            window.opener.location.reload();
+                        }
+                        window.close();
                     }}>닫기</Button>
                 </div>
             </header>

@@ -96,7 +96,12 @@ const CropperContainer = ({ getCropData, cropperRef, canvasRef, pdfURL }) => {
               )}
             </div>
             <div>
-              <button onClick={getCropData}>Crop Image</button>
+              <button
+                  className={`${styles.geniaButton} ${styles.geniaButtonGreen}`}
+                  onClick={getCropData}
+              >
+                이미지 캡쳐
+              </button>
             </div>
           </div>
           <div className={styles.imgBox}>
@@ -108,7 +113,6 @@ const CropperContainer = ({ getCropData, cropperRef, canvasRef, pdfURL }) => {
 
                     initialAspectRatio={1}
                     src={canvasRef.current?.toDataURL()}
-                    dragMode={"move"}
                     viewMode={1}
                     minCropBoxHeight={10}
                     minCropBoxWidth={10}

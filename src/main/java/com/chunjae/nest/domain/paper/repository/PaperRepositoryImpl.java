@@ -64,6 +64,9 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
         if (option.equals("userId")) {
             return userIdLike(keyword);
         }
+        if (option.equals("all")) {
+            return nameLike(keyword).or(userIdLike(keyword));
+        }
         return null;
     }
 
@@ -103,7 +106,6 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
     }
 
     private BooleanExpression yearEq(String year) {
-        System.out.println("레파지토리 부분 - 받은 year 값 : " + year);
         if ("년도".equals(year)) {
             return null;
         } else if ("2023".equals(year)) {
@@ -116,7 +118,7 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
     }
 
     private BooleanExpression monthEq(int month) {
-        System.out.println("레파지토리 부분 - 받은 month 값 : " + month);
+        //System.out.println("레파지토리 부분 - 받은 month 값 : " + month);
         BooleanExpression monthCondition = (month != 0) ? paper.month.eq(month) : null;
 
         // 생략해도 돌아가는지 확인하기
@@ -128,8 +130,8 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
     }
 
     private BooleanExpression areaAndSubjectEq(String area, String subject) {
-        System.out.println("레파지토리 부분 - 받은 area 값 : " + area);
-        System.out.println("레파지토리 부분 - 받은 subject 값 : " + subject);
+//        System.out.println("레파지토리 부분 - 받은 area 값 : " + area);
+//        System.out.println("레파지토리 부분 - 받은 subject 값 : " + subject);
 
         if ("전체".equals(area) && "전체".equals(subject)) {
             return null;
@@ -147,7 +149,7 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
     }
 
     private BooleanExpression keyWordEq(String searchOption, String searchKeyword) {
-        System.out.println("레파지토리 부분 - 받은 keyword 값 : " + searchOption + ", " + searchKeyword);
+//        System.out.println("레파지토리 부분 - 받은 keyword 값 : " + searchOption + ", " + searchKeyword);
 
         if ("전체".equals(searchOption) || (searchKeyword != null && searchKeyword.isEmpty())) {
             BooleanExpression userSearch = paper.user.name.like("%" + searchKeyword + "%");
@@ -166,13 +168,13 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
     }
 
     private BooleanExpression categoryEq(String category) {
-        System.out.println("레파지토리 부분 - 받은 category 값 : " + category);
+//        System.out.println("레파지토리 부분 - 받은 category 값 : " + category);
         BooleanExpression categoryCondition = (category != null) ? paper.category.eq(category) : null;
         return categoryCondition;
     }
 
     private BooleanExpression gradeEq(String grade) {
-        System.out.println("레파지토리 부분 - 받은 grade 값 : " + grade);
+//        System.out.println("레파지토리 부분 - 받은 grade 값 : " + grade);
 
         if ("전체".equals(grade)) {
             return null;
@@ -190,7 +192,7 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
 
     private BooleanExpression paperStatusEq(String paperStatus) {
 
-        System.out.println("레파지토리 부분 - 받은 paperStatus 값 : " + paperStatus);
+//        System.out.println("레파지토리 부분 - 받은 paperStatus 값 : " + paperStatus);
         BooleanExpression result = paper.paperStatus.ne(PaperStatus.valueOf("DELETED"));
 
         if ("전체".equals(paperStatus)) {

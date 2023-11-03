@@ -7,11 +7,11 @@ if [ -n "$containers" ]; then
 else
   echo "No containers to remove."
 fi
-images=$(docker ps -qa)
+images=$(docker images -q)
 if [ -n "$images" ]; then
-  docker rm -f $images
+  docker rmi -f $images
 else
   echo "No images to remove."
 fi
-sudo docker system prune --force
+sudo docker system prune --all --volumes --force
 echo "...Clean Docker Done..."
