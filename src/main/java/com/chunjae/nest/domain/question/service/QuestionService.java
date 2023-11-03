@@ -4,6 +4,7 @@ import com.chunjae.nest.domain.paper.dto.SearchKeywordDTO;
 import com.chunjae.nest.domain.paper.entity.*;
 import com.chunjae.nest.domain.paper.repository.PaperAssignmentRepository;
 import com.chunjae.nest.domain.paper.repository.PaperLogRepository;
+import com.chunjae.nest.domain.paper.repository.PaperRepository;
 import com.chunjae.nest.domain.paper.service.S3UploadService;
 import com.chunjae.nest.domain.question.dto.OCRMathReqDTO;
 import com.chunjae.nest.domain.question.dto.OCRMathResDTO;
@@ -18,6 +19,7 @@ import com.chunjae.nest.domain.question.entity.QuestionStatus;
 import com.chunjae.nest.domain.question.repository.QuestionFileRepository;
 import com.chunjae.nest.domain.question.repository.QuestionLogRepository;
 import com.chunjae.nest.domain.question.repository.QuestionRepository;
+import com.chunjae.nest.domain.user.entity.RoleStatus;
 import com.chunjae.nest.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,8 +42,19 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
     private final QuestionFileRepository questionFileRepository;
     private final QuestionLogRepository questionLogRepository;
+    private final PaperRepository paperRepository;
     private final PaperLogRepository paperLogRepository;
     private final PaperAssignmentRepository paperAssignmentRepository;
+
+    public boolean canAccess(String paperId, User user) {
+        System.out.println(user.getRole().getRole());
+        if (user.getRole().getRole().equals("총괄관리자")) return true;
+        Long id = Long.parseLong(paperId);
+        Paper paper = paperRepository.findById(id).orElse(null);
+        if (paper == null) return false;
+        PaperAssignment paperAssignment = paperAssignmentRepository.findByUserAndPaper(user, paper).orElse(null);
+        return paperAssignment != null;
+    }
 
     @Transactional
     public String uploadQuestionFile(User user, QuestionRequest questionRequest) throws IOException {

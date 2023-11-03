@@ -5,18 +5,18 @@ import com.chunjae.nest.domain.paper.dto.PaperExcelDTO;
 import com.chunjae.nest.domain.paper.dto.SearchKeywordDTO;
 import com.chunjae.nest.domain.paper.entity.Paper;
 import com.chunjae.nest.domain.question.service.QuestionService;
+import com.chunjae.nest.domain.user.entity.User;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.OutputStream;
 import java.net.URLEncoder;
@@ -176,7 +176,8 @@ public class QuestionController {
     }
 
     @GetMapping("/transform")
-    public String transform() {
+    public String transform(@RequestParam String id, @SessionAttribute(name = "user") User user) {
+        if (!questionService.canAccess(id,user)) return "forward:/error.html";
         return "forward:/react/ocr.html";
     }
 }
