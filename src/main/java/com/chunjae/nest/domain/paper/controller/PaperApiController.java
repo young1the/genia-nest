@@ -61,9 +61,10 @@ public class PaperApiController {
     public ResponseEntity<String> assignTaskPaper(@SessionAttribute(name = "user") User user,
                                                   @RequestBody PaperAssignmentRequest paperAssignmentRequest) {
 
-        paperService.assignTaskPaper(paperAssignmentRequest);
-
-        return ResponseEntity.ok().build();
+        if ("ok".equals(paperService.assignTaskPaper(paperAssignmentRequest))) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.badRequest().build();
     }
 
     @PostMapping("/unassign")

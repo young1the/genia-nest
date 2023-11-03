@@ -110,7 +110,7 @@ const CropperContainer = ({ getCropData, cropperRef, canvasRef, pdfURL }) => {
                 iscaptureStart ? (
                   <Cropper
                     ref={cropperRef}
-
+                    dragMode={"move"}
                     initialAspectRatio={1}
                     src={canvasRef.current?.toDataURL()}
                     viewMode={1}

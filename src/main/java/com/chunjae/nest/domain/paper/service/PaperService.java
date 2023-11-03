@@ -9,8 +9,8 @@ import com.chunjae.nest.domain.paper.repository.PaperAssignmentRepository;
 import com.chunjae.nest.domain.paper.repository.PaperFileRepository;
 import com.chunjae.nest.domain.paper.repository.PaperLogRepository;
 import com.chunjae.nest.domain.paper.repository.PaperRepository;
-import com.chunjae.nest.domain.user.entity.RoleStatus;
 import com.chunjae.nest.domain.user.entity.User;
+import com.chunjae.nest.domain.user.entity.UserStatus;
 import com.chunjae.nest.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +41,6 @@ public class PaperService {
     public String saveUploadedPaper(User user, PaperRequest paperRequest) throws IOException {
         log.info("paperRequest:{}", paperRequest.toString());
         log.info("user :{}", user.getRole().toString());
-//        User userData = userRepository.findById(user.getId()).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
 
         MultipartFile multipartFile = paperRequest.getMultipartFile();
         if (multipartFile == null) {
@@ -123,24 +122,22 @@ public class PaperService {
     @Transactional
     public String updatePaper(User user, Long id, PaperRequest paperRequest) throws IOException {
         log.info("id:{}, paperRequest:{}", id, paperRequest.toString());
-        User userData = userRepository.findById(user.getId()).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
         Paper paper = paperRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("시험지가 없습니다."));
-        validateUserAndPaper(userData, paper);
-
+        validateUserAndPaper(user, paper);
 
         String originUrl = paper.getPaperFile().getUrl();
         PaperFile paperFile = paper.getPaperFile();
-        paper.paperToUpdate(paperRequest);
         MultipartFile multipartFile = paperRequest.getMultipartFile();
-
-        if (paper.getOcrCount() != 0 && (paper.getPaperStatus() == PaperStatus.IN_PROGRESS || paper.getPaperStatus() == PaperStatus.TO_DO)) {
-            return "ok";
-        }
         if (multipartFile == null) {
             paperFile.updatePaperFile("", "");
             s3UploadService.deletePaper(originUrl);
             return "ok";
         }
+        paper.paperToUpdate(paperRequest);
+
+        if (paper.getOcrCount() != 0 && (paper.getPaperStatus() == PaperStatus.IN_PROGRESS || paper.getPaperStatus() == PaperStatus.TO_DO))
+            return "ok";
+
 
         String url = s3UploadService.uploadPaper(multipartFile);
         String fileName = s3UploadService.getFileName(url);
@@ -193,19 +190,23 @@ public class PaperService {
         User user = userRepository.findById(paperAssignmentRequest.getUserId()).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
         Paper paper = paperRepository.findById(paperAssignmentRequest.getPaperId()).orElseThrow(() -> new IllegalArgumentException("시험지가 없습니다."));
         Optional<PaperAssignment> assignmentUser = paperAssignmentRepository.findByUserAndPaper(user, paper);
-        if (assignmentUser.isPresent()) {
-            PaperAssignment paperAssignment = assignmentUser.get();
-            paperAssignment.updatePaperAssignmentStatus(PaperAssignmentStatus.TO_DO);
+
+        if (user.getUserStatus() != UserStatus.DELETE) {
+            if (assignmentUser.isPresent()) {
+                PaperAssignment paperAssignment = assignmentUser.get();
+                paperAssignment.updatePaperAssignmentStatus(PaperAssignmentStatus.TO_DO);
+                return "ok";
+            }
+
+            PaperAssignment paperAssignment = PaperAssignment.builder()
+                    .user(user)
+                    .paper(paper)
+                    .paperAssignmentStatus(PaperAssignmentStatus.TO_DO)
+                    .build();
+            paperAssignmentRepository.save(paperAssignment);
             return "ok";
         }
-        PaperAssignment paperAssignment = PaperAssignment.builder()
-                .user(user)
-                .paper(paper)
-                .paperAssignmentStatus(PaperAssignmentStatus.TO_DO)
-                .build();
-        paperAssignmentRepository.save(paperAssignment);
-
-        return "ok";
+        return "failed";
     }
 
     @Transactional
@@ -220,7 +221,7 @@ public class PaperService {
 
     public void validateUserAndPaper(User user, Paper paper) {
         if (!Objects.equals(user.getId(), paper.getUser().getId())) {
-            throw new IllegalArgumentException("유저와 문제지의 등록자가 일치하지 않습니다.");
+            throw new IllegalArgumentException("유저와 시험지의 등록자가 일치하지 않습니다.");
         }
     }
 

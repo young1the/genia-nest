@@ -21,7 +21,6 @@ import com.chunjae.nest.domain.question.repository.QuestionFileRepository;
 import com.chunjae.nest.domain.question.repository.QuestionLogRepository;
 import com.chunjae.nest.domain.question.repository.QuestionRepository;
 import com.chunjae.nest.domain.user.entity.User;
-import com.chunjae.nest.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -31,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 @Service
 @Slf4j
@@ -44,31 +42,33 @@ public class QuestionService {
     private final QuestionFileRepository questionFileRepository;
     private final QuestionLogRepository questionLogRepository;
     private final PaperLogRepository paperLogRepository;
-    private final UserRepository userRepository;
 
     @Transactional
     public String uploadQuestionFile(User user, QuestionRequest questionRequest) throws IOException {
         log.info("questionRequest: {}", questionRequest.toString());
+//        log.info("user:{}", user.toString());
+//        if (!isAssignedUser(user)) {
+//            throw new IllegalArgumentException("작업 지정된 유저가 아닙니다.");
+//        }
 
-        User userData = userRepository.findById(user.getId()).orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
-        if (!isAssignedUser(userData)) {
-            throw new IllegalArgumentException("작업 지정된 유저가 아닙니다.");
-        }
+
 
         Question question = questionRequest.createQuestion(user);
         MultipartFile multipartFile = questionRequest.getMultipartFile();
         String numExpression = questionRequest.getNumExpression();
-        String questionUrl = s3UploadService.uploadPaper(multipartFile);
-        String questionFileName = s3UploadService.getFileName(questionUrl);
 
+        log.info("user:{}",user.getId());
 
         try {
+            String questionUrl = s3UploadService.uploadPaper(multipartFile);
+            String questionFileName = s3UploadService.getFileName(questionUrl);
+            log.info("questionUrl:{}",questionUrl);
             if (!"failed".equals(questionUrl)) {
 
                 String result = performOCR(numExpression, questionUrl);
                 question.updateQuestionContent(result);
                 questionRepository.save(question);
-
+                log.info("questionUrl:{}",questionUrl);
                 QuestionFile questionFile = QuestionFile.builder()
                         .name(questionFileName)
                         .url(questionUrl)
@@ -89,8 +89,8 @@ public class QuestionService {
                 return result;
             }
         } catch (Exception e) {
-            s3UploadService.deletePaper(questionUrl);
-            e.printStackTrace();
+            log.info("e:{}", e.getMessage());
+            return "failed";
         }
         return "failed";
     }
@@ -98,11 +98,10 @@ public class QuestionService {
 
     @Transactional
     public String saveQuestion(User user, Long id, int num, String content) {
-        User userData = userRepository.findById(user.getId()).orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
         Question question = questionRepository.findByPaperIdAndNum(id, num).orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
-        if (!isAssignedUser(userData)) {
-            throw new IllegalArgumentException("작업 지정된 유저가 아닙니다.");
-        }
+//        if (!isAssignedUser(user)) {
+//            throw new IllegalArgumentException("작업 지정된 유저가 아닙니다.");
+//        }
 
         if (!"".equals(content)) {
 
@@ -144,11 +143,10 @@ public class QuestionService {
 
     @Transactional
     public String updateQuestion(User user, QuestionRequest questionRequest) throws IOException {
-        User userData = userRepository.findById(user.getId()).orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
         Question question = questionRepository.findByPaperIdAndNum(questionRequest.getPaper().getId(), questionRequest.getNum()).orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
-        if (!isAssignedUser(userData)) {
-            throw new IllegalArgumentException("작업 지정된 유저가 아닙니다.");
-        }
+//        if (!isAssignedUser(user)) {
+//            throw new IllegalArgumentException("작업 지정된 유저가 아닙니다.");
+//        }
 
         QuestionFile questionFile = question.getQuestionFile();
         String numExpression = questionRequest.getNumExpression();
@@ -157,7 +155,6 @@ public class QuestionService {
         String questionUrl = s3UploadService.uploadPaper(multipartFile);
         String fileName = s3UploadService.getFileName(questionUrl);
         try {
-
 
             String result = performOCR(numExpression, questionUrl);
             questionFile.updateQuestionFile(fileName, questionUrl);
@@ -175,9 +172,8 @@ public class QuestionService {
 
     @Transactional
     public void deleteQuestion(User user, Long id, int num) {
-        User userData = userRepository.findById(user.getId()).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
         Question question = questionRepository.findByPaperIdAndNum(id, num).orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
-        if (!isAssignedUser(userData)) {
+        if (!isAssignedUser(user)) {
             throw new IllegalArgumentException("작업 지정된 유저가 아닙니다.");
         }
         question.updateQuestionContent("");
@@ -186,7 +182,7 @@ public class QuestionService {
         questionFile.updateQuestionFile("", "");
         s3UploadService.deletePaper(questionFile.getUrl());
         QuestionLog questionLog = QuestionLog.builder()
-                .userId(userData.getUserId())
+                .userId(user.getUserId())
                 .questionNum(question.getNum())
                 .questionUrl(questionFile.getUrl())
                 .paperName(question.getPaper().getName())
@@ -196,9 +192,14 @@ public class QuestionService {
     }
 
     public boolean isAssignedUser(User user) {
+        if (user.getPaperAssignments() == null) {
+            return false;
+        }
         return user.getPaperAssignments()
                 .stream()
-                .anyMatch(paper -> paper.getUser().getId().equals(user.getId()) && paper.getPaperAssignmentStatus() == PaperAssignmentStatus.TO_DO);
+                .anyMatch(paperAssignment ->
+                        paperAssignment.getUser().getId().equals(user.getId()) &&
+                                paperAssignment.getPaperAssignmentStatus() == PaperAssignmentStatus.TO_DO);
     }
 
     public String performOCR(String numExpression, String questionUrl) {
