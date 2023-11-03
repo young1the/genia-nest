@@ -1,10 +1,8 @@
 package com.chunjae.nest.domain.question.service;
 
 import com.chunjae.nest.domain.paper.dto.SearchKeywordDTO;
-import com.chunjae.nest.domain.paper.entity.Paper;
-import com.chunjae.nest.domain.paper.entity.PaperAssignmentStatus;
-import com.chunjae.nest.domain.paper.entity.PaperLog;
-import com.chunjae.nest.domain.paper.entity.PaperStatus;
+import com.chunjae.nest.domain.paper.entity.*;
+import com.chunjae.nest.domain.paper.repository.PaperAssignmentRepository;
 import com.chunjae.nest.domain.paper.repository.PaperLogRepository;
 import com.chunjae.nest.domain.paper.service.S3UploadService;
 import com.chunjae.nest.domain.question.dto.OCRMathReqDTO;
@@ -30,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -42,33 +41,31 @@ public class QuestionService {
     private final QuestionFileRepository questionFileRepository;
     private final QuestionLogRepository questionLogRepository;
     private final PaperLogRepository paperLogRepository;
+    private final PaperAssignmentRepository paperAssignmentRepository;
 
     @Transactional
     public String uploadQuestionFile(User user, QuestionRequest questionRequest) throws IOException {
         log.info("questionRequest: {}", questionRequest.toString());
-//        log.info("user:{}", user.toString());
-//        if (!isAssignedUser(user)) {
-//            throw new IllegalArgumentException("작업 지정된 유저가 아닙니다.");
-//        }
-
+        PaperAssignment userAssignment = findUserAssignment(user, questionRequest.getPaper());
+        if (userAssignment == null) throw new IllegalArgumentException("작업 지정된 유저가 아닙니다");
 
 
         Question question = questionRequest.createQuestion(user);
         MultipartFile multipartFile = questionRequest.getMultipartFile();
         String numExpression = questionRequest.getNumExpression();
 
-        log.info("user:{}",user.getId());
+        log.info("user:{}", user.getId());
 
         try {
             String questionUrl = s3UploadService.uploadPaper(multipartFile);
             String questionFileName = s3UploadService.getFileName(questionUrl);
-            log.info("questionUrl:{}",questionUrl);
+            log.info("questionUrl:{}", questionUrl);
             if (!"failed".equals(questionUrl)) {
 
                 String result = performOCR(numExpression, questionUrl);
                 question.updateQuestionContent(result);
                 questionRepository.save(question);
-                log.info("questionUrl:{}",questionUrl);
+                log.info("questionUrl:{}", questionUrl);
                 QuestionFile questionFile = QuestionFile.builder()
                         .name(questionFileName)
                         .url(questionUrl)
@@ -99,9 +96,9 @@ public class QuestionService {
     @Transactional
     public String saveQuestion(User user, Long id, int num, String content) {
         Question question = questionRepository.findByPaperIdAndNum(id, num).orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
-//        if (!isAssignedUser(user)) {
-//            throw new IllegalArgumentException("작업 지정된 유저가 아닙니다.");
-//        }
+        PaperAssignment userAssignment = findUserAssignment(user, question.getPaper());
+        if (userAssignment == null) throw new IllegalArgumentException("작업 지정된 유저가 아닙니다");
+
 
         if (!"".equals(content)) {
 
@@ -144,9 +141,8 @@ public class QuestionService {
     @Transactional
     public String updateQuestion(User user, QuestionRequest questionRequest) throws IOException {
         Question question = questionRepository.findByPaperIdAndNum(questionRequest.getPaper().getId(), questionRequest.getNum()).orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
-//        if (!isAssignedUser(user)) {
-//            throw new IllegalArgumentException("작업 지정된 유저가 아닙니다.");
-//        }
+        PaperAssignment userAssignment = findUserAssignment(user, question.getPaper());
+        if (userAssignment == null) throw new IllegalArgumentException("작업 지정된 유저가 아닙니다");
 
         QuestionFile questionFile = question.getQuestionFile();
         String numExpression = questionRequest.getNumExpression();
@@ -173,9 +169,9 @@ public class QuestionService {
     @Transactional
     public void deleteQuestion(User user, Long id, int num) {
         Question question = questionRepository.findByPaperIdAndNum(id, num).orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
-        if (!isAssignedUser(user)) {
-            throw new IllegalArgumentException("작업 지정된 유저가 아닙니다.");
-        }
+        PaperAssignment userAssignment = findUserAssignment(user, question.getPaper());
+        if (userAssignment == null) throw new IllegalArgumentException("작업 지정된 유저가 아닙니다");
+
         question.updateQuestionContent("");
         question.updateQuestionStatus(QuestionStatus.DELETED);
         QuestionFile questionFile = question.getQuestionFile();
@@ -191,15 +187,12 @@ public class QuestionService {
         questionLogRepository.save(questionLog);
     }
 
-    public boolean isAssignedUser(User user) {
-        if (user.getPaperAssignments() == null) {
-            return false;
-        }
-        return user.getPaperAssignments()
+    public PaperAssignment findUserAssignment(User user, Paper paper) {
+        return paper.getPaperAssignments()
                 .stream()
-                .anyMatch(paperAssignment ->
-                        paperAssignment.getUser().getId().equals(user.getId()) &&
-                                paperAssignment.getPaperAssignmentStatus() == PaperAssignmentStatus.TO_DO);
+                .filter(assignment -> Objects.equals(assignment.getUser().getId(), user.getId()) && assignment.getPaperAssignmentStatus() == PaperAssignmentStatus.TO_DO)
+                .findFirst()
+                .orElse(null);
     }
 
     public String performOCR(String numExpression, String questionUrl) {

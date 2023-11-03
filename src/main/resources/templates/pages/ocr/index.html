@@ -151,7 +151,6 @@
 									<col style="width: 6%;">
 									<col style="width: 6%;">
 									<col style="width: 8%;">
-									<col style="width: 6%;">
 								</colgroup>
 								<thead>
 									<tr>
@@ -167,7 +166,6 @@
 										<th>문항 수</th>
 										<th>담당자</th>
 										<th>등록일</th>
-										<th>OCR 상태</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -187,7 +185,7 @@
 										<td th:text="${#temporals.format(paper.createdAt, 'yyyy-MM-dd')}"></td>
 									</tr>
 									<tr th:if="${papers.isEmpty()}" >
-										<td colspan="13">검색 결과가 없습니다.</td>
+										<td colspan="12">검색 결과가 없습니다.</td>
 									</tr>
 								</tbody>
 								</tbody>
