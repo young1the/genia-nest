@@ -64,6 +64,9 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
         if (option.equals("userId")) {
             return userIdLike(keyword);
         }
+        if (option.equals("all")) {
+            return nameLike(keyword).or(userIdLike(keyword));
+        }
         return null;
     }
 
