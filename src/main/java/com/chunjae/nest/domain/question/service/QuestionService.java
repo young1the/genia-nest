@@ -2,6 +2,7 @@ package com.chunjae.nest.domain.question.service;
 
 import com.chunjae.nest.domain.paper.dto.SearchKeywordDTO;
 import com.chunjae.nest.domain.paper.entity.Paper;
+import com.chunjae.nest.domain.paper.entity.PaperAssignmentStatus;
 import com.chunjae.nest.domain.paper.entity.PaperLog;
 import com.chunjae.nest.domain.paper.entity.PaperStatus;
 import com.chunjae.nest.domain.paper.repository.PaperLogRepository;
@@ -46,11 +47,14 @@ public class QuestionService {
     private final UserRepository userRepository;
 
     @Transactional
-    public String uploadQuestionFile(QuestionRequest questionRequest) throws IOException {
+    public String uploadQuestionFile(User user, QuestionRequest questionRequest) throws IOException {
         log.info("questionRequest: {}", questionRequest.toString());
-        Long id = 1L;
 
-        User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
+        User userData = userRepository.findById(user.getId()).orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+        if (!isAssignedUser(userData)) {
+            throw new IllegalArgumentException("작업 지정된 유저가 아닙니다.");
+        }
+
         Question question = questionRequest.createQuestion(user);
         MultipartFile multipartFile = questionRequest.getMultipartFile();
         String numExpression = questionRequest.getNumExpression();
@@ -92,25 +96,13 @@ public class QuestionService {
     }
 
 
-    public String performOCR(String numExpression, String questionUrl) {
-        if ("Y".equalsIgnoreCase(numExpression)) {
-            OCRMathReqDTO ocrMathReqDTO = new OCRMathReqDTO(questionUrl);
-            OCRMathResDTO ocrResDTO = ocrService.transMath(ocrMathReqDTO);
-            return ocrResDTO.getText();
-        }
-        if ("N".equalsIgnoreCase(numExpression)) {
-            OCRTextReqDTO ocrTextReqDTO = new OCRTextReqDTO(questionUrl);
-            OCRTextResDTO ocrTextResDTO = ocrService.transText(ocrTextReqDTO);
-            return ocrTextResDTO.getText();
-        }
-        return "failed";
-    }
-
     @Transactional
-    public String saveQuestion(Long id, int num, String content) {
-        Long userId = 1L;
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
+    public String saveQuestion(User user, Long id, int num, String content) {
+        User userData = userRepository.findById(user.getId()).orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
         Question question = questionRepository.findByPaperIdAndNum(id, num).orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
+        if (!isAssignedUser(userData)) {
+            throw new IllegalArgumentException("작업 지정된 유저가 아닙니다.");
+        }
 
         if (!"".equals(content)) {
 
@@ -128,7 +120,6 @@ public class QuestionService {
                     .questionStatus(QuestionStatus.COMPLETED)
                     .build();
 
-            questionRepository.save(question);
             questionLogRepository.save(questionLog);
             return "ok";
         }
@@ -152,45 +143,76 @@ public class QuestionService {
     }
 
     @Transactional
-    public String updateQuestion(QuestionRequest questionRequest) throws IOException {
-        Long userId = 1L;
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
+    public String updateQuestion(User user, QuestionRequest questionRequest) throws IOException {
+        User userData = userRepository.findById(user.getId()).orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
         Question question = questionRepository.findByPaperIdAndNum(questionRequest.getPaper().getId(), questionRequest.getNum()).orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
+        if (!isAssignedUser(userData)) {
+            throw new IllegalArgumentException("작업 지정된 유저가 아닙니다.");
+        }
+
         QuestionFile questionFile = question.getQuestionFile();
         String numExpression = questionRequest.getNumExpression();
         MultipartFile multipartFile = questionRequest.getMultipartFile();
 
-        s3UploadService.deletePaper(questionFile.getUrl());
         String questionUrl = s3UploadService.uploadPaper(multipartFile);
         String fileName = s3UploadService.getFileName(questionUrl);
+        try {
 
-        String result = performOCR(numExpression, questionUrl);
-        questionFile.updateQuestionFile(fileName, questionUrl);
-        question.updateQuestionContent(result);
-        question.updateType(questionRequest.getType());
-        question.updateQuestionStatus(QuestionStatus.BEFORE);
 
-        return result;
+            String result = performOCR(numExpression, questionUrl);
+            questionFile.updateQuestionFile(fileName, questionUrl);
+            question.updateQuestionContent(result);
+            question.updateType(questionRequest.getType());
+            question.updateQuestionStatus(QuestionStatus.BEFORE);
+            s3UploadService.deletePaper(questionFile.getUrl());
+            return result;
+        } catch (Exception e) {
+            log.info("e:{}", e.getMessage());
+            s3UploadService.deletePaper(questionUrl);
+            return "failed";
+        }
     }
 
     @Transactional
-    public void deleteQuestion(Long id, int num) {
-        Long userId = 1L;
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
+    public void deleteQuestion(User user, Long id, int num) {
+        User userData = userRepository.findById(user.getId()).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
         Question question = questionRepository.findByPaperIdAndNum(id, num).orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
+        if (!isAssignedUser(userData)) {
+            throw new IllegalArgumentException("작업 지정된 유저가 아닙니다.");
+        }
         question.updateQuestionContent("");
         question.updateQuestionStatus(QuestionStatus.DELETED);
         QuestionFile questionFile = question.getQuestionFile();
-        questionFile.updateQuestionFile(questionFile.getName(), "");
+        questionFile.updateQuestionFile("", "");
         s3UploadService.deletePaper(questionFile.getUrl());
         QuestionLog questionLog = QuestionLog.builder()
-                .userId(user.getUserId())
+                .userId(userData.getUserId())
                 .questionNum(question.getNum())
                 .questionUrl(questionFile.getUrl())
                 .paperName(question.getPaper().getName())
                 .questionStatus(QuestionStatus.DELETED)
                 .build();
         questionLogRepository.save(questionLog);
+    }
+
+    public boolean isAssignedUser(User user) {
+        return user.getPaperAssignments()
+                .stream()
+                .anyMatch(paper -> paper.getUser().getId().equals(user.getId()) && paper.getPaperAssignmentStatus() == PaperAssignmentStatus.TO_DO);
+    }
+
+    public String performOCR(String numExpression, String questionUrl) {
+        if ("Y".equalsIgnoreCase(numExpression)) {
+            OCRMathReqDTO ocrMathReqDTO = new OCRMathReqDTO(questionUrl);
+            OCRMathResDTO ocrResDTO = ocrService.transMath(ocrMathReqDTO);
+            return ocrResDTO.getText();
+        }
+        if ("N".equalsIgnoreCase(numExpression)) {
+            OCRTextReqDTO ocrTextReqDTO = new OCRTextReqDTO(questionUrl);
+            OCRTextResDTO ocrTextResDTO = ocrService.transText(ocrTextReqDTO);
+            return ocrTextResDTO.getText();
+        }
+        return "failed";
     }
 
     public void updatePaperStatusAndLog(Paper paper) {
@@ -229,7 +251,4 @@ public class QuestionService {
         return questionRepository.searchOCRDone(searchKeywordDTO, pageable);
     }
 
-    public List<Question> searchResults() {
-        return questionRepository.findAll();
-    }
 }

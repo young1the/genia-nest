@@ -19,7 +19,8 @@ public class PaperApiController {
     private final PaperService paperService;
 
     @PostMapping("/upload")
-    public ResponseEntity<String> saveUploadedPaper(@SessionAttribute("user") User user, PaperRequest paperRequest) throws IOException {
+    public ResponseEntity<String> saveUploadedPaper(@SessionAttribute(name = "user") User user,
+                                                    PaperRequest paperRequest) throws IOException {
 
         if ("ok".equals(paperService.saveUploadedPaper(user, paperRequest))) {
             return ResponseEntity.ok().build();
@@ -38,7 +39,7 @@ public class PaperApiController {
     }
 
     @PostMapping("/modify/{id}")
-    public ResponseEntity<String> updatePaper(@SessionAttribute("user") User user,
+    public ResponseEntity<String> updatePaper(@SessionAttribute(name = "user") User user,
                                               @PathVariable(name = "id") Long id,
                                               PaperRequest paperRequest) throws IOException {
         if ("ok".equals(paperService.updatePaper(user, id, paperRequest))) {
@@ -48,8 +49,8 @@ public class PaperApiController {
     }
 
     @PostMapping("/remove/{id}")
-    public ResponseEntity<String> deletePaper(@SessionAttribute("user") User user,
-            @PathVariable(name = "id") Long id) {
+    public ResponseEntity<String> deletePaper(@SessionAttribute(name = "user") User user,
+                                              @PathVariable(name = "id") Long id) {
         if ("ok".equals(paperService.deletePaper(user, id))) {
             return ResponseEntity.ok().build();
         }
@@ -57,7 +58,8 @@ public class PaperApiController {
     }
 
     @PostMapping("/assign")
-    public ResponseEntity<String> assignTaskPaper(@RequestBody PaperAssignmentRequest paperAssignmentRequest) {
+    public ResponseEntity<String> assignTaskPaper(@SessionAttribute(name = "user") User user,
+                                                  @RequestBody PaperAssignmentRequest paperAssignmentRequest) {
 
         paperService.assignTaskPaper(paperAssignmentRequest);
 
@@ -65,7 +67,8 @@ public class PaperApiController {
     }
 
     @PostMapping("/unassign")
-    public ResponseEntity<String> unassignTaskPaper(@RequestBody PaperAssignmentRequest paperAssignmentRequest) {
+    public ResponseEntity<String> unassignTaskPaper(@SessionAttribute(name = "user") User user,
+                                                    @RequestBody PaperAssignmentRequest paperAssignmentRequest) {
 
         paperService.unassignTaskPaper(paperAssignmentRequest);
 

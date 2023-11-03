@@ -41,14 +41,11 @@ public class PaperService {
     public String saveUploadedPaper(User user, PaperRequest paperRequest) throws IOException {
         log.info("paperRequest:{}", paperRequest.toString());
         log.info("user :{}", user.getRole().toString());
-        User userData = userRepository.findById(user.getId()).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
-//       if (!isAllowedUser(userData)){
-//           return "failed";
-//       }
+//        User userData = userRepository.findById(user.getId()).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
 
         MultipartFile multipartFile = paperRequest.getMultipartFile();
         if (multipartFile == null) {
-            Paper paper = paperRequest.createPaper(userData);
+            Paper paper = paperRequest.createPaper(user);
             PaperFile paperFile = PaperFile.builder()
                     .name("")
                     .url("")
@@ -65,34 +62,40 @@ public class PaperService {
             paperLogRepository.save(paperLog);
             return "ok";
         }
-        if (isAllowedFileType(multipartFile)) {
-            String url = s3UploadService.uploadPaper(multipartFile);
-            String fileName = s3UploadService.getFileName(url);
+        try {
+            if (isAllowedFileType(multipartFile)) {
+                String url = s3UploadService.uploadPaper(multipartFile);
+                String fileName = s3UploadService.getFileName(url);
 
-            log.info(" url: {}, fileName: {}", url, fileName);
+                log.info(" url: {}, fileName: {}", url, fileName);
 
-            if (!"failed".equals(url)) {
-                Paper paper = paperRequest.createPaper(user);
-                PaperFile paperFile = PaperFile.builder()
-                        .name(fileName)
-                        .url(url)
-                        .paper(paper)
-                        .build();
-                PaperLog paperLog = PaperLog.builder()
-                        .userId(user.getUserId())
-                        .paperUrl(url)
-                        .paperName(paperRequest.getName())
-                        .paperStatus(PaperStatus.TO_DO)
-                        .build();
+                if (!"failed".equals(url)) {
+                    Paper paper = paperRequest.createPaper(user);
+                    PaperFile paperFile = PaperFile.builder()
+                            .name(fileName)
+                            .url(url)
+                            .paper(paper)
+                            .build();
+                    PaperLog paperLog = PaperLog.builder()
+                            .userId(user.getUserId())
+                            .paperUrl(url)
+                            .paperName(paperRequest.getName())
+                            .paperStatus(PaperStatus.TO_DO)
+                            .build();
 
-                paperRepository.save(paper);
-                paperFileRepository.save(paperFile);
-                paperLogRepository.save(paperLog);
+                    paperRepository.save(paper);
+                    paperFileRepository.save(paperFile);
+                    paperLogRepository.save(paperLog);
 
-                return "ok";
+                    return "ok";
+                }
             }
+            return "failed";
+        } catch (Exception e) {
+            log.info("e:{}", e.getMessage());
+            return "failed";
         }
-        return "failed";
+
     }
 
     @Transactional(readOnly = true)
@@ -124,9 +127,7 @@ public class PaperService {
         Paper paper = paperRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("시험지가 없습니다."));
         validateUserAndPaper(userData, paper);
 
-        if (!isAllowedUser(userData)){
-            return "failed";
-        }
+
         String originUrl = paper.getPaperFile().getUrl();
         PaperFile paperFile = paper.getPaperFile();
         paper.paperToUpdate(paperRequest);
@@ -156,6 +157,7 @@ public class PaperService {
             }
             return "failed";
         } catch (Exception e) {
+            log.info("e:{}", e.getMessage());
             s3UploadService.deletePaper(url);
             return "failed";
         }
@@ -167,9 +169,6 @@ public class PaperService {
         Paper paper = paperRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("시험지가 없습니다."));
         String url = paper.getPaperFile().getUrl();
         validateUserAndPaper(userData, paper);
-        if (!isAllowedUser(userData)){
-            return "failed";
-        }
 
         if (0 == paper.getOcrCount()) {
             s3UploadService.deletePaper(url);
@@ -212,7 +211,7 @@ public class PaperService {
     @Transactional
     public String unassignTaskPaper(PaperAssignmentRequest paperAssignmentRequest) {
 
-        User user = userRepository.findById(paperAssignmentRequest.getUserId()).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
+        User user = userRepository.findById(paperAssignmentRequest.getUserId()).orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
         Paper paper = paperRepository.findById(paperAssignmentRequest.getPaperId()).orElseThrow(() -> new IllegalArgumentException("시험지가 없습니다."));
         PaperAssignment paperAssignment = paperAssignmentRepository.findByUserAndPaper(user, paper).orElseThrow(() -> new IllegalArgumentException("지정된 작업자가 없습니다."));
         paperAssignment.updatePaperAssignmentStatus(PaperAssignmentStatus.CANCELLED);
@@ -221,21 +220,13 @@ public class PaperService {
 
     public void validateUserAndPaper(User user, Paper paper) {
         if (!Objects.equals(user.getId(), paper.getUser().getId())) {
-            throw new IllegalArgumentException("유저와 시험지의 등록자가 일치하지 않습니다.");
+            throw new IllegalArgumentException("유저와 문제지의 등록자가 일치하지 않습니다.");
         }
     }
 
     public boolean isAllowedFileType(MultipartFile multipartFile) {
         String fileName = multipartFile.getOriginalFilename();
         return fileName != null && fileName.toLowerCase().endsWith(".pdf");
-    }
-
-    public boolean isAllowedUser(User user){
-        if (!"문제담당자".equals(user.getRole().getRole()) && (user.getRole().getRoleStatus() == RoleStatus.TERMINATED ||
-                user.getRole().getRoleStatus() == RoleStatus.CANCELLED)){
-            return false;
-        }
-        return true;
     }
 
     public Page<Paper> searchResults(SearchKeywordDTO searchKeywordDTO, Pageable pageable) {
