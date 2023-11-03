@@ -58,30 +58,35 @@ public class QuestionService {
         String questionFileName = s3UploadService.getFileName(questionUrl);
 
 
-        if (!"failed".equals(questionUrl)) {
+        try {
+            if (!"failed".equals(questionUrl)) {
 
-            String result = performOCR(numExpression, questionUrl);
-            question.updateQuestionContent(result);
-            questionRepository.save(question);
+                String result = performOCR(numExpression, questionUrl);
+                question.updateQuestionContent(result);
+                questionRepository.save(question);
 
-            QuestionFile questionFile = QuestionFile.builder()
-                    .name(questionFileName)
-                    .url(questionUrl)
-                    .question(question)
-                    .build();
+                QuestionFile questionFile = QuestionFile.builder()
+                        .name(questionFileName)
+                        .url(questionUrl)
+                        .question(question)
+                        .build();
 
-            QuestionLog questionLog = QuestionLog.builder()
-                    .userId(user.getUserId())
-                    .paperName(question.getPaper().getName())
-                    .questionUrl(questionUrl)
-                    .questionNum(question.getNum())
-                    .questionStatus(QuestionStatus.BEFORE)
-                    .build();
-            log.info("questionFile:{}, questionLog: {}", questionFile.toString(), questionLog.toString());
+                QuestionLog questionLog = QuestionLog.builder()
+                        .userId(user.getUserId())
+                        .paperName(question.getPaper().getName())
+                        .questionUrl(questionUrl)
+                        .questionNum(question.getNum())
+                        .questionStatus(QuestionStatus.BEFORE)
+                        .build();
+                log.info("questionFile:{}, questionLog: {}", questionFile.toString(), questionLog.toString());
 
-            questionFileRepository.save(questionFile);
-            questionLogRepository.save(questionLog);
-            return result;
+                questionFileRepository.save(questionFile);
+                questionLogRepository.save(questionLog);
+                return result;
+            }
+        } catch (Exception e) {
+            s3UploadService.deletePaper(questionUrl);
+            e.printStackTrace();
         }
         return "failed";
     }

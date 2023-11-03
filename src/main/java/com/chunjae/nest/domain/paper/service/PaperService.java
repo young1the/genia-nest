@@ -9,6 +9,7 @@ import com.chunjae.nest.domain.paper.repository.PaperAssignmentRepository;
 import com.chunjae.nest.domain.paper.repository.PaperFileRepository;
 import com.chunjae.nest.domain.paper.repository.PaperLogRepository;
 import com.chunjae.nest.domain.paper.repository.PaperRepository;
+import com.chunjae.nest.domain.user.entity.RoleStatus;
 import com.chunjae.nest.domain.user.entity.User;
 import com.chunjae.nest.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,14 +38,17 @@ public class PaperService {
 
 
     @Transactional
-    public String saveUploadedPaper(PaperRequest paperRequest) throws IOException {
-        log.info(" paperRequest:{}", paperRequest.toString());
+    public String saveUploadedPaper(User user, PaperRequest paperRequest) throws IOException {
+        log.info("paperRequest:{}", paperRequest.toString());
+        log.info("user :{}", user.getRole().toString());
+        User userData = userRepository.findById(user.getId()).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
+//       if (!isAllowedUser(userData)){
+//           return "failed";
+//       }
 
-        Long id = 1L;
-        User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
         MultipartFile multipartFile = paperRequest.getMultipartFile();
         if (multipartFile == null) {
-            Paper paper = paperRequest.createPaper(user);
+            Paper paper = paperRequest.createPaper(userData);
             PaperFile paperFile = PaperFile.builder()
                     .name("")
                     .url("")
@@ -114,12 +118,15 @@ public class PaperService {
     }
 
     @Transactional
-    public String updatePaper(Long id, PaperRequest paperRequest) throws IOException {
+    public String updatePaper(User user, Long id, PaperRequest paperRequest) throws IOException {
         log.info("id:{}, paperRequest:{}", id, paperRequest.toString());
-        Long userId = 1L;
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
+        User userData = userRepository.findById(user.getId()).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
         Paper paper = paperRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("시험지가 없습니다."));
-        validateUserAndPaper(user, paper);
+        validateUserAndPaper(userData, paper);
+
+        if (!isAllowedUser(userData)){
+            return "failed";
+        }
         String originUrl = paper.getPaperFile().getUrl();
         PaperFile paperFile = paper.getPaperFile();
         paper.paperToUpdate(paperRequest);
@@ -155,12 +162,14 @@ public class PaperService {
     }
 
     @Transactional
-    public String deletePaper(Long id) {
-        Long userId = 1L;
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
+    public String deletePaper(User user, Long id) {
+        User userData = userRepository.findById(user.getId()).orElseThrow(() -> new IllegalArgumentException("유저를 찾을수 없습니다."));
         Paper paper = paperRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("시험지가 없습니다."));
         String url = paper.getPaperFile().getUrl();
-        validateUserAndPaper(user, paper);
+        validateUserAndPaper(userData, paper);
+        if (!isAllowedUser(userData)){
+            return "failed";
+        }
 
         if (0 == paper.getOcrCount()) {
             s3UploadService.deletePaper(url);
@@ -212,13 +221,21 @@ public class PaperService {
 
     public void validateUserAndPaper(User user, Paper paper) {
         if (!Objects.equals(user.getId(), paper.getUser().getId())) {
-            throw new IllegalArgumentException("유저와 시험지의 작성자가 일치하지 않습니다.");
+            throw new IllegalArgumentException("유저와 시험지의 등록자가 일치하지 않습니다.");
         }
     }
 
     public boolean isAllowedFileType(MultipartFile multipartFile) {
         String fileName = multipartFile.getOriginalFilename();
         return fileName != null && fileName.toLowerCase().endsWith(".pdf");
+    }
+
+    public boolean isAllowedUser(User user){
+        if (!"문제담당자".equals(user.getRole().getRole()) && (user.getRole().getRoleStatus() == RoleStatus.TERMINATED ||
+                user.getRole().getRoleStatus() == RoleStatus.CANCELLED)){
+            return false;
+        }
+        return true;
     }
 
     public Page<Paper> searchResults(SearchKeywordDTO searchKeywordDTO, Pageable pageable) {
