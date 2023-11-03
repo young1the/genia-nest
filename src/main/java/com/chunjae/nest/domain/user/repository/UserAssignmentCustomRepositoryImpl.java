@@ -60,7 +60,7 @@ public class UserAssignmentCustomRepositoryImpl implements UserAssignmentCustomR
     }
 
     private BooleanExpression filterQuestionManager() {
-        return user.role.role.eq("문제담당자");
+        return user.role.role.ne("수집담당자");
     }
 
     @Override
