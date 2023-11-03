@@ -185,7 +185,6 @@
 										<td th:text="${paper.totalCount}" />
 										<td th:text="${paper.user.name}" />
 										<td th:text="${#temporals.format(paper.createdAt, 'yyyy-MM-dd')}"></td>
-										<td th:text="${paper.paperStatus.displayValue}" /> <!--확인용(최종 머지 시 삭제)-->
 									</tr>
 									<tr th:if="${papers.isEmpty()}" >
 										<td colspan="13">검색 결과가 없습니다.</td>

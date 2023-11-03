@@ -3,8 +3,8 @@ package com.chunjae.nest.domain.paper.controller;
 import com.chunjae.nest.domain.paper.dto.req.PaperAssignmentRequest;
 import com.chunjae.nest.domain.paper.dto.req.PaperRequest;
 import com.chunjae.nest.domain.paper.dto.res.PaperResponse;
-import com.chunjae.nest.domain.paper.entity.PaperAssignment;
 import com.chunjae.nest.domain.paper.service.PaperService;
+import com.chunjae.nest.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +19,10 @@ public class PaperApiController {
     private final PaperService paperService;
 
     @PostMapping("/upload")
-    public ResponseEntity<String> saveUploadedPaper(PaperRequest paperRequest) throws IOException {
-        if ("ok".equals(paperService.saveUploadedPaper(paperRequest))) {
+    public ResponseEntity<String> saveUploadedPaper(@SessionAttribute(name = "user") User user,
+                                                    PaperRequest paperRequest) throws IOException {
+
+        if ("ok".equals(paperService.saveUploadedPaper(user, paperRequest))) {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.badRequest().build();
@@ -37,32 +39,37 @@ public class PaperApiController {
     }
 
     @PostMapping("/modify/{id}")
-    public ResponseEntity<String> updatePaper(@PathVariable(name = "id") Long id,
+    public ResponseEntity<String> updatePaper(@SessionAttribute(name = "user") User user,
+                                              @PathVariable(name = "id") Long id,
                                               PaperRequest paperRequest) throws IOException {
-        if ("ok".equals(paperService.updatePaper(id, paperRequest))) {
+        if ("ok".equals(paperService.updatePaper(user, id, paperRequest))) {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.badRequest().build();
     }
 
     @PostMapping("/remove/{id}")
-    public ResponseEntity<String> deletePaper(@PathVariable(name = "id") Long id) {
-        if ("ok".equals(paperService.deletePaper(id))) {
+    public ResponseEntity<String> deletePaper(@SessionAttribute(name = "user") User user,
+                                              @PathVariable(name = "id") Long id) {
+        if ("ok".equals(paperService.deletePaper(user, id))) {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.badRequest().build();
     }
 
     @PostMapping("/assign")
-    public ResponseEntity<String> assignTaskPaper(@RequestBody PaperAssignmentRequest paperAssignmentRequest) {
+    public ResponseEntity<String> assignTaskPaper(@SessionAttribute(name = "user") User user,
+                                                  @RequestBody PaperAssignmentRequest paperAssignmentRequest) {
 
-        paperService.assignTaskPaper(paperAssignmentRequest);
-
-        return ResponseEntity.ok().build();
+        if ("ok".equals(paperService.assignTaskPaper(paperAssignmentRequest))) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.badRequest().build();
     }
 
     @PostMapping("/unassign")
-    public ResponseEntity<String> unassignTaskPaper(@RequestBody PaperAssignmentRequest paperAssignmentRequest){
+    public ResponseEntity<String> unassignTaskPaper(@SessionAttribute(name = "user") User user,
+                                                    @RequestBody PaperAssignmentRequest paperAssignmentRequest) {
 
         paperService.unassignTaskPaper(paperAssignmentRequest);
 
