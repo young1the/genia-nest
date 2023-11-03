@@ -63,6 +63,9 @@ function PaperApp({idParam}) {
             body: formData,
         })
         if (response.ok) {
+            if (window.opener) {
+                window.opener.location.reload();
+            }
             window.close();
         } else alert("저장 실패");
     }
@@ -82,6 +85,9 @@ function PaperApp({idParam}) {
             method: "POST",
         });
         if (response.ok) {
+            if (window.opener) {
+                window.opener.location.reload();
+            }
             window.close();
         }
     }
@@ -95,10 +101,8 @@ function PaperApp({idParam}) {
                     <Button color="gray" onClick={() => {
                         if (window.opener) {
                             window.opener.location.reload();
-                            window.close();
-                        } else {
-                            window.history.back();
                         }
+                        window.close();
                     }}>닫기</Button>
                 </div>
             </header>
