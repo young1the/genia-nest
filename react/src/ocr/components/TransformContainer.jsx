@@ -312,7 +312,10 @@ const TransformContainer = ({ cropData, totalCount, idParam, clearCropData }) =>
                   }
                   questionUpload();
                   if(questionNum === totalCount){
-                    alert("마지막 문제 입니다.");
+                    if (window.opener) {
+                      window.opener.location.reload();
+                    }
+                    window.close();
                   }else{
                     setQuestionNum((questionNum) => +questionNum + 1);
                   }
