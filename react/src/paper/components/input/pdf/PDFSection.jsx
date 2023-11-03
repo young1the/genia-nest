@@ -12,9 +12,10 @@ const PDFSection = ({pdfSectionProps}) => {
     const {
         movePDFPage, deletePDFPage, pages,
         paperFileSubmitHandler,
+        paperStatus,
     } = pdfSectionProps;
     const handleDragEnd = (event) => {
-        const { active, over } = event;
+        const {active, over} = event;
         movePDFPage(active.id, over.id);
     };
 
@@ -30,17 +31,22 @@ const PDFSection = ({pdfSectionProps}) => {
                 >
                     <SortableContext items={pages} strategy={rectSortingStrategy}>
                         <SortableItemContainer>
-                            {pages?.map(({ id, data }) => (
-                                <SortableItem
-                                    key={id}
-                                    id={id}
-                                    remove={() => {
-                                        deletePDFPage(id);
-                                    }}
-                                >
-                                    <PDFCanvas pdfPage={data} />
-                                </SortableItem>
-                            ))}
+                            {pages?.map(({id, data}) => {
+                                if (paperStatus === "변환 중") {
+                                    return <PDFCanvas key={id} pdfPage={data}/>;
+                                }
+                                return (
+                                    <SortableItem
+                                        key={id}
+                                        id={id}
+                                        remove={() => {
+                                            deletePDFPage(id);
+                                        }}
+                                    >
+                                        <PDFCanvas pdfPage={data}/>
+                                    </SortableItem>
+                                )
+                            })}
                         </SortableItemContainer>
                     </SortableContext>
                 </DndContext>

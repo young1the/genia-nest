@@ -110,6 +110,7 @@ public class PaperService {
                 .area(paper.getArea())
                 .subject(paper.getSubject())
                 .url(paper.getPaperFile().getUrl())
+                .paperStatus(paper.getPaperStatus().getDisplayValue())
                 .build();
     }
 

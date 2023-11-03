@@ -21,5 +21,6 @@ public class PaperResponse {
     private String area;
     private String subject;
     private String url;
+    private String paperStatus;
 
 }

@@ -30,7 +30,7 @@ function PaperApp({idParam}) {
     useEffect(() => {
         getInitialValue();
     }, []);
-    const [_,setData] = useState(false);
+    const [paperStatus,setPaperStatus] = useState();
     const getInitialValue = async () => {
         if (idParam) {
             const response = await fetch(`/api/paper/detail/${idParam}`);
@@ -42,7 +42,7 @@ function PaperApp({idParam}) {
                 console.log(`${name} : ${value}`);
                 inputRefs.current[name] = {value};
             })
-            setData(prev=>!prev);
+            setPaperStatus(result.paperStatus);
         }
     }
     const paperFileSubmitHandler = async () => {
@@ -80,6 +80,7 @@ function PaperApp({idParam}) {
 
     const infoSectionProps = {addPDF, deletePDFFile, files, inputRefs};
     const pdfSectionProps = {
+        paperStatus,
         movePDFPage, deletePDFPage, pages,
         generatePDFFile,
         pdfFileUrl: pdfBlob,
