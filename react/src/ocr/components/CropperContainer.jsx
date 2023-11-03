@@ -113,7 +113,6 @@ const CropperContainer = ({ getCropData, cropperRef, canvasRef, pdfURL }) => {
 
                     initialAspectRatio={1}
                     src={canvasRef.current?.toDataURL()}
-                    dragMode={"move"}
                     viewMode={1}
                     minCropBoxHeight={10}
                     minCropBoxWidth={10}
