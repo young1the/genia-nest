@@ -23,6 +23,7 @@
                             </div>
                             <div class="select-wrap">
                                 <select class="select-box" id="condition" name="searchOption">
+                                    <option value="all">전체</option>
                                     <option value="userId">아이디</option>
                                     <option value="name">이름</option>
                                 </select>
@@ -146,8 +147,6 @@
             </div>
         </div>
     </div>
-    <button onclick="openManagerList()">왕버튼</button>
-    <div id="pInput">자식한테 받은거</div>
 </div>
 <script>
     const openManagerList = (pageId) => {
