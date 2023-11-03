@@ -6,6 +6,7 @@ import com.chunjae.nest.domain.question.dto.res.QuestionResponse;
 import com.chunjae.nest.domain.question.entity.Question;
 import com.chunjae.nest.domain.question.repository.QuestionRepository;
 import com.chunjae.nest.domain.question.service.QuestionService;
+import com.chunjae.nest.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -24,18 +25,20 @@ public class QuestionApiController {
     private final QuestionRepository questionRepository;
 
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadQuestionFile(QuestionRequest questionRequest) throws IOException {
+    public ResponseEntity<String> uploadQuestionFile(@SessionAttribute(name = "user") User user,
+                                                     QuestionRequest questionRequest) throws IOException {
         Optional<Question> optionalQuestion = questionRepository.findByPaperIdAndNum(questionRequest.getPaper().getId(), questionRequest.getNum());
         if (optionalQuestion.isPresent()) {
-            return ResponseEntity.ok().body(questionService.updateQuestion(questionRequest));
+            return ResponseEntity.ok().body(questionService.updateQuestion(user, questionRequest));
         }
-        return ResponseEntity.ok().body(questionService.uploadQuestionFile(questionRequest));
+        return ResponseEntity.ok().body(questionService.uploadQuestionFile(user, questionRequest));
     }
 
     @PostMapping("/save/{id}")
-    public ResponseEntity<String> saveQuestion(@PathVariable(name = "id") Long id,
+    public ResponseEntity<String> saveQuestion(@SessionAttribute(name = "user") User user,
+                                               @PathVariable(name = "id") Long id,
                                                @RequestBody QuestionRequest.SaveRequest saveRequest) {
-        if ("ok".equals(questionService.saveQuestion(id, saveRequest.getNum(), saveRequest.getContent()))) {
+        if ("ok".equals(questionService.saveQuestion(user, id, saveRequest.getNum(), saveRequest.getContent()))) {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.badRequest().build();
@@ -52,10 +55,11 @@ public class QuestionApiController {
     }
 
     @PostMapping("/remove/{id}")
-    public ResponseEntity<String> deleteQuestion(@PathVariable(name = "id") Long id,
+    public ResponseEntity<String> deleteQuestion(@SessionAttribute(name = "user") User user,
+                                                 @PathVariable(name = "id") Long id,
                                                  @RequestParam(name = "num") int num) {
 
-        questionService.deleteQuestion(id, num);
+        questionService.deleteQuestion(user, id, num);
         return ResponseEntity.ok().build();
     }
 

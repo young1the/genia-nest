@@ -30,19 +30,23 @@ function PaperApp({idParam}) {
     useEffect(() => {
         getInitialValue();
     }, []);
-    const [_,setData] = useState(false);
+    const [paperStatus,setPaperStatus] = useState();
     const getInitialValue = async () => {
         if (idParam) {
             const response = await fetch(`/api/paper/detail/${idParam}`);
             const result = await response.json();
             if (result.url) {
-                await addPDF({name: result.name, url: result.url});
+                try {
+                    await addPDF({name: result.name, url: result.url});
+                } catch (e) {
+                    console.error("PDF 파일을 열 수 없습니다.");
+                }
             }
             Object.entries(result).forEach(([name, value]) => {
                 console.log(`${name} : ${value}`);
                 inputRefs.current[name] = {value};
             })
-            setData(prev=>!prev);
+            setPaperStatus(result.paperStatus);
         }
     }
     const paperFileSubmitHandler = async () => {
@@ -72,11 +76,15 @@ function PaperApp({idParam}) {
                 window.opener.location.reload();
             }
             window.close();
-        } else alert("저장 실패");
+        } else {
+            alert("저장 실패");
+            location.reload();
+        }
     }
 
     const infoSectionProps = {addPDF, deletePDFFile, files, inputRefs};
     const pdfSectionProps = {
+        paperStatus,
         movePDFPage, deletePDFPage, pages,
         generatePDFFile,
         pdfFileUrl: pdfBlob,
@@ -94,6 +102,9 @@ function PaperApp({idParam}) {
                 window.opener.location.reload();
             }
             window.close();
+        } else {
+            alert("저장 실패");
+            location.reload();
         }
     }
 

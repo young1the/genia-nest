@@ -32,7 +32,7 @@ public class PaperController implements Serializable {
     private final PaperService paperService;
 
     @GetMapping("")
-    public String index(Model model, HttpSession session,
+    public String index(Model model,
                         @ModelAttribute SearchKeywordDTO searchKeywordDTO,
                         @PageableDefault(size=10, sort="id", direction = Sort.Direction.DESC) Pageable pageable) {
 

@@ -55,9 +55,10 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
     }
 
     private BooleanExpression searchByOption(AssignmentSearchReqDTO searchKeywordDTO) {
+        if (searchKeywordDTO == null) return null;
         String keyword = searchKeywordDTO.getSearchKeyword();
         String option = searchKeywordDTO.getSearchOption();
-        if (keyword == null || option == null) return null;
+        if (keyword == null || option == null || keyword.isEmpty() || option.isEmpty() || keyword.isBlank() || option.isBlank()) return null;
         if (option.equals("name")) {
             return nameLike(keyword);
         }
@@ -72,8 +73,15 @@ public class PaperRepositoryImpl implements PaperRepositoryCustom {
 
     public Page<Paper> searchByWhere(AssignmentSearchReqDTO searchKeywordDTO, Pageable pageable) {
         JPAQuery<Paper> query = queryFactory.selectFrom(paper);
-        query = query.where(searchByOption(searchKeywordDTO), dateAfter(searchKeywordDTO.getStartDate()), dateBefore(searchKeywordDTO.getEndDate()));
-        Long count = queryFactory.selectFrom(paper).select(paper.count()).where(searchByOption(searchKeywordDTO), dateAfter(searchKeywordDTO.getStartDate()), dateBefore(searchKeywordDTO.getEndDate())).fetchOne();
+        query = query.where(
+                searchByOption(searchKeywordDTO),
+                dateAfter(searchKeywordDTO.getStartDate()),
+                dateBefore(searchKeywordDTO.getEndDate())).
+                orderBy(paper.id.desc());
+        Long count = queryFactory.selectFrom(paper).select(paper.count()).where(
+                searchByOption(searchKeywordDTO),
+                dateAfter(searchKeywordDTO.getStartDate()),
+                dateBefore(searchKeywordDTO.getEndDate())).fetchOne();
         List<Paper> results = query
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
