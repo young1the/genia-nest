@@ -25,6 +25,7 @@
     background-color: #777;
     color: #fff;
     border: none;
+    margin-bottom: 10px;
 }
 
 .geniaButtonLine {
@@ -42,6 +43,11 @@
     resize: none;
     height: 200px;
     line-height: 1.5;
+}
+
+.geniaTitle {
+    font-size: 20px;
+    font-weight: 600;
 }
 
 .inner {
@@ -1720,7 +1726,7 @@ a {
 .boxWrap
 .boxTop {
     margin: 10px 0 10px;
-    display: flex;
+    display: contents;
     align-items: center;
     justify-content: flex-start;
 }

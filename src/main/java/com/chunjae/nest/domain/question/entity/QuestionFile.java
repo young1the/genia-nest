@@ -19,7 +19,7 @@ public class QuestionFile extends BaseEntity {
     @JoinColumn(name = "question_id", nullable = false)
     private Question question;
 
-    @Column(unique = true, length = 255, nullable = false)
+    @Column(length = 255, nullable = false)
     private String name;
 
     @Column(length = 255, nullable = false)
