@@ -1,5 +1,6 @@
 FROM gradle:jdk17-alpine as builder
 RUN apk add --update --no-cache nodejs npm
+RUN sudo apk add freetype fontconfig
 WORKDIR /build
 
 COPY build.gradle /build/
@@ -13,4 +14,4 @@ COPY --from=builder /build/build/libs/nest-0.0.1-SNAPSHOT.jar app.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar -Djava.awt.headless=true", "/app.jar"]
+ENTRYPOINT ["java", "-jar", "/app.jar"]
