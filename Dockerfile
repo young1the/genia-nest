@@ -1,5 +1,5 @@
 FROM gradle:jdk17-alpine as builder
-RUN apk add --update --no-cache nodejs npm
+RUN apk add --update --no-cache nodejs npm fontconfig libfreetype6
 WORKDIR /build
 
 COPY build.gradle /build/
